@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carregando...</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0D0D0D; color:#F0EDE8; font-family:'DM Sans',system-ui,sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  .loading { text-align:center; }
+  .spinner { width:36px; height:36px; border:2px solid rgba(201,168,76,0.2); border-top-color:#C9A84C; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 20px; }
+  .loading-text { font-size:14px; color:#888880; letter-spacing:0.05em; }
+  .erro { text-align:center; padding:40px; }
+  .erro-titulo { font-family:'Playfair Display',serif; font-size:28px; font-weight:600; margin-bottom:12px; color:#F0EDE8; }
+  .erro-desc { font-size:14px; color:#888880; line-height:1.7; }
+  .erro-link { display:inline-block; margin-top:24px; color:#C9A84C; font-size:13px; text-decoration:none; border-bottom:1px solid rgba(201,168,76,0.3); padding-bottom:2px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="app">
+  <div class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Carregando pagina...</div>
+  </div>
+</div>
+
+<script>
+var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
+var SB_KEY = 'sb_publishable_Yi2a2lXgQYH96PYP8ceZOw_dcMFQh9v';
+
+// Pega o slug da URL: donalab.com.br/p/[slug]
+function getSlug() {
+  var path = window.location.pathname; // ex: /p/ana-coaching
+  var parts = path.split('/').filter(Boolean); // ['p', 'ana-coaching']
+  // parts[0] = 'p', parts[1] = slug
+  return parts.length >= 2 ? parts[1] : null;
+}
+
+function mostrarErro(slug) {
+  document.getElementById('app').innerHTML =
+    '<div class="erro">' +
+    '<div class="erro-titulo">Pagina nao encontrada</div>' +
+    '<div class="erro-desc">A pagina <strong>' + (slug || '') + '</strong> nao existe ou foi removida.</div>' +
+    '<a class="erro-link" href="/">Voltar ao inicio</a>' +
+    '</div>';
+  document.title = 'Pagina nao encontrada';
+}
+
+var slug = getSlug();
+
+if (!slug) {
+  mostrarErro('');
+} else {
+  fetch(SB_URL + '/rest/v1/paginas?slug=eq.' + encodeURIComponent(slug) + '&select=html,nome,produto', {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY
+    }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data || !data.length || !data[0].html) {
+      mostrarErro(slug);
+      return;
+    }
+    var pagina = data[0];
+    // Substitui o documento inteiro pelo HTML da pagina
+    document.open();
+    document.write(pagina.html);
+    document.close();
+  })
+  .catch(function() {
+    mostrarErro(slug);
+  });
+}
+</script>
+
+</body>
+</html>
