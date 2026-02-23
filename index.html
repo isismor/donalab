@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dona Lab — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --gold-border: rgba(201,168,76,0.3);
+    --bg: #0D0D0D;
+    --surface: #141414;
+    --surface2: #1A1A1A;
+    --surface3: #222222;
+    --text: #F0EDE8;
+    --text-muted: #888880;
+    --text-dim: #555550;
+    --danger: #e05555;
+    --danger-dim: rgba(224,85,85,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar-logo {
+    padding: 0 28px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 28px;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .nav { flex: 1; padding: 0 16px; }
+  .nav-section { margin-bottom: 32px; }
+
+  .nav-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 12px;
+    margin-bottom: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--gold-dim);
+    color: var(--gold-light);
+    border-color: var(--gold-border);
+  }
+
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--gold);
+    color: #0D0D0D;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .sidebar-user {
+    padding: 20px 28px 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), #8a6a1f);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0D0D0D;
+    flex-shrink: 0;
+  }
+
+  .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .user-email { font-size: 11px; color: var(--text-muted); }
+
+  .main { padding: 40px 48px; overflow-y: auto; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: #0D0D0D;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-outline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .search-input-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 360px;
+  }
+
+  .search-input-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 14px 10px 40px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input::placeholder { color: var(--text-dim); }
+  .search-input:focus { border-color: var(--gold-border); }
+
+  .clients-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  .clients-count span { color: var(--text); font-weight: 500; }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead tr { border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+  th {
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  td {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .client-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .client-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0D0D0D;
+    flex-shrink: 0;
+  }
+
+  .client-name { font-weight: 500; }
+  .client-muted { color: var(--text-muted); }
+
+  .notes-preview {
+    color: var(--text-dim);
+    font-size: 12px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .notes-preview.has-notes { color: var(--text-muted); }
+
+  .actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .action-btn {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+
+  .action-btn:hover { background: var(--surface2); color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .action-btn.danger:hover { background: var(--danger-dim); color: var(--danger); border-color: rgba(224,85,85,0.3); }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+
+  .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+  .empty-state p { font-size: 14px; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 520px;
+    padding: 32px;
+    transform: translateY(16px);
+    transition: transform 0.25s;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .form-group { margin-bottom: 20px; }
+
+  .form-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .form-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-input::placeholder { color: var(--text-dim); }
+  .form-input:focus { border-color: var(--gold-border); background: var(--surface3); }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 28px;
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--surface2);
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+
+  .profile-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0D0D0D;
+    flex-shrink: 0;
+  }
+
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .profile-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  .profile-field { margin-bottom: 16px; }
+
+  .profile-field-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+  }
+
+  .profile-field-value {
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 10px 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .confirm-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: var(--danger-dim);
+    border: 1px solid rgba(224,85,85,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--danger);
+    margin-bottom: 16px;
+  }
+
+  .confirm-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .confirm-text { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+
+  .btn-danger:hover { opacity: 0.85; }
+
+  .av-1 { background: linear-gradient(135deg, #C9A84C, #8a6a1f); }
+  .av-2 { background: linear-gradient(135deg, #7c6bc9, #4a3d8a); }
+  .av-3 { background: linear-gradient(135deg, #4caf80, #2a7a55); }
+  .av-4 { background: linear-gradient(135deg, #c96b6b, #8a3030); }
+  .av-5 { background: linear-gradient(135deg, #4c9ac9, #2a5f8a); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-name">Dona Lab</div>
+      <div class="logo-sub">Painel Admin</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">
+        <div class="nav-label">Principal</div>
+
+        <a class="nav-item active" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
+          Clientes
+          <span class="nav-badge" id="sidebar-badge">0</span>
+        </a>
+
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          Materiais
+        </a>
+
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          Paginas
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Conta</div>
+
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Perfil
+        </a>
+
+        <a class="nav-item" href="#">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+          Suporte
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">I</div>
+      <div style="min-width:0">
+        <div class="user-name">Isis Moreira</div>
+        <div class="user-email">isisalvesmoreira@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">Clientes</div>
+      <button class="btn-gold" onclick="openNewModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Cliente
+      </button>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Buscar cliente..." id="search-input" oninput="filterClients()">
+      </div>
+      <div class="clients-count"><span id="count-display">0</span> clientes</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>WhatsApp</th>
+            <th>Dados</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody id="clients-tbody">
+          <tr id="empty-row">
+            <td colspan="5">
+              <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><line x1="16" y1="11" x2="22" y2="11"/><line x1="19" y1="8" x2="19" y2="14"/></svg>
+                <p>Nenhum cliente cadastrado ainda.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Novo / Editar Cliente -->
+<div class="modal-overlay" id="form-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="form-modal-title">Novo Cliente</div>
+      <div class="modal-close" onclick="closeModal('form-modal')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nome</label>
+      <input class="form-input" type="text" id="input-nome" placeholder="Nome completo">
+    </div>
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input class="form-input" type="email" id="input-email" placeholder="email@exemplo.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp</label>
+      <input class="form-input" type="text" id="input-whatsapp" placeholder="(11) 99999-9999">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Dados</label>
+      <textarea class="form-input" id="input-dados" placeholder="Anotacoes sobre o cliente..."></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-outline" onclick="closeModal('form-modal')">Cancelar</button>
+      <button class="btn-gold" onclick="saveClient()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Perfil -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Perfil do Cliente</div>
+      <div class="modal-close" onclick="closeModal('profile-modal')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar"></div>
+      <div>
+        <div class="profile-name" id="profile-name"></div>
+        <div class="profile-sub" id="profile-email-display"></div>
+      </div>
+    </div>
+
+    <div class="profile-field">
+      <div class="profile-field-label">WhatsApp</div>
+      <div class="profile-field-value" id="profile-whatsapp"></div>
+    </div>
+    <div class="profile-field">
+      <div class="profile-field-label">Dados</div>
+      <div class="profile-field-value" id="profile-dados"></div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-outline" onclick="closeModal('profile-modal')">Fechar</button>
+      <button class="btn-gold" onclick="editFromProfile()">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Confirmar Exclusao -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="confirm-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </div>
+    <div class="confirm-title">Excluir cliente?</div>
+    <div class="confirm-text">Essa acao nao pode ser desfeita. O cliente e todos os seus dados serao removidos permanentemente.</div>
+    <div class="form-actions">
+      <button class="btn-outline" onclick="closeModal('delete-modal')">Cancelar</button>
+      <button class="btn-danger" onclick="confirmDelete()">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const avatarColors = ['av-1','av-2','av-3','av-4','av-5'];
+  let clients = [];
+  let editingId = null;
+  let deletingId = null;
+  let viewingId = null;
+
+  function getInitials(name) {
+    return name.trim().split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase();
+  }
+
+  function getAvatarClass(id) {
+    return avatarColors[id % avatarColors.length];
+  }
+
+  function renderTable(list) {
+    const tbody = document.getElementById('clients-tbody');
+    const emptyRow = document.getElementById('empty-row');
+    document.querySelectorAll('.client-row').forEach(r => r.remove());
+
+    if (list.length === 0) {
+      emptyRow.style.display = '';
+      return;
+    }
+
+    emptyRow.style.display = 'none';
+
+    list.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.className = 'client-row';
+      tr.innerHTML = `
+        <td>
+          <div class="client-name-cell">
+            <div class="client-avatar ${getAvatarClass(c.id)}">${getInitials(c.nome)}</div>
+            <span class="client-name">${c.nome}</span>
+          </div>
+        </td>
+        <td class="client-muted">${c.email || '<span style="color:var(--text-dim)">-</span>'}</td>
+        <td class="client-muted">${c.whatsapp || '<span style="color:var(--text-dim)">-</span>'}</td>
+        <td><div class="notes-preview ${c.dados ? 'has-notes' : ''}">${c.dados || 'Sem anotacoes'}</div></td>
+        <td>
+          <div class="actions-cell">
+            <button class="action-btn" title="Ver perfil" onclick="openProfile(${c.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button class="action-btn" title="Editar" onclick="openEdit(${c.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-btn danger" title="Excluir" onclick="openDelete(${c.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function updateCount() {
+    document.getElementById('count-display').textContent = clients.length;
+    document.getElementById('sidebar-badge').textContent = clients.length;
+  }
+
+  function filterClients() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtered = q ? clients.filter(c =>
+      c.nome.toLowerCase().includes(q) ||
+      (c.email && c.email.toLowerCase().includes(q)) ||
+      (c.whatsapp && c.whatsapp.toLowerCase().includes(q))
+    ) : clients;
+    renderTable(filtered);
+  }
+
+  function openNewModal() {
+    editingId = null;
+    document.getElementById('form-modal-title').textContent = 'Novo Cliente';
+    ['nome','email','whatsapp','dados'].forEach(f => document.getElementById('input-' + f).value = '');
+    openModal('form-modal');
+  }
+
+  function openEdit(id) {
+    const c = clients.find(x => x.id === id);
+    if (!c) return;
+    editingId = id;
+    document.getElementById('form-modal-title').textContent = 'Editar Cliente';
+    document.getElementById('input-nome').value = c.nome;
+    document.getElementById('input-email').value = c.email;
+    document.getElementById('input-whatsapp').value = c.whatsapp;
+    document.getElementById('input-dados').value = c.dados;
+    closeModal('profile-modal');
+    openModal('form-modal');
+  }
+
+  function editFromProfile() {
+    if (viewingId !== null) openEdit(viewingId);
+  }
+
+  function saveClient() {
+    const nome = document.getElementById('input-nome').value.trim();
+    if (!nome) { document.getElementById('input-nome').focus(); return; }
+
+    const data = {
+      nome,
+      email: document.getElementById('input-email').value.trim(),
+      whatsapp: document.getElementById('input-whatsapp').value.trim(),
+      dados: document.getElementById('input-dados').value.trim(),
+    };
+
+    if (editingId !== null) {
+      const idx = clients.findIndex(x => x.id === editingId);
+      clients[idx] = { ...clients[idx], ...data };
+    } else {
+      clients.push({ id: Date.now(), ...data });
+    }
+
+    closeModal('form-modal');
+    filterClients();
+    updateCount();
+  }
+
+  function openProfile(id) {
+    const c = clients.find(x => x.id === id);
+    if (!c) return;
+    viewingId = id;
+
+    const av = document.getElementById('profile-avatar');
+    av.textContent = getInitials(c.nome);
+    av.className = 'profile-avatar ' + getAvatarClass(c.id);
+
+    document.getElementById('profile-name').textContent = c.nome;
+    document.getElementById('profile-email-display').textContent = c.email || 'Sem e-mail';
+    document.getElementById('profile-whatsapp').textContent = c.whatsapp || 'Nao informado';
+    document.getElementById('profile-dados').textContent = c.dados || 'Sem anotacoes';
+
+    openModal('profile-modal');
+  }
+
+  function openDelete(id) {
+    deletingId = id;
+    openModal('delete-modal');
+  }
+
+  function confirmDelete() {
+    clients = clients.filter(x => x.id !== deletingId);
+    deletingId = null;
+    closeModal('delete-modal');
+    filterClients();
+    updateCount();
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+  });
+
+  updateCount();
+  renderTable(clients);
+</script>
+</body>
+</html>
