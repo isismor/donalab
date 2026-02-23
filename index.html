@@ -655,7 +655,7 @@
       <input class="login-input" type="password" id="login-pass" placeholder="sua senha">
     </div>
 
-    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <button class="login-btn" id="login-btn" onclick="(function(){var u=document.getElementById('login-user').value.trim(),p=document.getElementById('login-pass').value.trim();if(u==='isismoreira'&&p==='donalab@2025'){document.getElementById('login-overlay').style.display='none';sessionStorage.setItem('donalab_auth','1');}else{document.getElementById('login-error').style.display='block';}})()">Entrar</button>
     <div class="login-error" id="login-error">Usuario ou senha incorretos.</div>
   </div>
 </div>
@@ -707,7 +707,10 @@
       <div class="user-avatar">I</div>
       <div style="min-width:0">
         <div class="user-name">Isis Moreira</div>
-        <div class="user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="244d574d574548524157494b56414d5645644349454d480a474b49">[email&#160;protected]</a></div>
+        <div class="user-email">isisalvesmoreira@gmail.com</div>
+      </div>
+      <div onclick="sessionStorage.removeItem('donalab_auth');document.getElementById('login-overlay').style.display='flex';" title="Sair" style="margin-left:auto;cursor:pointer;color:var(--text-dim);flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='#e05555'" onmouseout="this.style.color='var(--text-dim)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </div>
     </div>
   </aside>
@@ -992,19 +995,22 @@
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
   // Login
-  function doLogin() {
-    const user = document.getElementById('login-user').value.trim();
-    const pass = document.getElementById('login-pass').value.trim();
+  window.doLogin = function() {
+    var user = document.getElementById('login-user').value.trim();
+    var pass = document.getElementById('login-pass').value.trim();
+    var erro = document.getElementById('login-error');
+    var overlay = document.getElementById('login-overlay');
     if (user === 'isismoreira' && pass === 'donalab@2025') {
-      document.getElementById('login-overlay').style.display = 'none';
+      overlay.style.display = 'none';
       sessionStorage.setItem('donalab_auth', '1');
     } else {
-      document.getElementById('login-error').style.display = 'block';
+      erro.style.display = 'block';
     }
-  }
+  };
 
-  document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('login-btn').onclick = window.doLogin;
+  document.getElementById('login-pass').onkeydown = function(e) { if (e.key === 'Enter') window.doLogin(); };
+  document.getElementById('login-user').onkeydown = function(e) { if (e.key === 'Enter') window.doLogin(); };
 
   if (sessionStorage.getItem('donalab_auth') === '1') {
     document.getElementById('login-overlay').style.display = 'none';
