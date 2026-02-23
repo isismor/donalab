@@ -341,30 +341,93 @@
         <!-- Etapa 2 -->
         <div id="etapa-2" style="display:none">
           <div class="table-wrap" style="padding:32px">
-            <div style="margin-bottom:24px"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px">Agente de Paginas</div><div style="font-size:13px;color:var(--text-muted)">O agente vai analisar os dados e gerar o conteudo otimizado para a pagina de vendas.</div></div>
-            <div class="form-group"><label class="form-label">API Key OpenAI</label><input class="form-input" type="password" id="openai-key" placeholder="sk-..." style="font-family:monospace"><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Va em Configuracoes para definir a chave padrao.</div></div>
-            <div id="agente-loading" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
-              <div style="width:32px;height:32px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>
-              <div style="font-size:13px">Agente processando os dados...</div>
+
+            <!-- API Key -->
+            <div class="form-group" style="max-width:480px">
+              <label class="form-label">API Key OpenAI</label>
+              <input class="form-input" type="password" id="openai-key" placeholder="sk-..." style="font-family:monospace">
+              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Salva automaticamente. Configure uma vez em <a href="#" onclick="showSection('config');return false;" style="color:var(--gold)">Configuracoes</a>.</div>
             </div>
-            <div id="agente-output" style="display:none;margin-top:16px"><label class="form-label">Conteudo gerado</label><textarea class="form-input" id="agente-resultado" rows="12" style="font-size:12px;font-family:monospace;line-height:1.6"></textarea></div>
+
+            <!-- Status dos agentes -->
+            <div id="agentes-status" style="display:none;margin-top:8px;margin-bottom:8px">
+
+              <!-- Lyra -->
+              <div id="status-lyra" style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface2);border:1px solid rgba(255,255,255,0.05);border-radius:14px;margin-bottom:12px">
+                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#9b6bc9,#4a1a8a);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">✍️</div>
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:14px;margin-bottom:3px">Lyra <span style="font-size:11px;color:var(--text-dim);font-weight:400">Copywriter</span></div>
+                  <div id="lyra-status-text" style="font-size:12px;color:var(--text-muted)">Aguardando...</div>
+                </div>
+                <div id="lyra-spinner" style="display:none;width:20px;height:20px;border:2px solid rgba(155,107,201,0.3);border-top-color:#9b6bc9;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
+                <div id="lyra-check" style="display:none;width:24px;height:24px;border-radius:50%;background:rgba(93,184,112,0.15);border:1px solid rgba(93,184,112,0.4);display:none;align-items:center;justify-content:center;flex-shrink:0;color:#5db870;font-size:13px">✓</div>
+                <div id="lyra-err" style="display:none;width:24px;height:24px;border-radius:50%;background:var(--danger-dim);border:1px solid rgba(224,85,85,0.3);align-items:center;justify-content:center;flex-shrink:0;color:var(--danger);font-size:13px">✗</div>
+              </div>
+
+              <!-- Orion -->
+              <div id="status-orion" style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface2);border:1px solid rgba(255,255,255,0.05);border-radius:14px;opacity:0.4;transition:opacity 0.3s">
+                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#4c9ac9,#1a3f6a);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎨</div>
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:14px;margin-bottom:3px">Orion <span style="font-size:11px;color:var(--text-dim);font-weight:400">Webdesigner</span></div>
+                  <div id="orion-status-text" style="font-size:12px;color:var(--text-muted)">Aguardando Lyra...</div>
+                </div>
+                <div id="orion-spinner" style="display:none;width:20px;height:20px;border:2px solid rgba(76,154,201,0.3);border-top-color:#4c9ac9;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
+                <div id="orion-check" style="display:none;width:24px;height:24px;border-radius:50%;background:rgba(93,184,112,0.15);border:1px solid rgba(93,184,112,0.4);align-items:center;justify-content:center;flex-shrink:0;color:#5db870;font-size:13px">✓</div>
+                <div id="orion-err" style="display:none;width:24px;height:24px;border-radius:50%;background:var(--danger-dim);border:1px solid rgba(224,85,85,0.3);align-items:center;justify-content:center;flex-shrink:0;color:var(--danger);font-size:13px">✗</div>
+              </div>
+
+            </div>
+
             <div style="display:flex;justify-content:space-between;margin-top:24px">
               <button class="btn-outline" id="btn-volta-1">Voltar</button>
-              <button class="btn-gold" id="btn-rodar-agente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg> Rodar Agente</button>
+              <button class="btn-gold" id="btn-rodar-agente">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Gerar Pagina
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Etapa 3 -->
         <div id="etapa-3" style="display:none">
+
+          <!-- Painel de imagens -->
+          <div id="painel-imagens" style="display:none;margin-bottom:20px">
+            <div class="table-wrap" style="padding:24px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <div style="font-size:13px;font-weight:500">Imagens pendentes detectadas</div>
+                <div style="font-size:12px;color:var(--text-dim);margin-left:4px">Faca upload ou remova cada area</div>
+              </div>
+              <div id="imagens-lista" style="display:flex;flex-direction:column;gap:12px"></div>
+            </div>
+          </div>
+
           <div class="table-wrap" style="padding:32px">
-            <div style="margin-bottom:24px"><div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px">Pagina gerada</div><div style="font-size:13px;color:var(--text-muted)">Revise e publique quando estiver pronta.</div></div>
-            <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:24px"><iframe id="pagina-preview" style="width:100%;height:600px;border:none;background:#fff"></iframe></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Pagina gerada</div>
+                <div style="font-size:13px;color:var(--text-muted)">Revise e publique quando estiver pronta.</div>
+              </div>
+              <button id="btn-recarregar-preview" style="background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);padding:8px 14px;border-radius:9px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                Atualizar preview
+              </button>
+            </div>
+            <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:24px">
+              <iframe id="pagina-preview" style="width:100%;height:640px;border:none;background:#fff"></iframe>
+            </div>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <button class="btn-outline" id="btn-volta-2">Voltar</button>
               <div style="display:flex;gap:10px">
-                <button class="btn-outline" id="btn-baixar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar HTML</button>
-                <button class="btn-gold" id="btn-salvar-pagina"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar Pagina</button>
+                <button class="btn-outline" id="btn-baixar">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Baixar HTML
+                </button>
+                <button class="btn-gold" id="btn-salvar-pagina">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+                  Salvar Pagina
+                </button>
               </div>
             </div>
           </div>
@@ -517,8 +580,181 @@ function showSection(name) {
   });
   if (name==='config') document.getElementById('config-openai-key').value = localStorage.getItem('openai_key')||'';
   if (name==='agentes') {
-    document.getElementById('orion-prompt').value = localStorage.getItem('orion_prompt')||'';
-    document.getElementById('lyra-prompt').value = localStorage.getItem('lyra_prompt')||'';
+    document.getElementById('orion-prompt').value = localStorage.getItem('orion_prompt') || `NOME: ORION — Webdesigner Sênior (Páginas de Alta Conversão)
+
+PAPEL
+Você é o ORION, webdesigner sênior especialista em páginas premium, elegantes e minimalistas (Apple-like), com carregamento rápido. Você recebe os inputs estruturados vindos da copywriter (NÃO reescreve, NÃO melhora, NÃO altera palavras) e transforma em uma página completa em HTML, mobile-first, com hierarquia visual clara, princípios de conversão e primal branding.
+
+REGRA DE COMPATIBILIDADE (OBRIGATÓRIA)
+Você deve devolver COMO OUTPUT:
+1) O HTML completo da página
+2) OS MESMOS OUTPUTS QUE VOCÊ RECEBEU COMO INPUTS (mesma estrutura, mesmos campos, mesmos valores), sem alterações de texto.
+   - Se você precisou preencher algo que estava vazio (ex.: placeholder de imagem), você NÃO inventa: você marca como PENDÊNCIA no campo correspondente e mantém placeholder no HTML.
+
+ESTILO (APPLE-LIKE) — GUIA
+- Premium, minimalista, muito respiro, grid limpo, "design padrão Apple".
+- Você escolhe entre DARK ou CLEAN com base no produto/nicho/promessa.
+- Componentes: cards com cantos arredondados, sombras suaves, divisórias sutis, botões em pílula.
+- Sem emojis no HTML e em nenhum texto.
+- Performance: sem bibliotecas pesadas, sem efeitos caros, CSS enxuto, imagens otimizadas (dimensões definidas + lazy-loading onde aplicável).
+- Acessibilidade básica: contraste adequado, headings semânticos, foco visível, aria/labels quando necessário.
+- Cores: é PROIBIDO usar combinações de baixo contraste juntas (ex.: texto claro em fundo claro).
+
+REGRAS DE OURO (NUNCA QUEBRAR)
+1) NÃO alterar a copy fornecida (nenhuma palavra em nenhum campo de texto).
+2) NÃO usar emojis.
+3) NÃO inventar dados (preço, garantias, bônus, credenciais, resultados, números).
+4) IMAGENS OBRIGATÓRIAS: você DEVE inserir imagens (URLs) em:
+   - HERO (Seção 1 — campo 4)
+   - RESULTADOS (Seção 5 — você deve ter 3 imagens de resultados)
+   - QUEM SOU EU (Seção 7 — campo 40)
+   Se algum link de imagem estiver faltando/inválido, use placeholder no HTML e marque PENDÊNCIA no output estruturado.
+5) Sempre entregar para HUMANO aprovar antes de publicar.
+6) Se detectar risco alto (legal/reputação/claims sensíveis, saúde/finanças, garantias absolutas) → escalar para HUMANO ANTES de concluir.
+
+TIPOS DE PÁGINA (VOCÊ INFERES NATURALMENTE)
+A) Página de vendas — incluir FAQ
+B) Página de captura (lead) — sem FAQ
+C) Relatório — sem FAQ
+
+ESTRUTURA DE ENTRADA (SEÇÕES 1 A 8)
+SEÇÃO 1 (HERO): nome, produto, promessa, foto hero, botão CTA + link
+SEÇÃO 2 (DOR E SOLUÇÃO): pergunta de objeção, 3 sintomas, solução
+SEÇÃO 3 (PARA QUEM É): título, 5 desejos, botão CTA + link
+SEÇÃO 4 (BENEFÍCIOS): abertura, 3 benefícios com explicação
+SEÇÃO 5 (RESULTADOS): 3 resultados com explicação + imagens 30a/30b/30c
+SEÇÃO 6 (OFERTA): título card, entrega, garantia, acesso, bônus, preço, botão + link
+SEÇÃO 7 (QUEM SOU EU): título, descrição, foto autor
+SEÇÃO 8 (RODAPÉ): nome, copyright, e-mail suporte
+
+DESIGN SYSTEM (OBRIGATÓRIO)
+- Fonte: system-ui (-apple-system, BlinkMacSystemFont, Segoe UI)
+- Layout: container central, grid responsivo, espaçamentos amplos
+- Componentes: cards arredondados, botões pílula, bordas sutis, sombra suave
+- Tema: escolher dark ou clean conforme produto/nicho
+- CSS puro em <style>, sem frameworks pesados
+
+SAÍDA (OUTPUT)
+Entregue APENAS:
+1) HTML COMPLETO (começando com <!DOCTYPE html>)
+2) OUTPUTS ESTRUTURADOS (mesmos campos recebidos, sem alterar textos)
+3) RESUMO FINAL: ações executadas, pendências, confiança, tipo de página
+
+CHECKLIST ANTES DE ENTREGAR
+- Mobile-first: 320px sem overflow
+- Sem emojis
+- Copy preservada (não alterada)
+- Links válidos nos CTAs
+- Imagens com width/height e lazy-loading
+- Acessibilidade básica (headings, contraste, foco visível)`;
+    document.getElementById('lyra-prompt').value = localStorage.getItem('lyra_prompt') || `PROMPT — LYRA | Copywriter Sênior de Páginas de Vendas (Alta Conversão)
+Você é Lyra, copywriter sênior especialista em páginas de vendas de alta conversão, com referências de escrita em David Ogilvy (clareza, especificidade, benefício acima de adjetivo, prova e credibilidade).
+Você escreve uma página seguindo EXATAMENTE o template de saída (itens 1 a 43), respeitando limites de caracteres (tolerância de ±3).
+
+1) Missão
+Gerar a copy completa de uma página de vendas em português, usando os inputs do cliente, com foco em:
+- promessa clara e crível
+- conexão com dor e objeções
+- benefícios concretos
+- resultados visuais e palpáveis
+- chamada para ação objetiva
+
+2) Regras de escrita (obrigatórias)
+- Linguagem: português (Brasil).
+- Não usar travessão (—). Se precisar, use ponto, vírgula, dois-pontos ou parênteses.
+- Evitar palavras em inglês, a não ser que venham no input (ex.: nome do método, termo do nicho, marca).
+- Evitar antíteses (ex.: "não é só X, é Y"). Reescreva de forma direta.
+- Escrever de forma simples, humana e assertiva. Sem exageros, sem promessas milagrosas.
+- Não inventar: não crie dados (números, prazos, certificações, nomes de empresas, resultados específicos) se não estiver nos inputs.
+- Se faltar algo essencial (ex.: preço, garantia, entrega), sinalize com [PENDENTE: ...].
+
+3) Rastreio silencioso (obrigatório e sem mencionar)
+Antes de escrever, faça um rastreio mental do mercado e do público:
+- qual desejo principal e qual medo principal do público
+- objeções mais prováveis (tempo, dinheiro, confiança, capacidade, dúvida sobre método)
+- linguagem comum do nicho (sem jargão excessivo)
+Importante: NÃO descreva esse rastreio. Só use o resultado dele na copy.
+
+OUTPUTS (Template) — Preencha TODOS os itens
+
+Seção 1
+1 Nome: (Nome da marca/pessoa)
+2 Nome do produto: (Até 30 caracteres)
+3 Promessa: (Até 90 caracteres)
+4 Foto: (centralizar foto)
+5 Botão de vendas: "quero me inscrever agora" (ou equivalente coerente)
+5b Link botão: (URL de checkout)
+
+Seção 2
+6 Pergunta que evoca maior objeção: (Até 50 caracteres)
+7 Sintoma 1 do problema: (Até 40 caracteres)
+8 Sintoma 2 do problema: (Até 40 caracteres)
+9 Sintoma 3 do problema: (Até 40 caracteres)
+10 Solução: (Até 60 caracteres)
+
+Seção 3
+11 Para quem é?: "Para quem é [Produto]" (35 caracteres)
+12 Desejo 1: (55 caracteres)
+13 Desejo 2: (55 caracteres)
+14 Desejo 3: (55 caracteres)
+15 Desejo 4: (55 caracteres)
+16 Desejo 5: (55 caracteres)
+17 Botão de vendas: "eu quero [maior benefício]" (22 caracteres)
+17b Link: (URL de checkout)
+
+Seção 4
+18 Benefícios: (60 caracteres)
+19 Benefício 1: (25 caracteres)
+20 Explicação benefício 1: (110 caracteres)
+21 Benefício 2: (25 caracteres)
+22 Explicação benefício 2: (110 caracteres)
+23 Benefício 3: (25 caracteres)
+24 Explicação benefício 3: (110 caracteres)
+
+Seção 5
+25 Resultado 1: (20 caracteres)
+26 Explicação resultado 1: (110 caracteres)
+27 Resultado 2: (20 caracteres)
+28 Explicação resultado 2: (110 caracteres)
+29 Resultado 3: (20 caracteres)
+30 Explicação resultado 3: (110 caracteres)
+30a Imagem Resultado 1: (URL ou PENDÊNCIA)
+30b Imagem Resultado 2: (URL ou PENDÊNCIA)
+30c Imagem Resultado 3: (URL ou PENDÊNCIA)
+
+Seção 6
+31 Card de compra: (25 caracteres)
+32 Forma de entrega: (bullets, 25 caracteres cada)
+33 Tempo de garantia: (25 caracteres)
+34 Tempo de acesso: (25 caracteres)
+35 Bônus: (25 caracteres)
+36 Preço: (25 caracteres)
+37 Botão de vendas: (20 caracteres)
+37b Link checkout: (URL)
+
+Seção 7
+38 Quem sou eu: "Quem sou [Primeiro Nome]" (Até 25 caracteres)
+39 Descrição: (350 caracteres)
+40 Foto autor: (URL ou PENDÊNCIA)
+
+Seção 8
+41 Nome: (20 caracteres)
+42 Copyright: (20 caracteres)
+43 E-mail de suporte: (deve conter "@")
+
+Roteamento interno
+- Se houver risco alto (alegações médicas, jurídicas, financeiras, promessas garantidas) → suavize e sinalize em Recomendações.
+- Se faltar dado crítico → use [PENDENTE: ...] no item e sugira preenchimento em Recomendações.
+- Se houver informação excessiva → priorize clareza e conversão, sem perder fidelidade ao input.
+
+Formato de entrega
+Entregue somente:
+1) "Ações executadas" (lista curta do que você produziu)
+2) "Outputs (Template)" com os itens 1 a 43, organizados por Seção 1 a Seção 8
+3) "Recomendações" (apenas se necessário: pendências, melhorias, testes)
+4) Uma linha final: "Confiança: alta/média/baixa + motivo"
+
+Agora execute: leia todos os inputs, faça o rastreio silencioso (sem mencionar) e gere os 43 itens no template, respeitando limites de caracteres (±3).`;
   }
 }
 
@@ -541,11 +777,27 @@ document.getElementById('btn-salvar-lyra').onclick = function() {
   setTimeout(function(){ m.style.display='none'; }, 2500);
 };
 
+// SUPABASE
+var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
+var SB_KEY = 'sb_publishable_Yi2a2lXgQYH96PYP8ceZOw_dcMFQh9v';
+function sbFetch(path, opts) {
+  return fetch(SB_URL + '/rest/v1/' + path, Object.assign({
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    }
+  }, opts || {})).then(function(r){ return r.json(); });
+}
+
 // CLIENTS
 var avatarColors = ['av-1','av-2','av-3','av-4','av-5'];
 var clients = [], editingId=null, deletingId=null, viewingId=null;
+
 function getInitials(n){ return n.trim().split(' ').slice(0,2).map(function(x){return x[0];}).join('').toUpperCase(); }
-function getAvatarClass(id){ return avatarColors[id%avatarColors.length]; }
+function getAvatarClass(id){ var h=0; for(var i=0;i<id.length;i++)h+=id.charCodeAt(i); return avatarColors[h%avatarColors.length]; }
+
 function renderTable(list){
   var tbody=document.getElementById('clients-tbody'), empty=document.getElementById('empty-row');
   document.querySelectorAll('.client-row').forEach(function(r){r.remove();});
@@ -557,47 +809,115 @@ function renderTable(list){
       '<td class="client-muted">'+(c.whatsapp||'<span style="color:var(--text-dim)">-</span>')+'</td>'+
       '<td><div class="notes-preview'+(c.dados?' has-notes':'')+'">'+( c.dados||'Sem anotacoes')+'</div></td>'+
       '<td><div class="actions-cell">'+
-      '<button class="action-btn" onclick="openProfile('+c.id+')" title="Ver"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
-      '<button class="action-btn" onclick="openEdit('+c.id+')" title="Editar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
-      '<button class="action-btn danger" onclick="openDelete('+c.id+')" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'+
+      '<button class="action-btn" onclick="openProfile(\''+c.id+'\')" title="Ver"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+      '<button class="action-btn" onclick="openEdit(\''+c.id+'\')" title="Editar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
+      '<button class="action-btn danger" onclick="openDelete(\''+c.id+'\')" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'+
       '</div></td>';
     tbody.appendChild(tr);
   });
 }
+
 function updateCount(){ document.getElementById('count-display').textContent=clients.length; document.getElementById('sidebar-badge').textContent=clients.length; }
-function filterClients(){ var q=document.getElementById('search-input').value.toLowerCase(); renderTable(q?clients.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.email&&c.email.toLowerCase().includes(q));} ):clients); }
+
+function filterClients(){
+  var q=document.getElementById('search-input').value.toLowerCase();
+  renderTable(q?clients.filter(function(c){return c.nome.toLowerCase().includes(q)||(c.email&&c.email.toLowerCase().includes(q));}):clients);
+}
+
+function loadClients(){
+  sbFetch('clientes?select=*&order=created_at.desc').then(function(data){
+    if(Array.isArray(data)){ clients=data; filterClients(); updateCount(); }
+  });
+}
+
 function openNewModal(){ editingId=null; document.getElementById('form-modal-title').textContent='Novo Cliente'; ['nome','email','whatsapp','dados'].forEach(function(f){document.getElementById('input-'+f).value='';}); openModal('form-modal'); }
-function openEdit(id){ var c=clients.find(function(x){return x.id===id;}); if(!c)return; editingId=id; document.getElementById('form-modal-title').textContent='Editar Cliente'; document.getElementById('input-nome').value=c.nome; document.getElementById('input-email').value=c.email; document.getElementById('input-whatsapp').value=c.whatsapp; document.getElementById('input-dados').value=c.dados; closeModal('profile-modal'); openModal('form-modal'); }
+
+function openEdit(id){
+  var c=clients.find(function(x){return x.id===id;});
+  if(!c)return; editingId=id;
+  document.getElementById('form-modal-title').textContent='Editar Cliente';
+  document.getElementById('input-nome').value=c.nome;
+  document.getElementById('input-email').value=c.email||'';
+  document.getElementById('input-whatsapp').value=c.whatsapp||'';
+  document.getElementById('input-dados').value=c.dados||'';
+  closeModal('profile-modal'); openModal('form-modal');
+}
+
 function editFromProfile(){ if(viewingId!==null)openEdit(viewingId); }
-function saveClient(){ var nome=document.getElementById('input-nome').value.trim(); if(!nome){document.getElementById('input-nome').focus();return;} var d={nome:nome,email:document.getElementById('input-email').value.trim(),whatsapp:document.getElementById('input-whatsapp').value.trim(),dados:document.getElementById('input-dados').value.trim()}; if(editingId!==null){var i=clients.findIndex(function(x){return x.id===editingId;});clients[i]=Object.assign({},clients[i],d);}else{clients.push(Object.assign({id:Date.now()},d));} closeModal('form-modal'); filterClients(); updateCount(); }
-function openProfile(id){ var c=clients.find(function(x){return x.id===id;}); if(!c)return; viewingId=id; var av=document.getElementById('profile-avatar'); av.textContent=getInitials(c.nome); av.className='profile-avatar '+getAvatarClass(c.id); document.getElementById('profile-name').textContent=c.nome; document.getElementById('profile-email-display').textContent=c.email||'Sem e-mail'; document.getElementById('profile-whatsapp').textContent=c.whatsapp||'Nao informado'; document.getElementById('profile-dados').textContent=c.dados||'Sem anotacoes'; openModal('profile-modal'); }
+
+function saveClient(){
+  var nome=document.getElementById('input-nome').value.trim();
+  if(!nome){document.getElementById('input-nome').focus();return;}
+  var d={nome:nome,email:document.getElementById('input-email').value.trim(),whatsapp:document.getElementById('input-whatsapp').value.trim(),dados:document.getElementById('input-dados').value.trim()};
+  closeModal('form-modal');
+  if(editingId!==null){
+    sbFetch('clientes?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(d)}).then(function(){ loadClients(); editingId=null; });
+  } else {
+    sbFetch('clientes',{method:'POST',body:JSON.stringify(d)}).then(function(){ loadClients(); });
+  }
+}
+
+function openProfile(id){
+  var c=clients.find(function(x){return x.id===id;});
+  if(!c)return; viewingId=id;
+  var av=document.getElementById('profile-avatar');
+  av.textContent=getInitials(c.nome); av.className='profile-avatar '+getAvatarClass(c.id);
+  document.getElementById('profile-name').textContent=c.nome;
+  document.getElementById('profile-email-display').textContent=c.email||'Sem e-mail';
+  document.getElementById('profile-whatsapp').textContent=c.whatsapp||'Nao informado';
+  document.getElementById('profile-dados').textContent=c.dados||'Sem anotacoes';
+  openModal('profile-modal');
+}
+
 function openDelete(id){ deletingId=id; openModal('delete-modal'); }
-function confirmDelete(){ clients=clients.filter(function(x){return x.id!==deletingId;}); deletingId=null; closeModal('delete-modal'); filterClients(); updateCount(); }
+
+function confirmDelete(){
+  if(!deletingId)return;
+  sbFetch('clientes?id=eq.'+deletingId,{method:'DELETE'}).then(function(){
+    deletingId=null; closeModal('delete-modal'); loadClients();
+  });
+}
+
 function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 // PAGES
-var pages = JSON.parse(localStorage.getItem('donalab_pages')||'[]');
-var _html=null, _slug='', _nome='', _produto='';
+var pages=[], _html=null, _slug='', _nome='', _produto='';
 
 function renderPages(){
   var tbody=document.getElementById('paginas-tbody'), empty=document.getElementById('paginas-empty');
   document.querySelectorAll('.page-row').forEach(function(r){r.remove();});
   var badge=document.getElementById('pages-badge'); badge.textContent=pages.length; badge.style.display=pages.length>0?'':'none';
   if(!pages.length){empty.style.display='';return;} empty.style.display='none';
-  pages.forEach(function(p,i){
+  pages.forEach(function(p){
     var tr=document.createElement('tr'); tr.className='page-row';
-    tr.innerHTML='<td><span style="font-weight:500">'+p.nome+'</span></td><td class="client-muted">'+(p.cliente||'-')+'</td><td class="client-muted">'+(p.produto||'-')+'</td>'+
-      '<td><span style="color:var(--gold);font-size:12px">/'+p.slug+'</span></td>'+
+    tr.innerHTML='<td><span style="font-weight:500">'+p.nome+'</span></td>'+
+      '<td class="client-muted">'+(p.cliente||'-')+'</td>'+
+      '<td class="client-muted">'+(p.produto||'-')+'</td>'+
+      '<td><a href="https://donalab.com.br/p/'+p.slug+'" target="_blank" style="color:var(--gold);font-size:12px;text-decoration:none">donalab.com.br/p/'+p.slug+'</a></td>'+
       '<td><div class="actions-cell">'+
-      '<button class="action-btn" onclick="verPagina('+i+')" title="Ver"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
-      '<button class="action-btn danger" onclick="deletePage('+i+')" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'+
+      '<button class="action-btn" onclick="verPagina(\''+p.id+'\')" title="Ver"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+      '<button class="action-btn danger" onclick="deletePage(\''+p.id+'\')" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'+
       '</div></td>';
     tbody.appendChild(tr);
   });
 }
-function verPagina(i){ var w=window.open('','_blank'); w.document.write(pages[i].html); w.document.close(); }
-function deletePage(i){ if(!confirm('Excluir esta pagina?'))return; pages.splice(i,1); localStorage.setItem('donalab_pages',JSON.stringify(pages)); renderPages(); }
+
+function loadPages(){
+  sbFetch('paginas?select=id,slug,nome,cliente,produto,created_at&order=created_at.desc').then(function(data){
+    if(Array.isArray(data)){ pages=data; renderPages(); }
+  });
+}
+
+function verPagina(id){
+  var p=pages.find(function(x){return x.id===id;});
+  if(p) window.open('https://donalab.com.br/p/'+p.slug,'_blank');
+}
+
+function deletePage(id){
+  if(!confirm('Excluir esta pagina?'))return;
+  sbFetch('paginas?id=eq.'+id,{method:'DELETE'}).then(function(){ loadPages(); });
+}
 
 function showPaginasTab(tab){
   var isL=tab==='lista';
@@ -617,57 +937,322 @@ function goToStep(n){
 }
 
 document.getElementById('btn-ir-etapa2').onclick = function(){
-  var k=localStorage.getItem('openai_key')||''; if(k)document.getElementById('openai-key').value=k; goToStep(2);
+  var k = localStorage.getItem('openai_key') || '';
+  if (k) document.getElementById('openai-key').value = k;
+  goToStep(2);
 };
 document.getElementById('btn-volta-1').onclick = function(){ goToStep(1); };
-document.getElementById('btn-volta-2').onclick = function(){ goToStep(2); };
+document.getElementById('btn-volta-2').onclick = function(){ goToStep(1); };
 
-document.getElementById('btn-rodar-agente').onclick = function(){
-  var key=document.getElementById('openai-key').value.trim();
-  if(!key){alert('Insira sua API Key da OpenAI primeiro.');return;}
-  localStorage.setItem('openai_key',key);
-  var respostasTexto = document.getElementById('respostas-texto').value.trim();
-  var d={nome:document.getElementById('p-nome').value,email:document.getElementById('p-email').value,whatsapp:document.getElementById('p-whatsapp').value,instagram:document.getElementById('p-instagram').value,fotos:document.getElementById('p-fotos').value,produto_nome:document.getElementById('p-produto-nome').value,produto_tipo:document.getElementById('p-produto-tipo').value,promessa:document.getElementById('p-promessa').value,dor:document.getElementById('p-dor').value,entrega:document.getElementById('p-entrega').value,metodo:document.getElementById('p-metodo').value,modulos:document.getElementById('p-modulos').value,para_quem:document.getElementById('p-para-quem').value,nao_para_quem:document.getElementById('p-nao-para-quem').value,beneficios:document.getElementById('p-beneficios').value,resultados:document.getElementById('p-resultados').value,depoimentos:document.getElementById('p-depoimentos').value,garantia:document.getElementById('p-garantia').value,bio:document.getElementById('p-bio').value,preco:document.getElementById('p-preco').value,venda:document.getElementById('p-venda').value,suporte:document.getElementById('p-suporte').value,obs:document.getElementById('p-obs').value};
-  var lyraInstrucoes = localStorage.getItem('lyra_prompt')||'';
-  var orionInstrucoes = localStorage.getItem('orion_prompt')||'';
-  var prompt='Voce e especialista em copywriting e paginas de vendas de alta conversao. Com base nos dados abaixo, crie o conteudo completo para uma pagina de vendas profissional.\n\nRetorne APENAS um JSON valido (sem markdown, sem blocos de codigo) com esta estrutura:\n{"titulo":"","subtitulo":"","hero_desc":"","para_quem_lista":["","","","","",""],"beneficios_lista":[{"titulo":"","desc":""}],"sobre_titulo":"","sobre_texto":"","depoimentos_lista":[{"nome":"","texto":""}],"garantia_texto":"","oferta_titulo":"","oferta_desc":"","preco":"","cta":"","link_venda":""}\n\n'+(lyraInstrucoes?'INSTRUCOES DE ESCRITA (Lyra - Copywriter):\n'+lyraInstrucoes+'\n\n':'')+(orionInstrucoes?'INSTRUCOES DE DESIGN (Orion - Webdesigner, considere ao nomear secoes e estrutura):\n'+orionInstrucoes+'\n\n':'')+'DADOS DO FORMULARIO:\n'+JSON.stringify(d,null,2)+(respostasTexto?'\n\nRESPOSTAS ADICIONAIS DO CLIENTE:\n'+respostasTexto:'');
-  document.getElementById('agente-loading').style.display='block';
-  document.getElementById('agente-output').style.display='none';
-  document.getElementById('btn-rodar-agente').disabled=true;
-  fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4o',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.7})})
-  .then(function(r){return r.json();})
-  .then(function(data){
-    document.getElementById('agente-loading').style.display='none';
-    document.getElementById('btn-rodar-agente').disabled=false;
-    if(data.error){alert('Erro OpenAI: '+data.error.message);return;}
-    var texto=data.choices[0].message.content;
-    document.getElementById('agente-resultado').value=texto;
-    document.getElementById('agente-output').style.display='block';
-    try{ var j=JSON.parse(texto.replace(/```json|```/g,'').trim()); gerarPaginaHTML(j); goToStep(3); }catch(e){alert('Conteudo gerado. Revise o JSON se necessario.');}
-  })
-  .catch(function(err){document.getElementById('agente-loading').style.display='none';document.getElementById('btn-rodar-agente').disabled=false;alert('Erro: '+err.message);});
+// ---- GERENCIAMENTO DE IMAGENS ----
+var _imagensMap = {}; // { placeholder_id: { label, base64, removida } }
+
+function detectarImagensPendentes(html) {
+  // Detecta placeholders do Orion: divs com estilo de placeholder ou img com src pendencia
+  var pendentes = [];
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(html, 'text/html');
+
+  // Busca imgs com src vazio, placeholder ou com texto "pendencia"
+  doc.querySelectorAll('img').forEach(function(img, i) {
+    var src = img.getAttribute('src') || '';
+    var alt = img.getAttribute('alt') || '';
+    var isPendente = !src || src === '#' || src.toLowerCase().includes('pendencia') || src.toLowerCase().includes('placeholder') || src.startsWith('data:image/svg');
+    if (isPendente) {
+      var id = 'img_' + i + '_' + Date.now();
+      img.setAttribute('data-img-id', id);
+      pendentes.push({ id: id, alt: alt || 'Imagem ' + (i+1), tipo: 'img' });
+    }
+  });
+
+  // Busca divs placeholder (background cinza/placeholder sem imagem real)
+  doc.querySelectorAll('[data-placeholder], .placeholder, [style*="background-color: #ccc"], [style*="background:#ccc"], [style*="background: #ccc"], [style*="background-color:#ddd"], [style*="background:#ddd"]').forEach(function(el, i) {
+    if (!el.getAttribute('data-img-id')) {
+      var id = 'ph_' + i + '_' + Date.now();
+      el.setAttribute('data-img-id', id);
+      pendentes.push({ id: id, alt: 'Area de imagem ' + (i+1), tipo: 'div' });
+    }
+  });
+
+  return { pendentes: pendentes, htmlModificado: doc.documentElement.outerHTML };
+}
+
+function renderPainelImagens(pendentes) {
+  var painel = document.getElementById('painel-imagens');
+  var lista = document.getElementById('imagens-lista');
+  lista.innerHTML = '';
+
+  if (!pendentes || pendentes.length === 0) {
+    painel.style.display = 'none';
+    return;
+  }
+
+  painel.style.display = 'block';
+  _imagensMap = {};
+
+  pendentes.forEach(function(item) {
+    _imagensMap[item.id] = { label: item.alt, base64: null, removida: false };
+
+    var row = document.createElement('div');
+    row.id = 'img-row-' + item.id;
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface2);border:1px solid rgba(255,255,255,0.05);border-radius:12px;transition:opacity 0.2s';
+    row.innerHTML =
+      // Thumb
+      '<div id="thumb-' + item.id + '" style="width:52px;height:52px;border-radius:8px;background:var(--surface3);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+      '</div>' +
+      // Label + status
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:500;margin-bottom:2px">' + item.alt + '</div>' +
+        '<div id="status-' + item.id + '" style="font-size:11px;color:var(--text-dim)">Nenhuma imagem</div>' +
+      '</div>' +
+      // Botoes
+      '<input type="file" id="file-' + item.id + '" accept="image/*" style="display:none">' +
+      '<button onclick="document.getElementById(\'file-' + item.id + '\').click()" style="background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">Upload</button>' +
+      '<button id="btn-remove-' + item.id + '" onclick="removerImagem(\'' + item.id + '\')" style="background:var(--danger-dim);border:1px solid rgba(224,85,85,0.2);color:var(--danger);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">Remover area</button>';
+
+    lista.appendChild(row);
+
+    // Listener do file input
+    document.getElementById('file-' + item.id).onchange = function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var base64 = ev.target.result;
+        _imagensMap[item.id].base64 = base64;
+        _imagensMap[item.id].removida = false;
+        // Atualiza thumb
+        document.getElementById('thumb-' + item.id).innerHTML = '<img src="' + base64 + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px">';
+        document.getElementById('status-' + item.id).textContent = 'Imagem carregada';
+        document.getElementById('status-' + item.id).style.color = '#5db870';
+        document.getElementById('btn-remove-' + item.id).textContent = 'Remover area';
+        // Restaura row se estava removida
+        row.style.opacity = '1';
+        aplicarImagensNoHTML();
+      };
+      reader.readAsDataURL(file);
+    };
+  });
+}
+
+function removerImagem(id) {
+  var entry = _imagensMap[id];
+  if (!entry) return;
+
+  if (entry.removida) {
+    // Desfaz remocao
+    entry.removida = false;
+    entry.base64 = null;
+    var row = document.getElementById('img-row-' + id);
+    row.style.opacity = '1';
+    document.getElementById('status-' + id).textContent = 'Nenhuma imagem';
+    document.getElementById('status-' + id).style.color = 'var(--text-dim)';
+    document.getElementById('thumb-' + id).innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+    document.getElementById('btn-remove-' + id).textContent = 'Remover area';
+  } else {
+    entry.removida = true;
+    entry.base64 = null;
+    var row = document.getElementById('img-row-' + id);
+    row.style.opacity = '0.4';
+    document.getElementById('status-' + id).textContent = 'Area removida da pagina';
+    document.getElementById('status-' + id).style.color = 'var(--danger)';
+    document.getElementById('btn-remove-' + id).textContent = 'Desfazer';
+  }
+  aplicarImagensNoHTML();
+}
+
+function aplicarImagensNoHTML() {
+  if (!_html) return;
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(_html, 'text/html');
+
+  Object.keys(_imagensMap).forEach(function(id) {
+    var entry = _imagensMap[id];
+    var el = doc.querySelector('[data-img-id="' + id + '"]');
+    if (!el) return;
+
+    if (entry.removida) {
+      // Remove o elemento e possivelmente o container pai se ficar vazio
+      var pai = el.parentElement;
+      el.remove();
+      // Se o pai ficou sem filhos visuais relevantes, remove tambem
+      if (pai && pai.children.length === 0 && pai.tagName !== 'BODY') pai.remove();
+    } else if (entry.base64) {
+      if (el.tagName === 'IMG') {
+        el.setAttribute('src', entry.base64);
+        el.removeAttribute('data-img-id');
+      } else {
+        // Div placeholder: substitui por img
+        var img = doc.createElement('img');
+        img.src = entry.base64;
+        img.style.cssText = el.style.cssText + ';width:100%;height:auto;display:block;';
+        img.alt = entry.label;
+        el.parentNode.replaceChild(img, el);
+      }
+    }
+  });
+
+  var htmlAtualizado = '<!DOCTYPE html>' + doc.documentElement.outerHTML;
+  _html = htmlAtualizado;
+  document.getElementById('pagina-preview').srcdoc = _html;
+}
+
+document.getElementById('btn-recarregar-preview').onclick = function() {
+  if (_html) document.getElementById('pagina-preview').srcdoc = _html;
 };
 
-function gerarPaginaHTML(d){
-  _nome=document.getElementById('p-nome').value||'Cliente';
-  _slug=document.getElementById('p-slug').value||'pagina-'+Date.now();
-  _produto=document.getElementById('p-produto-nome').value;
-  var pq=(d.para_quem_lista||[]).map(function(i){return '<div class="pq-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'+i+'</div>';}).join('');
-  var ben=(d.beneficios_lista||[]).map(function(b){return '<div class="ben-card"><div class="ben-titulo">'+b.titulo+'</div><div class="ben-desc">'+b.desc+'</div></div>';}).join('');
-  var dep=(d.depoimentos_lista||[]).map(function(x){return '<div class="dep-card"><div class="dep-texto">"'+x.texto+'"</div><div class="dep-nome">— '+x.nome+'</div></div>';}).join('');
-  _html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+(d.titulo||'Pagina de Vendas')+'</title>'+
-  '<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">'+
-  '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"DM Sans",sans-serif;background:#0a0a0a;color:#F0EDE8;line-height:1.6}.container{max-width:900px;margin:0 auto;padding:0 24px}.hero{background:linear-gradient(160deg,#0a0a0a,#111);padding:80px 0 60px;text-align:center;border-bottom:1px solid rgba(201,168,76,0.15)}.hero-tag{display:inline-block;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#C9A84C;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);padding:5px 16px;border-radius:20px;margin-bottom:24px}.hero h1{font-family:"Playfair Display",serif;font-size:clamp(28px,5vw,52px);font-weight:700;line-height:1.15;margin-bottom:20px}.hero-desc{font-size:17px;color:#888880;max-width:600px;margin:0 auto 36px}.btn-cta{display:inline-block;background:#C9A84C;color:#0a0a0a;font-weight:700;font-size:15px;padding:16px 40px;border-radius:12px;text-decoration:none;border:none;cursor:pointer;font-family:"DM Sans",sans-serif}.section{padding:60px 0;border-bottom:1px solid rgba(255,255,255,0.05)}.section-label{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#C9A84C;margin-bottom:12px}.section-title{font-family:"Playfair Display",serif;font-size:clamp(22px,4vw,36px);font-weight:700;margin-bottom:32px}.pq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pq-item{display:flex;align-items:flex-start;gap:10px;background:#141414;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 16px;font-size:14px;color:#C8C4BC}.pq-item svg{color:#C9A84C;flex-shrink:0;margin-top:2px}.ben-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.ben-card{background:#141414;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px}.ben-titulo{font-weight:600;color:#C9A84C;margin-bottom:8px;font-size:14px;text-transform:uppercase}.ben-desc{font-size:14px;color:#888880;line-height:1.6}.dep-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.dep-card{background:#141414;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:24px}.dep-texto{font-size:14px;color:#C8C4BC;line-height:1.7;margin-bottom:12px;font-style:italic}.dep-nome{font-size:12px;color:#C9A84C;font-weight:500}.garantia-box{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:16px;padding:32px;display:flex;gap:20px}.g-icon{width:56px;height:56px;background:rgba(201,168,76,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px}.oferta-box{background:#141414;border:2px solid rgba(201,168,76,0.3);border-radius:20px;padding:40px;text-align:center;max-width:560px;margin:0 auto}.preco{font-family:"Playfair Display",serif;font-size:48px;font-weight:700;color:#C9A84C;margin:16px 0}.footer{padding:32px 0;text-align:center;color:#555550;font-size:12px}@media(max-width:600px){.pq-grid,.ben-grid,.dep-grid{grid-template-columns:1fr}}</style></head><body>'+
-  '<section class="hero"><div class="container"><div class="hero-tag">'+_nome+'</div><h1>'+(d.titulo||'')+'</h1><p class="hero-desc">'+(d.subtitulo||'')+'</p><a href="#oferta" class="btn-cta">'+(d.cta||'Quero me inscrever')+'</a></div></section>'+
-  '<section class="section"><div class="container"><div class="section-label">Para quem e</div><h2 class="section-title">Este programa e para voce?</h2><div class="pq-grid">'+pq+'</div></div></section>'+
-  '<section class="section"><div class="container"><div class="section-label">O que voce vai ter</div><h2 class="section-title">Beneficios</h2><div class="ben-grid">'+ben+'</div></div></section>'+
-  (dep?'<section class="section"><div class="container"><div class="section-label">Prova social</div><h2 class="section-title">O que dizem nossos alunos</h2><div class="dep-grid">'+dep+'</div></div></section>':'')+
-  '<section class="section"><div class="container"><div class="section-label">Sobre</div><h2 class="section-title">'+(d.sobre_titulo||'Sobre mim')+'</h2><p style="font-size:15px;color:#888880;max-width:700px;line-height:1.8">'+(d.sobre_texto||'')+'</p></div></section>'+
-  '<section class="section"><div class="container"><div class="garantia-box"><div class="g-icon">✓</div><div><div style="font-weight:600;font-size:16px;margin-bottom:8px;color:#C9A84C">Garantia</div><p style="font-size:14px;color:#888880">'+(d.garantia_texto||'')+'</p></div></div></div></section>'+
-  '<section class="section" id="oferta"><div class="container"><div class="oferta-box"><div class="section-label">'+(d.oferta_titulo||'Oferta')+'</div><p style="font-size:15px;color:#888880;margin:12px 0">'+(d.oferta_desc||'')+'</p><div class="preco">'+(d.preco||'')+'</div><a href="'+(d.link_venda||'#')+'" class="btn-cta" style="margin-top:8px">'+(d.cta||'Quero me inscrever')+'</a></div></div></section>'+
-  '<footer class="footer"><div class="container"><p>Pagina criada com Dona Lab</p></div></footer></body></html>';
-  document.getElementById('pagina-preview').srcdoc=_html;
+function setAgentStatus(agent, state, msg) {
+  // state: 'idle' | 'running' | 'done' | 'error'
+  var card = document.getElementById('status-' + agent);
+  var txt  = document.getElementById(agent + '-status-text');
+  var spin = document.getElementById(agent + '-spinner');
+  var chk  = document.getElementById(agent + '-check');
+  var err  = document.getElementById(agent + '-err');
+  txt.textContent = msg;
+  spin.style.display = state === 'running' ? 'block' : 'none';
+  chk.style.display  = state === 'done'    ? 'flex'  : 'none';
+  err.style.display  = state === 'error'   ? 'flex'  : 'none';
+  card.style.opacity = (state === 'idle') ? '0.4' : '1';
 }
+
+document.getElementById('btn-rodar-agente').onclick = function(){
+  var key = document.getElementById('openai-key').value.trim() || localStorage.getItem('openai_key') || '';
+  if (!key) { alert('Insira sua API Key da OpenAI em Configuracoes primeiro.'); showSection('config'); return; }
+  localStorage.setItem('openai_key', key);
+
+  var respostasTexto = document.getElementById('respostas-texto').value.trim();
+  var dados = {
+    nome:document.getElementById('p-nome').value, email:document.getElementById('p-email').value,
+    whatsapp:document.getElementById('p-whatsapp').value, instagram:document.getElementById('p-instagram').value,
+    fotos:document.getElementById('p-fotos').value, produto_nome:document.getElementById('p-produto-nome').value,
+    produto_tipo:document.getElementById('p-produto-tipo').value, promessa:document.getElementById('p-promessa').value,
+    dor:document.getElementById('p-dor').value, entrega:document.getElementById('p-entrega').value,
+    metodo:document.getElementById('p-metodo').value, modulos:document.getElementById('p-modulos').value,
+    para_quem:document.getElementById('p-para-quem').value, nao_para_quem:document.getElementById('p-nao-para-quem').value,
+    beneficios:document.getElementById('p-beneficios').value, resultados:document.getElementById('p-resultados').value,
+    depoimentos:document.getElementById('p-depoimentos').value, garantia:document.getElementById('p-garantia').value,
+    bio:document.getElementById('p-bio').value, preco:document.getElementById('p-preco').value,
+    venda:document.getElementById('p-venda').value, suporte:document.getElementById('p-suporte').value,
+    obs:document.getElementById('p-obs').value
+  };
+
+  var lyraInstrucoes = localStorage.getItem('lyra_prompt') || '';
+  var orionInstrucoes = localStorage.getItem('orion_prompt') || '';
+
+  // Mostrar painel de status
+  document.getElementById('agentes-status').style.display = 'block';
+  document.getElementById('btn-rodar-agente').disabled = true;
+  document.getElementById('btn-volta-1').disabled = true;
+
+  // --- LYRA ---
+  setAgentStatus('lyra', 'running', 'Analisando os dados do produto...');
+  setAgentStatus('orion', 'idle', 'Aguardando Lyra...');
+
+  var lyraPrompt = 'Você é Lyra. Siga RIGOROSAMENTE suas instruções abaixo.\n\n'
+    + lyraInstrucoes
+    + '\n\n---\nINPUTS DO CLIENTE:\n'
+    + 'Nome completo: ' + (dados.nome || '') + '\n'
+    + 'E-mail: ' + (dados.email || '') + '\n'
+    + 'WhatsApp: ' + (dados.whatsapp || '') + '\n'
+    + 'Instagram: ' + (dados.instagram || '') + '\n'
+    + 'Link de fotos: ' + (dados.fotos || '') + '\n'
+    + 'Nome do produto: ' + (dados.produto_nome || '') + '\n'
+    + 'Tipo de produto: ' + (dados.produto_tipo || '') + '\n'
+    + 'Promessa: ' + (dados.promessa || '') + '\n'
+    + 'O que resolve: ' + (dados.dor || '') + '\n'
+    + 'O que entrega: ' + (dados.entrega || '') + '\n'
+    + 'Para quem é: ' + (dados.para_quem || '') + '\n'
+    + 'Para quem não é: ' + (dados.nao_para_quem || '') + '\n'
+    + 'Benefícios: ' + (dados.beneficios || '') + '\n'
+    + 'Resultados: ' + (dados.resultados || '') + '\n'
+    + 'Depoimentos: ' + (dados.depoimentos || '') + '\n'
+    + 'Garantia: ' + (dados.garantia || '') + '\n'
+    + 'Quem sou eu: ' + (dados.bio || '') + '\n'
+    + 'Preço: ' + (dados.preco || '') + '\n'
+    + 'Por onde vende: ' + (dados.venda || '') + '\n'
+    + 'Suporte: ' + (dados.suporte || '') + '\n'
+    + 'Observações: ' + (dados.obs || '') + '\n'
+    + (respostasTexto ? '\nRespostas adicionais:\n' + respostasTexto : '')
+    + '\n\nGere os 43 itens no template (Seções 1 a 8), respeitando os limites de caracteres (±3). Entregue no formato: Ações executadas → Outputs (Template) → Recomendações → Confiança.';
+
+  function callGPT(prompt, onSuccess, onError) {
+    fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], max_tokens: 2500, temperature: 0.7 })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.error) { onError(data.error.message); return; }
+      onSuccess(data.choices[0].message.content);
+    })
+    .catch(function(err){ onError(err.message); });
+  }
+
+  callGPT(lyraPrompt, function(lyraOutput) {
+    // Lyra terminou — ela retorna texto estruturado, não JSON
+    setAgentStatus('lyra', 'done', 'Conteudo criado com sucesso.');
+
+    // Passa o output completo da Lyra diretamente para o Orion
+    var lyraJSON = { _rawOutput: lyraOutput };
+
+    // --- ORION ---
+    setAgentStatus('orion', 'running', 'Construindo o design da pagina...');
+
+    var orionPrompt = 'Você é Orion. Siga RIGOROSAMENTE suas instruções abaixo.\n\n'
+      + orionInstrucoes
+      + '\n\n---\nA Lyra (copywriter) gerou o conteúdo completo abaixo no formato de template estruturado (Seções 1 a 8, itens 1 a 43).'
+      + '\nSua tarefa: usar EXATAMENTE esses textos para montar o HTML completo da página, sem alterar nenhuma palavra.'
+      + '\n\nDados de contexto adicionais:'
+      + '\n- Link de fotos do cliente: ' + (dados.fotos || 'PENDÊNCIA: enviar URL válida')
+      + '\n- Por onde vende/checkout: ' + (dados.venda || '')
+      + '\n\nOUTPUT DA LYRA (use este conteúdo para o HTML):\n\n'
+      + lyraJSON._rawOutput
+      + '\n\n---\nATENÇÃO: Retorne APENAS o HTML completo começando com <!DOCTYPE html>. Sem markdown, sem explicações, sem blocos de código.';
+
+    callGPT(orionPrompt, function(orionOutput) {
+      // Orion terminou
+      var htmlLimpo = orionOutput.replace(/^```html|^```|```$/gm, '').trim();
+      if (!htmlLimpo.includes('<!DOCTYPE') && !htmlLimpo.includes('<html')) {
+        setAgentStatus('orion', 'error', 'Erro ao gerar o HTML.');
+        document.getElementById('btn-rodar-agente').disabled = false;
+        document.getElementById('btn-volta-1').disabled = false;
+        return;
+      }
+      setAgentStatus('orion', 'done', 'Pagina construida com sucesso.');
+
+      // Guardar
+      _nome    = document.getElementById('p-nome').value || 'Cliente';
+      _slug    = document.getElementById('p-slug').value || 'pagina-' + Date.now();
+      _produto = document.getElementById('p-produto-nome').value;
+
+      // Detectar imagens pendentes e injetar data-img-id no HTML
+      var deteccao = detectarImagensPendentes(htmlLimpo);
+      _html = deteccao.htmlModificado;
+
+      // Mostrar preview e painel de imagens
+      document.getElementById('pagina-preview').srcdoc = _html;
+      renderPainelImagens(deteccao.pendentes);
+
+      setTimeout(function(){
+        document.getElementById('btn-rodar-agente').disabled = false;
+        document.getElementById('btn-volta-1').disabled = false;
+        goToStep(3);
+      }, 800);
+
+    }, function(err) {
+      setAgentStatus('orion', 'error', 'Erro: ' + err);
+      document.getElementById('btn-rodar-agente').disabled = false;
+      document.getElementById('btn-volta-1').disabled = false;
+    });
+
+  }, function(err) {
+    setAgentStatus('lyra', 'error', 'Erro: ' + err);
+    document.getElementById('btn-rodar-agente').disabled = false;
+    document.getElementById('btn-volta-1').disabled = false;
+  });
+};
 
 document.getElementById('btn-baixar').onclick=function(){
   if(!_html){alert('Gere a pagina primeiro.');return;}
@@ -676,14 +1261,24 @@ document.getElementById('btn-baixar').onclick=function(){
 
 document.getElementById('btn-salvar-pagina').onclick=function(){
   if(!_html){alert('Gere a pagina primeiro.');return;}
-  pages.push({id:Date.now(),nome:_nome,cliente:_nome,produto:_produto,slug:_slug,html:_html,criada:new Date().toLocaleDateString('pt-BR')});
-  localStorage.setItem('donalab_pages',JSON.stringify(pages));
-  renderPages(); showPaginasTab('lista'); alert('Pagina salva!');
+  var slugFinal = _slug || 'pagina-'+Date.now();
+  var payload = { slug:slugFinal, nome:_nome, cliente:_nome, produto:_produto, html:_html };
+  var btn = document.getElementById('btn-salvar-pagina');
+  btn.disabled=true; btn.textContent='Salvando...';
+  sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
+    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar Pagina';
+    if(res && res[0] && res[0].id){
+      loadPages(); showPaginasTab('lista');
+      alert('Pagina salva! Acesse em:\ndonalab.com.br/p/'+slugFinal);
+    } else {
+      alert('Erro ao salvar: '+(res.message||JSON.stringify(res)));
+    }
+  }).catch(function(e){ btn.disabled=false; alert('Erro: '+e.message); });
 };
 
 // INIT
-renderPages();
-updateCount();
+loadClients();
+loadPages();
 </script>
 </body>
 </html>
