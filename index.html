@@ -546,9 +546,119 @@
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  /* Login */
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    padding: 48px 40px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 36px;
+  }
+
+  .login-group {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
+  .login-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+    display: block;
+  }
+
+  .login-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-input:focus { border-color: var(--gold-border); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #0D0D0D;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+
+  .login-btn:hover { background: var(--gold-light); }
+
+  .login-error {
+    font-size: 12px;
+    color: #e05555;
+    margin-top: 12px;
+    display: none;
+  }
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">Dona Lab</div>
+    <div class="login-sub">Painel Admin</div>
+
+    <div class="login-group">
+      <label class="login-label">Usuario</label>
+      <input class="login-input" type="text" id="login-user" placeholder="seu usuario">
+    </div>
+
+    <div class="login-group">
+      <label class="login-label">Senha</label>
+      <input class="login-input" type="password" id="login-pass" placeholder="sua senha">
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error">Usuario ou senha incorretos.</div>
+  </div>
+</div>
 
 <div class="layout">
   <aside class="sidebar">
@@ -597,7 +707,7 @@
       <div class="user-avatar">I</div>
       <div style="min-width:0">
         <div class="user-name">Isis Moreira</div>
-        <div class="user-email">isisalvesmoreira@gmail.com</div>
+        <div class="user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="244d574d574548524157494b56414d5645644349454d480a474b49">[email&#160;protected]</a></div>
       </div>
     </div>
   </aside>
@@ -728,7 +838,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   const avatarColors = ['av-1','av-2','av-3','av-4','av-5'];
   let clients = [];
   let editingId = null;
@@ -881,12 +991,23 @@
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-  });
+  // Login
+  function doLogin() {
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value.trim();
+    if (user === 'isismoreira' && pass === 'donalab@2025') {
+      document.getElementById('login-overlay').style.display = 'none';
+      sessionStorage.setItem('donalab_auth', '1');
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
 
-  updateCount();
-  renderTable(clients);
-</script>
-</body>
-</html>
+  document.getElementById('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  if (sessionStorage.getItem('donalab_auth') === '1') {
+    document.getElementById('login-overlay').style.display = 'none';
+  }
+
+  document.qu
