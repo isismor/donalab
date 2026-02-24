@@ -760,6 +760,49 @@ C43: (e-mail suporte)"></textarea>
   </div>
 </div>
 
+<!-- MODAL: Editar Página -->
+<div class="modal-overlay" id="edit-page-modal" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title">Editar Página</div>
+      <div class="modal-close" onclick="document.getElementById('edit-page-modal').style.display='none'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <input type="hidden" id="edit-page-id">
+    <div class="form-group">
+      <label class="form-label">Título da página (nome)</label>
+      <input class="form-input" id="edit-page-titulo" placeholder="Nome do cliente / título">
+    </div>
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:20px 0 12px;font-weight:600">Seção 6 — Oferta</div>
+    <div class="form-group">
+      <label class="form-label">Título da oferta (C31)</label>
+      <input class="form-input" id="edit-c31" placeholder="Ex: Método Transformação Total">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Texto do botão (C37)</label>
+      <input class="form-input" id="edit-c37" placeholder="Ex: Quero começar agora">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link do botão — checkout (C37B)</label>
+      <input class="form-input" id="edit-c37b" placeholder="https://pay.hotmart.com/...">
+    </div>
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:20px 0 12px;font-weight:600">Imagens</div>
+    <div class="form-group">
+      <label class="form-label">Foto hero — seção 1 (C4)</label>
+      <input class="form-input" id="edit-c4" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Foto do autor — seção 7 (C40)</label>
+      <input class="form-input" id="edit-c40" placeholder="https://...">
+    </div>
+    <div class="form-actions">
+      <button class="btn-outline" onclick="document.getElementById('edit-page-modal').style.display='none'">Cancelar</button>
+      <button class="btn-gold" id="btn-salvar-edicao" onclick="salvarEdicaoPagina()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Excluir -->
 <div class="modal-overlay" id="delete-modal">
   <div class="modal" style="max-width:400px">
@@ -991,6 +1034,7 @@ function renderPages(){
       '<td><a href="https://donalab.com.br/p/'+p.slug+'" target="_blank" style="color:var(--gold);font-size:12px;text-decoration:none">donalab.com.br/p/'+p.slug+'</a></td>'+
       '<td><div class="actions-cell">'+
       '<button class="action-btn" onclick="verPagina(\''+p.id+'\')" title="Ver"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+      '<button class="action-btn" onclick="editarPagina(\''+p.id+'\')" title="Editar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'+
       '<button class="action-btn danger" onclick="deletePage(\''+p.id+'\')" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>'+
       '</div></td>';
     tbody.appendChild(tr);
@@ -1011,6 +1055,96 @@ function verPagina(id){
 function deletePage(id){
   if(!confirm('Excluir esta pagina?'))return;
   sbFetch('paginas?id=eq.'+id,{method:'DELETE'}).then(function(){ loadPages(); });
+}
+
+function editarPagina(id){
+  var p = pages.find(function(x){ return x.id===id; });
+  if(!p) return;
+  // Preenche modal de edição
+  document.getElementById('edit-page-id').value = id;
+  document.getElementById('edit-page-titulo').value = p.nome || '';
+  document.getElementById('edit-page-slug').value = p.slug || '';
+  // Carregar HTML da página para extrair C4, C31, C37B
+  sbFetch('paginas?id=eq.'+id+'&select=html').then(function(res){
+    if(!res || !res[0]) return;
+    var html = res[0].html || '';
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+    // C4: hero img
+    var heroImg = doc.querySelector('.hero-img-wrap img');
+    document.getElementById('edit-c4').value = heroImg ? heroImg.getAttribute('src') : '';
+    // C40: autor img
+    var autorImg = doc.querySelector('.autor-inner img');
+    document.getElementById('edit-c40').value = autorImg ? autorImg.getAttribute('src') : '';
+    // C37B: link do botão da seção 6
+    var btnSec6 = doc.querySelector('#sec6 a.btn-cta');
+    document.getElementById('edit-c37b').value = btnSec6 ? btnSec6.getAttribute('href') : '';
+    // C37: texto do botão
+    document.getElementById('edit-c37').value = btnSec6 ? btnSec6.textContent.trim() : '';
+    // C31: título da oferta
+    var titulo31 = doc.querySelector('#sec6 h3');
+    document.getElementById('edit-c31').value = titulo31 ? titulo31.textContent.trim() : '';
+  });
+  document.getElementById('edit-page-modal').style.display='flex';
+}
+
+function salvarEdicaoPagina(){
+  var id    = document.getElementById('edit-page-id').value;
+  var titulo = document.getElementById('edit-page-titulo').value.trim();
+  var c4    = document.getElementById('edit-c4').value.trim();
+  var c40   = document.getElementById('edit-c40').value.trim();
+  var c37b  = document.getElementById('edit-c37b').value.trim();
+  var c37   = document.getElementById('edit-c37').value.trim();
+  var c31   = document.getElementById('edit-c31').value.trim();
+  var btn   = document.getElementById('btn-salvar-edicao');
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  // Busca HTML atual
+  sbFetch('paginas?id=eq.'+id+'&select=html').then(function(res){
+    if(!res || !res[0]){ btn.disabled=false; btn.textContent='Salvar'; return; }
+    var html = res[0].html;
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(html, 'text/html');
+
+    // Atualiza C4 (hero img)
+    if(c4){
+      var heroImg = doc.querySelector('.hero-img-wrap img');
+      if(heroImg){ heroImg.setAttribute('src', c4); }
+      else {
+        var heroWrap = doc.querySelector('.hero-img-wrap');
+        if(heroWrap){ heroWrap.innerHTML = '<img src="'+c4+'" style="width:100%;height:100%;object-fit:cover">'; }
+      }
+    }
+    // Atualiza C40 (autor img)
+    if(c40){
+      var autorImg = doc.querySelector('.autor-inner img');
+      if(autorImg){ autorImg.setAttribute('src', c40); }
+      else {
+        var autorWrap = doc.querySelector('.autor-inner > div:first-child');
+        if(autorWrap){ autorWrap.innerHTML = '<img src="'+c40+'" style="width:100%;height:100%;object-fit:cover">'; }
+      }
+    }
+    // Atualiza C37B (link botão sec6) e C37 (texto)
+    var btnSec6 = doc.querySelector('#sec6 a.btn-cta');
+    if(btnSec6){
+      if(c37b) btnSec6.setAttribute('href', c37b);
+      if(c37)  btnSec6.textContent = c37;
+    }
+    // Atualiza C31 (título oferta)
+    var titulo31el = doc.querySelector('#sec6 h3');
+    if(titulo31el && c31) titulo31el.textContent = c31;
+
+    var newHtml = '<!DOCTYPE html>' + doc.documentElement.outerHTML;
+    var patch = { html: newHtml };
+    if(titulo) patch.nome = titulo;
+
+    sbFetch('paginas?id=eq.'+id, {method:'PATCH', body:JSON.stringify(patch)}).then(function(){
+      btn.disabled=false; btn.textContent='Salvar';
+      document.getElementById('edit-page-modal').style.display='none';
+      loadPages();
+      alert('Página atualizada!');
+    });
+  });
 }
 
 function showPaginasTab(tab){
@@ -1208,7 +1342,7 @@ function buildPage(v) {
   function img(k,alt,style){
     return r(k)
       ? '<img src="'+r(k)+'" alt="'+s(alt)+'" style="'+style+'">'
-      : '<div style="'+style+';background:#2a2a1a;display:flex;align-items:center;justify-content:center;color:#3a3a2a;font-size:11px;font-family:sans-serif;">Imagem</div>';
+      : '';
   }
 
   return `<!DOCTYPE html>
@@ -1223,51 +1357,58 @@ function buildPage(v) {
 body{background:#0d0d0d;color:#e8e0cc;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:780px;margin:0 auto;padding:0 28px}
-.gold{color:#C9A84C}
-.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer}
+.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center}
 .btn-cta:hover{background:#dbb95e}
 .section{padding:60px 0}
 .card{background:#181610;border:1px solid #2a2618;border-radius:14px}
+
+/* ── SEÇÃO 1 mobile ── */
 @media(max-width:640px){
-  .hero-inner{flex-direction:column!important}
-  .hero-img-wrap{width:100%!important;height:220px!important;order:-1;margin-bottom:24px}
-  .ben-cols,.res-cols{flex-direction:column!important}
-  .ben-col,.res-col{border-right:none!important;border-bottom:1px solid #2a2618}
+  .hero-inner{flex-direction:column!important;text-align:center!important}
+  .hero-text{align-items:center!important}
+  .hero-img-wrap{width:100%!important;height:220px!important;margin:24px 0!important;order:2!important}
+  .hero-cta-wrap{order:3!important;width:100%}
+  .hero-cta-wrap a{display:block!important;width:100%!important}
+  /* Seção 4 mobile */
+  .ben-cols{flex-direction:column!important}
+  .ben-col{border-right:none!important;border-bottom:1px solid #2a2618!important;text-align:center!important}
+  .ben-col:last-child{border-bottom:none!important}
+  /* Seção 5 mobile */
+  .res-cols{flex-direction:column!important}
+  /* Seção 7 mobile */
+  .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
 }
 </style>
 </head>
 <body>
 
 <!-- ══ SEÇÃO 1: HERO ══ campos 1-5 -->
-<div style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;padding:40px 36px">
+<div id="sec1" style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;padding:40px 36px">
   <div class="hero-inner" style="display:flex;align-items:center;gap:32px">
-    <div style="flex:1;min-width:0">
-      <!-- C1: nome da marca, espaçado e pequeno -->
-      <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:20px;font-weight:500">${s('C1')}</div>
-      <!-- C2: título grande dourado, spaced letters -->
-      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,44px);font-weight:800;color:#C9A84C;letter-spacing:.12em;text-transform:uppercase;line-height:1.1;margin-bottom:16px">${s('C2')}</h1>
-      <!-- C3: subtítulo cinza -->
-      <p style="font-size:15px;color:#8a8070;margin-bottom:32px;line-height:1.65">${s('C3')}</p>
-      <!-- C5: botão CTA dourado -->
-      <a href="${r('C5B')}" class="btn-cta">${s('C5')}</a>
+    <!-- Coluna de texto: C1, C2, C3 (order 1), depois imagem (order 2), depois botão (order 3) -->
+    <div class="hero-text" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start">
+      <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:16px;font-weight:500">${s('C1')}</div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(26px,5vw,42px);font-weight:800;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;line-height:1.1;margin-bottom:14px">${s('C2')}</h1>
+      <p style="font-size:15px;color:#8a8070;line-height:1.65;margin-bottom:0">${s('C3')}</p>
     </div>
-    <!-- C4: imagem hero direita -->
-    <div class="hero-img-wrap" style="flex-shrink:0;width:260px;height:220px;border-radius:12px;overflow:hidden">
-      ${img('C4','C1','width:100%;height:100%;object-fit:cover')}
+    <!-- C4: imagem hero — no desktop fica à direita, no mobile entre C3 e C5 -->
+    <div class="hero-img-wrap" style="flex-shrink:0;width:260px;height:220px;border-radius:12px;overflow:hidden;order:0">
+      ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover">' : ''}
     </div>
+  </div>
+  <!-- C5: botão sempre abaixo no desktop e mobile -->
+  <div class="hero-cta-wrap" style="margin-top:28px">
+    <a href="#sec6" class="btn-cta">${s('C5')}</a>
   </div>
 </div>
 
 <!-- ══ SEÇÃO 2: DOR ══ campos 6, 7, 8, 9, 10 -->
 <div class="section">
   <div class="wrap" style="text-align:center">
-    <!-- C6: título centralizado bold -->
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;margin-bottom:28px">${s('C6')}</h2>
-    <!-- C7, C8, C9: três pílulas escuras lado a lado -->
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
       ${['C7','C8','C9'].map(function(k){return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';}).join('')}
     </div>
-    <!-- C10: solução — título grande bold centralizado -->
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc">${s('C10')}</h2>
   </div>
 </div>
@@ -1275,24 +1416,22 @@ a{color:inherit;text-decoration:none}
 <!-- ══ SEÇÃO 3: PARA QUEM ══ campos 11-17 -->
 <div class="section" style="padding-top:0">
   <div class="wrap">
-    <!-- card escuro com C11 à esq e lista numerada C12-C16 à dir -->
     <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
-      <!-- C11: título dourado grande lado esquerdo -->
-      <div style="min-width:180px;padding:36px 28px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618">
-        <div style="font-family:'Playfair Display',serif;font-size:clamp(18px,3vw,26px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.2">${s('C11')}</div>
+      <!-- C11: 30% do container -->
+      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618;flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(16px,2.5vw,22px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.3">${s('C11')}</div>
       </div>
-      <!-- C12-C16: lista numerada lado direito -->
-      <div style="flex:1;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+      <!-- C12-C16: 70% do container -->
+      <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
         ${['C12','C13','C14','C15','C16'].map(function(k,i){
           return '<div style="font-size:14px;color:#c0b090;display:flex;align-items:baseline;gap:8px">'
-            +'<span style="color:#8a8070;font-size:12px;min-width:16px">'+(i+1)+'.</span>'
+            +'<span style="color:#8a8070;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
             +'<span>'+s(k)+'</span></div>';
         }).join('')}
       </div>
     </div>
-    <!-- C17: botão CTA centralizado -->
     <div style="text-align:center">
-      <a href="${r('C17B')}" class="btn-cta">${s('C17')}</a>
+      <a href="#sec6" class="btn-cta">${s('C17')}</a>
     </div>
   </div>
 </div>
@@ -1300,12 +1439,10 @@ a{color:inherit;text-decoration:none}
 <!-- ══ SEÇÃO 4: BENEFÍCIOS ══ campos 18-24 -->
 <div class="section">
   <div class="wrap">
-    <!-- C18: título centralizado -->
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:32px">${s('C18')}</h2>
-    <!-- 3 colunas separadas por linha vertical dourada -->
-    <div class="ben-cols" style="display:flex;gap:0">
+    <div class="ben-cols" style="display:flex;gap:0;background:#181610;border:1px solid #2a2618;border-radius:14px;overflow:hidden">
       ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
-        return '<div class="ben-col" style="flex:1;padding:24px 28px'+(i<2?';border-right:1px solid #2a2618':'')+'">'
+        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #2a2618':'')+'">'
           +'<div style="font-size:11px;font-weight:700;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
           +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(pair[1])+'</p>'
           +'</div>';
@@ -1314,36 +1451,31 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- ══ SEÇÃO 5: RESULTADOS ══ campos 25-30, 30A-30C -->
+<!-- ══ SEÇÃO 5: RESULTADOS ══ campos 25-30 (sem imagens) -->
 <div class="section" style="padding-top:0">
   <div class="wrap">
     <div class="res-cols" style="display:flex;gap:16px">
-      ${[['C25','C26','C30A'],['C27','C28','C30B'],['C29','C30','C30C']].map(function(t){
-        return '<div class="res-col card" style="flex:1;overflow:hidden">'
-          +'<div style="height:160px;overflow:hidden">'+img(t[2],t[0],'width:100%;height:100%;object-fit:cover')+'</div>'
-          +'<div style="padding:20px">'
-          +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;font-style:italic;color:#C9A84C;margin-bottom:8px">'+s(t[0])+'</div>'
-          +'<p style="font-size:12px;color:#8a8070;line-height:1.6">'+s(t[1])+'</p>'
-          +'</div></div>';
+      ${[['C25','C26'],['C27','C28'],['C29','C30']].map(function(t){
+        return '<div class="card" style="flex:1;padding:28px 22px">'
+          +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;font-style:italic;color:#C9A84C;margin-bottom:10px">'+s(t[0])+'</div>'
+          +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(t[1])+'</p>'
+          +'</div>';
       }).join('')}
     </div>
   </div>
 </div>
 
 <!-- ══ SEÇÃO 6: OFERTA / CARD ══ campos 31-37 -->
-<div class="section">
+<div id="sec6" class="section">
   <div class="wrap" style="display:flex;justify-content:center">
     <div style="background:linear-gradient(160deg,#1c1a08,#221e0a);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:40px 36px;width:100%;max-width:480px">
-      <!-- C31: título italic dourado grande centralizado -->
       <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C31')}</h3>
-      <!-- C32-C36: itens em pílulas bege esmaecido -->
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
         ${['C32','C33','C34','C35','C36'].filter(function(k){return r(k);}).map(function(k){
           return '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:100px;padding:11px 22px;font-size:13px;color:#b0a070;text-align:center;font-weight:500">'+s(k)+'</div>';
         }).join('')}
       </div>
-      <!-- C37: botão CTA dourado full width -->
-      <a href="${r('C37B')}" class="btn-cta" style="display:block;text-align:center;width:100%">${s('C37')}</a>
+      <a href="${r('C37B')}" class="btn-cta" style="display:block;width:100%">${s('C37')}</a>
     </div>
   </div>
 </div>
@@ -1351,15 +1483,12 @@ a{color:inherit;text-decoration:none}
 <!-- ══ SEÇÃO 7: QUEM SOU EU ══ campos 38-40 -->
 <div class="section" style="border-top:1px solid #1e1c10">
   <div class="wrap">
-    <div style="display:flex;align-items:center;gap:36px;flex-wrap:wrap">
-      <!-- C40: foto vertical (portrait) à esquerda -->
+    <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
       <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.2)">
-        ${img('C40','C38','width:100%;height:100%;object-fit:cover')}
+        ${r('C40') ? '<img src="'+r('C40')+'" alt="'+s('C38')+'" style="width:100%;height:100%;object-fit:cover">' : '<div style="width:100%;height:100%;background:#1c1a10;display:flex;align-items:center;justify-content:center;color:#3a3428;font-size:11px">Foto</div>'}
       </div>
       <div style="flex:1;min-width:200px">
-        <!-- C38: nome grande dourado -->
         <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C38')}</h2>
-        <!-- C39: bio, texto menor -->
         <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C39')}</p>
       </div>
     </div>
@@ -1432,40 +1561,56 @@ document.getElementById('btn-baixar').onclick=function(){
 
 document.getElementById('btn-salvar-pagina').onclick=function(){
   if(!_html){alert('Gere a página primeiro.');return;}
-  var slugFinal = _slug || 'pagina-'+Date.now();
-  var linkPagina = 'donalab.com.br/p/' + slugFinal;
   var nomeCliente = document.getElementById('p-nome').value.trim() || _nome;
   var emailCliente = document.getElementById('p-email').value.trim();
   var btn = document.getElementById('btn-salvar-pagina');
   btn.disabled=true; btn.textContent='Publicando...';
 
-  // 1. Salvar página
-  var payload = { slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:_html };
-  sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
-    if(!res || !res[0] || !res[0].id) {
-      btn.disabled=false; btn.innerHTML='Publicar Página';
-      alert('Erro ao salvar: '+(res&&res.message||JSON.stringify(res))); return;
-    }
+  // Gera slug: primeiro-nome-[numero-de-paginas-do-cliente + 1]
+  var primeiroNome = nomeCliente.split(' ')[0].toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,'');
 
-    // 2. Auto-cadastrar cliente (upsert por email)
-    var clientePayload = { nome: nomeCliente, email: emailCliente, dados: 'Página: https://'+linkPagina };
-    sbFetch('clientes?select=id,email&email=eq.'+encodeURIComponent(emailCliente)).then(function(existe){
-      if (existe && existe.length > 0) {
-        // já existe — atualiza dados
-        sbFetch('clientes?id=eq.'+existe[0].id, {method:'PATCH', body:JSON.stringify({dados: 'Página: https://'+linkPagina})});
-      } else if (emailCliente) {
-        // novo cliente
-        sbFetch('clientes', {method:'POST', body:JSON.stringify(clientePayload)});
+  sbFetch('paginas?select=id&cliente=eq.'+encodeURIComponent(nomeCliente)).then(function(existentes){
+    var numPaginas = (Array.isArray(existentes) ? existentes.length : 0) + 1;
+    var slugFinal = primeiroNome + '-' + numPaginas;
+    var linkPagina = 'donalab.com.br/p/' + slugFinal;
+
+    // Salvar página
+    var payload = { slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:_html };
+    sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
+      if(!res || !res[0] || !res[0].id){
+        btn.disabled=false; btn.innerHTML='Publicar Página';
+        alert('Erro ao salvar: '+(res&&res.message||JSON.stringify(res))); return;
       }
-    });
 
-    btn.disabled=false;
-    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Publicar Página';
-    loadPages();
-    loadClients();
-    showPaginasTab('lista');
-    alert('Página publicada!\nAcesse em: https://'+linkPagina);
-  }).catch(function(e){ btn.disabled=false; alert('Erro: '+e.message); });
+      // Auto-cadastrar cliente
+      var clientePayload = { nome:nomeCliente, email:emailCliente, dados:'Página: https://'+linkPagina };
+      if(emailCliente){
+        sbFetch('clientes?select=id&email=eq.'+encodeURIComponent(emailCliente)).then(function(existe){
+          if(existe && existe.length>0){
+            sbFetch('clientes?id=eq.'+existe[0].id,{method:'PATCH',body:JSON.stringify({dados:'Página: https://'+linkPagina})});
+          } else {
+            sbFetch('clientes',{method:'POST',body:JSON.stringify(clientePayload)});
+          }
+        });
+      } else {
+        // sem email, cadastra pelo nome se não existir
+        sbFetch('clientes?select=id&nome=eq.'+encodeURIComponent(nomeCliente)).then(function(existe){
+          if(!existe || !existe.length){
+            sbFetch('clientes',{method:'POST',body:JSON.stringify({nome:nomeCliente,dados:'Página: https://'+linkPagina})});
+          }
+        });
+      }
+
+      btn.disabled=false;
+      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Publicar Página';
+      loadPages();
+      loadClients();
+      showPaginasTab('lista');
+      alert('Página publicada!\nSlug: '+slugFinal+'\nLink: https://'+linkPagina);
+    }).catch(function(e){ btn.disabled=false; alert('Erro: '+e.message); });
+  });
 };
 
 // INIT
