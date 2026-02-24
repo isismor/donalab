@@ -21,6 +21,9 @@
   .nav-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; color:var(--text-muted); cursor:pointer; transition:all 0.2s; font-size:14px; text-decoration:none; margin-bottom:2px; border:1px solid transparent; }
   .nav-item:hover { background:var(--surface2); color:var(--text); }
   .nav-item.active { background:var(--gold-dim); color:var(--gold-light); border-color:var(--gold-border); }
+  .nav-subitem { font-size:13px; padding:8px 12px; margin-bottom:1px; color:var(--text-dim); }
+  .nav-subitem:hover { color:var(--text); }
+  .nav-subitem.active { background:var(--gold-dim); color:var(--gold-light); border-color:var(--gold-border); }
   .nav-icon { width:18px; height:18px; flex-shrink:0; }
   .nav-badge { margin-left:auto; background:var(--gold); color:#0D0D0D; font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; }
   .sidebar-user { padding:20px 28px 0; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:12px; }
@@ -122,6 +125,56 @@
   .login-btn:hover { background:var(--gold-light); }
   .login-error { font-size:12px; color:#e05555; margin-top:12px; display:none; }
   @keyframes spin { to { transform:rotate(360deg); } }
+  /* ── FLUXO GLASS VERTICAL ── */
+  .fluxo-canvas { padding:0 32px 40px; }
+  .fluxo-pipeline { max-width:680px; margin:0 auto; display:flex; flex-direction:column; align-items:center; }
+  .fluxo-select { background:rgba(255,255,255,0.06); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:8px 14px; color:var(--text); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; }
+  .fluxo-btn-save { background:var(--gold); color:#080808; border:none; border-radius:100px; padding:9px 20px; font-size:12px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .2s; }
+  .fluxo-btn-save:hover { background:var(--gold-light); }
+
+  /* Nó glass */
+  .fno { width:100%; background:rgba(255,255,255,0.04); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.09); border-radius:18px; padding:20px 24px; display:flex; align-items:center; gap:18px; cursor:pointer; transition:all .25s; position:relative; overflow:hidden; }
+  .fno::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(201,168,76,0.04) 0%,transparent 60%); pointer-events:none; }
+  .fno:hover { border-color:rgba(201,168,76,0.3); background:rgba(255,255,255,0.07); transform:translateX(4px); }
+  .fno[data-status="done"] { border-color:rgba(93,184,112,0.35); background:rgba(93,184,112,0.05); }
+  .fno[data-status="done"]::before { background:linear-gradient(135deg,rgba(93,184,112,0.06) 0%,transparent 60%); }
+  .fno[data-status="running"] { border-color:rgba(201,168,76,0.5); background:rgba(201,168,76,0.06); animation:fno-pulse 2s infinite; }
+  .fno[data-status="error"] { border-color:rgba(224,85,85,0.4); background:rgba(224,85,85,0.05); }
+  .fno-left { flex-shrink:0; }
+  .fno-icon { width:46px; height:46px; border-radius:14px; background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); display:flex; align-items:center; justify-content:center; }
+  .fno-body { flex:1; min-width:0; }
+  .fno-type { font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:4px; opacity:.8; }
+  .fno-title { font-size:15px; font-weight:600; color:var(--text); margin-bottom:3px; }
+  .fno-sub { font-size:12px; color:var(--text-muted); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fno-right { flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .fno-badge { font-size:10px; padding:4px 12px; border-radius:100px; background:rgba(255,255,255,0.06); color:var(--text-dim); white-space:nowrap; }
+  .fno[data-status="done"] .fno-badge { background:rgba(93,184,112,0.15); color:#5db870; }
+  .fno[data-status="running"] .fno-badge { background:rgba(201,168,76,0.15); color:var(--gold); }
+  .fno[data-status="error"] .fno-badge { background:rgba(224,85,85,0.15); color:#e05555; }
+  .fno-edit-btn { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:8px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); transition:all .2s; }
+  .fno-edit-btn:hover { border-color:var(--gold-border); color:var(--gold); background:var(--gold-dim); }
+
+  /* Conector vertical */
+  .fno-connector { display:flex; flex-direction:column; align-items:center; padding:2px 0; }
+  .fno-line { width:2px; height:28px; background:linear-gradient(to bottom, rgba(201,168,76,0.15), rgba(201,168,76,0.4)); }
+  .fno-arrow { font-size:10px; color:rgba(201,168,76,0.5); line-height:1; margin-top:-2px; }
+
+  /* Modal editar nó */
+  .fno-modal { background:rgba(18,18,18,0.92); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:32px; width:100%; max-width:500px; margin:24px; }
+  .fno-field { margin-bottom:18px; }
+  .fno-field label { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:6px; }
+  .fno-field input, .fno-field select, .fno-field textarea { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:11px 14px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; transition:border-color .2s; resize:vertical; }
+  .fno-field input:focus, .fno-field select:focus, .fno-field textarea:focus { border-color:rgba(201,168,76,0.4); }
+  .fno-status-row { display:flex; gap:8px; margin-bottom:20px; }
+  .fno-status-opt { flex:1; padding:9px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); font-size:11px; font-weight:600; cursor:pointer; text-align:center; transition:all .2s; color:var(--text-muted); font-family:'DM Sans',sans-serif; }
+  .fno-status-opt[data-s="idle"].sel { border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:var(--text); }
+  .fno-status-opt[data-s="running"].sel { border-color:rgba(201,168,76,0.5); background:rgba(201,168,76,0.1); color:var(--gold); }
+  .fno-status-opt[data-s="done"].sel { border-color:rgba(93,184,112,0.5); background:rgba(93,184,112,0.1); color:#5db870; }
+  .fno-status-opt[data-s="error"].sel { border-color:rgba(224,85,85,0.5); background:rgba(224,85,85,0.1); color:#e05555; }
+
+  @keyframes fno-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.15)} 50%{box-shadow:0 0 20px 4px rgba(201,168,76,0.08)} }
+  @keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.2)} 50%{box-shadow:0 0 0 6px rgba(201,168,76,0)} }
+
 </style>
 </head>
 <body>
@@ -151,22 +204,53 @@
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
           Clientes <span class="nav-badge" id="sidebar-badge">0</span>
         </a>
-        <a class="nav-item" id="nav-materiais" href="#" onclick="showSection('materiais');return false;">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-          Materiais
-        </a>
         <a class="nav-item" id="nav-paginas" href="#" onclick="showSection('paginas');return false;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
           Paginas <span class="nav-badge" id="pages-badge" style="display:none">0</span>
         </a>
+        <div class="nav-item" id="nav-materiais" onclick="toggleMateriais()" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            Materiais
+          </div>
+          <svg id="materiais-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="materiais-subitens" style="display:none;padding-left:16px;margin-top:2px;">
+          <a class="nav-item nav-subitem" id="nav-plano-ouro" href="#" onclick="showMateriais('plano-ouro');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Plano de Ouro
+          </a>
+          <a class="nav-item nav-subitem" id="nav-conteudo-alcance" href="#" onclick="showMateriais('conteudo-alcance');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            Conteúdo de Alto Alcance
+          </a>
+        </div>
+        <div class="nav-item" id="nav-fluxos" onclick="toggleFluxos()" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Fluxos
+          </div>
+          <svg id="fluxos-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="fluxos-subitens" style="display:none;padding-left:16px;margin-top:2px;">
+          <a class="nav-item nav-subitem" id="nav-fluxo-paginas" href="#" onclick="showFluxo('paginas');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            Páginas
+          </a>
+          <a class="nav-item nav-subitem" id="nav-fluxo-plano-ouro" href="#" onclick="showFluxo('plano-ouro');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Plano de Ouro
+          </a>
+          <a class="nav-item nav-subitem" id="nav-fluxo-conteudo-alcance" href="#" onclick="showFluxo('conteudo-alcance');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            Conteúdo de Alto Alcance
+          </a>
+        </div>
         <a class="nav-item" id="nav-config" href="#" onclick="showSection('config');return false;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           Configuracoes
         </a>
-        <a class="nav-item" id="nav-agentes" href="#" onclick="showSection('agentes');return false;">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M3 21c0-4 3.6-7 9-7s9 3 9 7"/><circle cx="17" cy="8" r="2" fill="currentColor" opacity="0.4"/><circle cx="7" cy="8" r="2" fill="currentColor" opacity="0.4"/></svg>
-          Agentes
-        </a>
+
       </div>
     </nav>
     <div class="sidebar-user">
@@ -207,35 +291,289 @@
     </div>
 
     <!-- MATERIAIS -->
-    <div id="section-materiais" style="display:none">
-      <div class="topbar"><div class="page-title">Materiais</div></div>
-      <div class="table-wrap" style="padding:60px;text-align:center;color:var(--text-dim)">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-        <p style="font-size:14px">Secao de Materiais em breve.</p>
+    <!-- MATERIAIS: PLANO DE OURO -->
+    <div id="section-plano-ouro" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Plano de Ouro</div>
+        <button class="btn-gold" onclick="abrirModalMaterial('plano-ouro')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Material
+        </button>
+      </div>
+      <div id="lista-plano-ouro" class="table-wrap" style="padding:0">
+        <div style="padding:60px;text-align:center;color:var(--text-dim)">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <p style="font-size:14px">Nenhum material no Plano de Ouro ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATERIAIS: CONTEUDO DE ALTO ALCANCE -->
+    <div id="section-conteudo-alcance" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Conteúdo de Alto Alcance</div>
+        <button class="btn-gold" onclick="abrirModalMaterial('conteudo-alcance')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Material
+        </button>
+      </div>
+      <div id="lista-conteudo-alcance" class="table-wrap" style="padding:0">
+        <div style="padding:60px;text-align:center;color:var(--text-dim)">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <p style="font-size:14px">Nenhum conteúdo de alto alcance ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ADICIONAR MATERIAL -->
+    <div id="modal-material" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+      <div style="background:var(--surface);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px;width:100%;max-width:480px;margin:24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:24px;">Adicionar Material</div>
+        <input type="hidden" id="material-categoria">
+        <div class="form-group"><label class="form-label">Título do material</label><input class="form-input" id="material-nome" placeholder="Ex: Guia de Copywriting"></div>
+        <div class="form-group"><label class="form-label">Tipo</label>
+          <select class="form-input" id="material-tipo">
+            <option value="PDF">PDF</option>
+            <option value="Vídeo">Vídeo</option>
+            <option value="Planilha">Planilha</option>
+            <option value="Documento">Documento</option>
+            <option value="Link">Link</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Link de acesso</label><input class="form-input" id="material-url" placeholder="https://..."></div>
+        <div class="form-group"><label class="form-label">Descrição (opcional)</label><textarea class="form-input" id="material-desc" rows="2" placeholder="Breve descrição do material..."></textarea></div>
+        <div class="form-group"><label class="form-label">Atribuir ao cliente</label>
+          <select class="form-input" id="material-cliente-id"><option value="">Todos os clientes</option></select>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button class="btn-gold" id="btn-salvar-material" style="flex:1">Salvar Material</button>
+          <button onclick="fecharModalMaterial()" style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:12px;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;">Cancelar</button>
+        </div>
       </div>
     </div>
 
     <!-- PAGINAS -->
+
+    <!-- FLUXO: PLANO DE OURO -->
+    <!-- FLUXO: PLANO DE OURO — vertical glass -->
+    <div id="section-fluxo-plano-ouro" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Fluxo — Plano de Ouro</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div id="fluxo-po-status-pill" style="display:none;align-items:center;gap:6px;background:rgba(93,184,112,0.1);border:1px solid rgba(93,184,112,0.3);border-radius:100px;padding:6px 14px;font-size:12px;color:#5db870;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#5db870;display:inline-block;"></span>
+            Salvo
+          </div>
+          <select id="fluxo-po-cliente" class="fluxo-select">
+            <option value="">Selecionar cliente...</option>
+          </select>
+          <button onclick="salvarStatusFluxo()" class="fluxo-btn-save">Salvar status</button>
+        </div>
+      </div>
+
+      <!-- CANVAS GLASS VERTICAL -->
+      <div class="fluxo-canvas">
+        <div class="fluxo-pipeline">
+
+          <!-- NÓ 1 -->
+          <div class="fno" id="no-1" data-status="idle" data-idx="0" onclick="abrirEditarNo(0)">
+            <div class="fno-left">
+              <div class="fno-icon" style="background:rgba(52,168,83,0.15);border-color:rgba(52,168,83,0.35);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">GATILHO</div>
+              <div class="fno-title">Google Sheets</div>
+              <div class="fno-sub" id="fno-sub-0">Entrada de linha com dados do cliente</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-0">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(0)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 2 -->
+          <div class="fno" id="no-2" data-status="idle" data-idx="1" onclick="abrirEditarNo(1)">
+            <div class="fno-left">
+              <div class="fno-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M3 21c0-4 3.6-7 9-7s9 3 9 7"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">CHAT MODEL</div>
+              <div class="fno-title">Página 1</div>
+              <div class="fno-sub" id="fno-sub-1">Gera conteúdo → JSON</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-1">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(1)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 3 -->
+          <div class="fno" id="no-3" data-status="idle" data-idx="2" onclick="abrirEditarNo(2)">
+            <div class="fno-left">
+              <div class="fno-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M3 21c0-4 3.6-7 9-7s9 3 9 7"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">CHAT MODEL</div>
+              <div class="fno-title">Página 2</div>
+              <div class="fno-sub" id="fno-sub-2">Gera conteúdo → JSON</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-2">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(2)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 4 -->
+          <div class="fno" id="no-4" data-status="idle" data-idx="3" onclick="abrirEditarNo(3)">
+            <div class="fno-left">
+              <div class="fno-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M3 21c0-4 3.6-7 9-7s9 3 9 7"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">CHAT MODEL</div>
+              <div class="fno-title">Página 3</div>
+              <div class="fno-sub" id="fno-sub-3">Gera conteúdo → JSON</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-3">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(3)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 5 -->
+          <div class="fno" id="no-5" data-status="idle" data-idx="4" onclick="abrirEditarNo(4)">
+            <div class="fno-left">
+              <div class="fno-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 2a5 5 0 015 5v2a5 5 0 01-10 0V7a5 5 0 015-5z"/><path d="M3 21c0-4 3.6-7 9-7s9 3 9 7"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">CHAT MODEL</div>
+              <div class="fno-title">Página 4</div>
+              <div class="fno-sub" id="fno-sub-4">Gera conteúdo → JSON</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-4">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(4)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 6: Merge -->
+          <div class="fno" id="no-6" data-status="idle" data-idx="5" onclick="abrirEditarNo(5)">
+            <div class="fno-left">
+              <div class="fno-icon" style="background:rgba(130,100,255,0.15);border-color:rgba(130,100,255,0.35);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a088ff" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">MERGE</div>
+              <div class="fno-title">Unir eBook</div>
+              <div class="fno-sub" id="fno-sub-5">Une páginas 1, 2, 3 e 4 em PDF</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-5">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(5)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="fno-connector"><div class="fno-line"></div><div class="fno-arrow">▼</div></div>
+
+          <!-- NÓ 7: Atualizar cliente -->
+          <div class="fno" id="no-7" data-status="idle" data-idx="6" onclick="abrirEditarNo(6)">
+            <div class="fno-left">
+              <div class="fno-icon" style="background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.35);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 11h6M19 8v6"/></svg>
+              </div>
+            </div>
+            <div class="fno-body">
+              <div class="fno-type">SAÍDA</div>
+              <div class="fno-title">Atualizar Cliente</div>
+              <div class="fno-sub" id="fno-sub-6">Salva link do eBook no perfil do cliente</div>
+            </div>
+            <div class="fno-right">
+              <div class="fno-badge" id="fno-badge-6">Aguardando</div>
+              <button class="fno-edit-btn" onclick="event.stopPropagation();abrirEditarNo(6)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div><!-- end pipeline -->
+      </div><!-- end canvas -->
+    </div>
+
+    <!-- MODAL EDITAR NÓ -->
+    <div id="modal-editar-no" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;">
+      <div class="fno-modal">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+          <div>
+            <div id="modal-no-tipo" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;"></div>
+            <div id="modal-no-titulo" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;"></div>
+          </div>
+          <button onclick="fecharEditarNo()" style="background:rgba(255,255,255,0.06);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;color:var(--text-muted);font-size:16px;">✕</button>
+        </div>
+
+        <div id="modal-no-campos"></div>
+
+        <div style="display:flex;gap:10px;margin-top:24px;">
+          <button onclick="salvarConfigNo()" style="flex:1;background:var(--gold);color:#080808;border:none;border-radius:100px;padding:13px;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Salvar configuração</button>
+          <button onclick="fecharEditarNo()" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:100px;padding:13px;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLUXO: CONTEUDO DE ALTO ALCANCE (placeholder) -->
+    <div id="section-fluxo-conteudo-alcance" style="display:none">
+      <div class="topbar"><div class="page-title">Fluxo — Conteúdo de Alto Alcance</div></div>
+      <div style="padding:60px;text-align:center;color:var(--text-dim)">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <p style="font-size:14px">Fluxo em construção.</p>
+      </div>
+    </div>
+
     <div id="section-paginas" style="display:none">
       <div class="topbar">
-        <div class="page-title">Paginas</div>
+        <div class="page-title">Páginas</div>
         <button class="btn-gold" onclick="showPaginasTab('nova')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Nova Pagina
+          Nova Página
         </button>
       </div>
       <div class="tabs-bar">
-        <button id="tab-lista" class="tab-btn active" onclick="showPaginasTab('lista')">Paginas Criadas</button>
-        <button id="tab-nova" class="tab-btn inactive" onclick="showPaginasTab('nova')">Nova Pagina</button>
+        <button id="tab-lista" class="tab-btn active" onclick="showPaginasTab('lista')">Páginas Criadas</button>
+        <button id="tab-nova" class="tab-btn inactive" onclick="showPaginasTab('nova')">Nova Página</button>
       </div>
 
       <!-- Lista -->
       <div id="paginas-lista">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Pagina</th><th>Cliente</th><th>Produto</th><th>Link</th><th>Acoes</th></tr></thead>
+            <thead><tr><th>Página</th><th>Cliente</th><th>Produto</th><th>Link</th><th>Ações</th></tr></thead>
             <tbody id="paginas-tbody">
-              <tr id="paginas-empty"><td colspan="5"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg><p>Nenhuma pagina criada ainda.</p></div></td></tr>
+              <tr id="paginas-empty"><td colspan="5"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg><p>Nenhuma página criada ainda.</p></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -246,154 +584,107 @@
         <div class="steps-bar">
           <div class="step-dot active" id="step-dot-1"><div class="step-num">1</div><div class="step-lbl">Dados</div></div>
           <div class="step-line" id="step-line-1"></div>
-          <div class="step-dot" id="step-dot-2"><div class="step-num">2</div><div class="step-lbl">Agente</div></div>
+          <div class="step-dot" id="step-dot-2"><div class="step-num">2</div><div class="step-lbl">Gerar</div></div>
           <div class="step-line" id="step-line-2"></div>
-          <div class="step-dot" id="step-dot-3"><div class="step-num">3</div><div class="step-lbl">Pagina</div></div>
+          <div class="step-dot" id="step-dot-3"><div class="step-num">3</div><div class="step-lbl">Página</div></div>
         </div>
 
         <!-- Etapa 1 -->
         <div id="etapa-1">
-          <div class="table-wrap" style="padding:32px">
-            <!-- Cole as respostas aqui -->
-            <div style="margin-bottom:20px">
-              <div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;font-weight:500">Cole as respostas aqui (opcional)</div>
-              <textarea id="respostas-texto" class="form-input" rows="6" style="font-size:13px;line-height:1.7" placeholder="Cole aqui as respostas do cliente em qualquer formato (texto, lista, JSON)...&#10;&#10;O agente vai processar tudo automaticamente na Etapa 2."></textarea>
+          <div class="table-wrap" style="padding:32px;max-width:700px;margin:0 auto">
+
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Nova Página</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:28px">Preencha os dados e cole os 43 campos para gerar a página automaticamente.</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Nome do cliente</label>
+                <input class="form-input" id="p-nome" placeholder="Nome completo">
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">E-mail do cliente</label>
+                <input class="form-input" id="p-email" type="email" placeholder="email@exemplo.com">
+              </div>
             </div>
 
-            <div style="background:var(--surface2);border:2px dashed rgba(255,255,255,0.08);border-radius:12px;padding:24px;text-align:center;margin-bottom:28px;cursor:pointer" onclick="document.getElementById('upload-csv').click()" onmouseover="this.style.borderColor='var(--gold-border)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gold);margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <div style="font-size:13px;color:var(--text-muted)">Importar via CSV ou XLS <span style="color:var(--gold)">clique aqui</span></div>
-              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">ou preencha manualmente abaixo</div>
-              <input type="file" id="upload-csv" accept=".csv,.xls,.xlsx" style="display:none">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
-              <div class="form-section">
-                <div class="form-section-title">1. Dados de cadastro</div>
-                <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="p-nome" placeholder="Nome do cliente"></div>
-                <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="p-email" type="email" placeholder="email@exemplo.com"></div>
-                <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="p-whatsapp" placeholder="(11) 99999-9999"></div>
-                <div class="form-group"><label class="form-label">Instagram</label><input class="form-input" id="p-instagram" placeholder="@usuario"></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">2. Materiais visuais</div>
-                <div class="form-group"><label class="form-label">Link com fotos (Drive/Dropbox)</label><input class="form-input" id="p-fotos" placeholder="https://drive.google.com/..."></div>
-              </div>
-              <div class="form-section" style="grid-column:1/-1">
-                <div class="form-section-title">3. Informacoes do produto</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-                  <div class="form-group"><label class="form-label">Nome do produto</label><input class="form-input" id="p-produto-nome" placeholder="Ex: Metodo X"></div>
-                  <div class="form-group"><label class="form-label">Tipo</label><select class="form-input" id="p-produto-tipo"><option value="">Selecione...</option><option>Mentoria</option><option>Consultoria</option><option>Desafio</option><option>Produto fisico</option><option>Outro</option></select></div>
-                  <div class="form-group" style="grid-column:1/-1"><label class="form-label">Promessa principal</label><textarea class="form-input" id="p-promessa" rows="2" placeholder="Transformacao principal do produto"></textarea></div>
-                  <div class="form-group"><label class="form-label">O que resolve (dor)</label><textarea class="form-input" id="p-dor" rows="3" placeholder="Problema que resolve..."></textarea></div>
-                  <div class="form-group"><label class="form-label">O que entrega</label><textarea class="form-input" id="p-entrega" rows="3" placeholder="Formato e conteudo..."></textarea></div>
-                  <div class="form-group"><label class="form-label">Metodo</label><input class="form-input" id="p-metodo" placeholder="Nome e descricao do metodo"></div>
-                  <div class="form-group"><label class="form-label">Modulos</label><textarea class="form-input" id="p-modulos" rows="3" placeholder="Liste os modulos..."></textarea></div>
-                </div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">4. Publico-alvo</div>
-                <div class="form-group"><label class="form-label">Para quem e</label><textarea class="form-input" id="p-para-quem" rows="3" placeholder="Publico ideal..."></textarea></div>
-                <div class="form-group"><label class="form-label">Para quem nao e</label><textarea class="form-input" id="p-nao-para-quem" rows="3" placeholder="Quem nao deve comprar..."></textarea></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">5. Beneficios e resultados</div>
-                <div class="form-group"><label class="form-label">Beneficios</label><textarea class="form-input" id="p-beneficios" rows="3" placeholder="Principais beneficios..."></textarea></div>
-                <div class="form-group"><label class="form-label">Resultados</label><textarea class="form-input" id="p-resultados" rows="3" placeholder="Antes/depois, conquistas..."></textarea></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">6. Prova social</div>
-                <div class="form-group"><label class="form-label">Depoimentos</label><textarea class="form-input" id="p-depoimentos" rows="4" placeholder="Texto ou links de prints..."></textarea></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">7. Garantia</div>
-                <div class="form-group"><label class="form-label">Prazo e condicao</label><input class="form-input" id="p-garantia" placeholder="Ex: 7 dias reembolso total"></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">8. Autoridade</div>
-                <div class="form-group"><label class="form-label">Mini bio</label><textarea class="form-input" id="p-bio" rows="4" placeholder="Credenciais, historia, autoridade..."></textarea></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">9. Oferta e venda</div>
-                <div class="form-group"><label class="form-label">Preco</label><input class="form-input" id="p-preco" placeholder="Ex: R$997 ou 12x de R$97"></div>
-                <div class="form-group"><label class="form-label">Por onde vende</label><input class="form-input" id="p-venda" placeholder="Hotmart / Kiwify / WhatsApp..."></div>
-              </div>
-              <div class="form-section">
-                <div class="form-section-title">10. Suporte</div>
-                <div class="form-group"><label class="form-label">Contato de suporte</label><input class="form-input" id="p-suporte" placeholder="WhatsApp / E-mail / Instagram"></div>
-              </div>
-              <div class="form-section" style="grid-column:1/-1">
-                <div class="form-section-title">11. Observacoes finais</div>
-                <div class="form-group"><label class="form-label">Informacoes adicionais</label><textarea class="form-input" id="p-obs" rows="3" placeholder="Qualquer info extra..."></textarea></div>
-              </div>
-              <div class="form-section" style="grid-column:1/-1">
-                <div class="form-section-title">Link da pagina</div>
-                <div class="form-group"><label class="form-label">Slug (donalab.com.br/...)</label>
-                  <div style="display:flex;gap:8px;align-items:center"><span style="color:var(--text-dim);font-size:13px;white-space:nowrap">donalab.com.br/</span><input class="form-input" id="p-slug" placeholder="nome-do-produto" style="flex:1"></div>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex;justify-content:flex-end;margin-top:24px">
-              <button class="btn-gold" id="btn-ir-etapa2">Continuar para o Agente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Etapa 2 -->
-        <div id="etapa-2" style="display:none">
-          <div class="table-wrap" style="padding:32px">
-
-            <!-- API Key oculta -->
-            <input type="hidden" id="openai-key">
-
-            <!-- Status dos agentes -->
-            <div id="agentes-status" style="display:none;margin-top:8px;margin-bottom:8px">
-
-              <!-- Lyra -->
-              <div id="status-lyra" style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface2);border:1px solid rgba(255,255,255,0.05);border-radius:14px;margin-bottom:12px">
-                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#9b6bc9,#4a1a8a);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">✍️</div>
-                <div style="flex:1">
-                  <div style="font-weight:600;font-size:14px;margin-bottom:3px">Lyra <span style="font-size:11px;color:var(--text-dim);font-weight:400">Copywriter</span></div>
-                  <div id="lyra-status-text" style="font-size:12px;color:var(--text-muted)">Aguardando...</div>
-                </div>
-                <div id="lyra-spinner" style="display:none;width:20px;height:20px;border:2px solid rgba(155,107,201,0.3);border-top-color:#9b6bc9;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
-                <div id="lyra-check" style="display:none;width:24px;height:24px;border-radius:50%;background:rgba(93,184,112,0.15);border:1px solid rgba(93,184,112,0.4);display:none;align-items:center;justify-content:center;flex-shrink:0;color:#5db870;font-size:13px">✓</div>
-                <div id="lyra-err" style="display:none;width:24px;height:24px;border-radius:50%;background:var(--danger-dim);border:1px solid rgba(224,85,85,0.3);align-items:center;justify-content:center;flex-shrink:0;color:var(--danger);font-size:13px">✗</div>
-              </div>
-
-              <!-- Orion -->
-              <div id="status-orion" style="display:flex;align-items:center;gap:16px;padding:20px;background:var(--surface2);border:1px solid rgba(255,255,255,0.05);border-radius:14px;opacity:0.4;transition:opacity 0.3s">
-                <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#4c9ac9,#1a3f6a);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎨</div>
-                <div style="flex:1">
-                  <div style="font-weight:600;font-size:14px;margin-bottom:3px">Orion <span style="font-size:11px;color:var(--text-dim);font-weight:400">Webdesigner</span></div>
-                  <div id="orion-status-text" style="font-size:12px;color:var(--text-muted)">Aguardando Lyra...</div>
-                </div>
-                <div id="orion-spinner" style="display:none;width:20px;height:20px;border:2px solid rgba(76,154,201,0.3);border-top-color:#4c9ac9;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
-                <div id="orion-check" style="display:none;width:24px;height:24px;border-radius:50%;background:rgba(93,184,112,0.15);border:1px solid rgba(93,184,112,0.4);align-items:center;justify-content:center;flex-shrink:0;color:#5db870;font-size:13px">✓</div>
-                <div id="orion-err" style="display:none;width:24px;height:24px;border-radius:50%;background:var(--danger-dim);border:1px solid rgba(224,85,85,0.3);align-items:center;justify-content:center;flex-shrink:0;color:var(--danger);font-size:13px">✗</div>
-              </div>
-
+            <div class="form-group">
+              <label class="form-label">Cole aqui os 43 campos</label>
+              <textarea class="form-input" id="respostas-43" rows="20" style="font-size:13px;line-height:1.8;font-family:monospace" placeholder="C1: (nome da marca/pessoa)
+C2: (título principal — produto)
+C3: (subtítulo / promessa)
+C4: (URL foto hero)
+C5: (texto botão CTA)
+C5B: (link checkout)
+C6: (pergunta de dor)
+C7: (sintoma 1)
+C8: (sintoma 2)
+C9: (sintoma 3)
+C10: (solução)
+C11: (título — para quem é)
+C12: (desejo 1)
+C13: (desejo 2)
+C14: (desejo 3)
+C15: (desejo 4)
+C16: (desejo 5)
+C17: (texto botão CTA 2)
+C17B: (link checkout)
+C18: (título benefícios)
+C19: (benefício 1 título)
+C20: (benefício 1 descrição)
+C21: (benefício 2 título)
+C22: (benefício 2 descrição)
+C23: (benefício 3 título)
+C24: (benefício 3 descrição)
+C25: (resultado 1 título)
+C26: (resultado 1 descrição)
+C27: (resultado 2 título)
+C28: (resultado 2 descrição)
+C29: (resultado 3 título)
+C30: (resultado 3 descrição)
+C30A: (URL imagem resultado 1)
+C30B: (URL imagem resultado 2)
+C30C: (URL imagem resultado 3)
+C31: (título card oferta)
+C32: (item oferta 1)
+C33: (item oferta 2)
+C34: (item oferta 3)
+C35: (item oferta 4)
+C36: (item oferta 5)
+C37: (texto botão compra)
+C37B: (link checkout)
+C38: (quem sou eu — nome)
+C39: (bio)
+C40: (URL foto autor)
+C41: (nome rodapé)
+C42: (copyright)
+C43: (e-mail suporte)"></textarea>
             </div>
 
-            <div style="display:flex;justify-content:space-between;margin-top:24px">
-              <button class="btn-outline" id="btn-volta-1">Voltar</button>
-              <button class="btn-gold" id="btn-rodar-agente">
+            <div style="display:flex;justify-content:flex-end;margin-top:8px">
+              <button class="btn-gold" id="btn-gerar-pagina" style="display:flex;align-items:center;gap:8px">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Gerar Pagina
+                Gerar Página
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Etapa 3 -->
-        <div id="etapa-3" style="display:none">
+        <!-- Etapa 2: gerando -->
+        <div id="etapa-2" style="display:none">
+          <div class="table-wrap" style="padding:48px;text-align:center;max-width:500px;margin:0 auto">
+            <div style="width:56px;height:56px;border:3px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 24px"></div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px">Gerando sua página...</div>
+            <div id="gerando-status" style="font-size:13px;color:var(--text-muted)">Processando os campos...</div>
+          </div>
+        </div>
 
-          <!-- Painel de imagens -->
+        <!-- Etapa 3: resultado -->
+        <div id="etapa-3" style="display:none">
           <div id="painel-imagens" style="display:none;margin-bottom:20px">
             <div class="table-wrap" style="padding:24px">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <div style="font-size:13px;font-weight:500">Imagens pendentes detectadas</div>
-                <div style="font-size:12px;color:var(--text-dim);margin-left:4px">Faca upload ou remova cada area</div>
+                <div style="font-size:13px;font-weight:500">Imagens pendentes</div>
               </div>
               <div id="imagens-lista" style="display:flex;flex-direction:column;gap:12px"></div>
             </div>
@@ -402,13 +693,9 @@
           <div class="table-wrap" style="padding:32px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
               <div>
-                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Pagina gerada</div>
+                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Página gerada</div>
                 <div style="font-size:13px;color:var(--text-muted)">Revise e publique quando estiver pronta.</div>
               </div>
-              <button id="btn-recarregar-preview" style="background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--text-muted);padding:8px 14px;border-radius:9px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-                Atualizar preview
-              </button>
             </div>
             <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:24px">
               <iframe id="pagina-preview" style="width:100%;height:640px;border:none;background:#fff"></iframe>
@@ -422,12 +709,13 @@
                 </button>
                 <button class="btn-gold" id="btn-salvar-pagina">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                  Salvar Pagina
+                  Publicar Página
                 </button>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -443,74 +731,7 @@
       </div>
     </div>
 
-    <!-- AGENTES -->
-    <div id="section-agentes" style="display:none">
-      <div class="topbar"><div class="page-title">Agentes</div></div>
 
-      <!-- Orion -->
-      <div class="table-wrap" style="padding:32px;margin-bottom:24px">
-        <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px">
-          <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4c9ac9,#1a3f6a);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">🎨</div>
-          <div>
-            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:4px">Orion <span style="font-size:12px;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:2px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;vertical-align:middle;margin-left:6px">Webdesigner</span></div>
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Responsavel pela estrutura visual e layout da pagina de vendas. Define hierarquia, secoes, paleta de cores e estilo do HTML gerado.</div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Instrucoes do Orion</label>
-          <textarea class="form-input" id="orion-prompt" rows="10" style="font-size:13px;line-height:1.8" placeholder="Descreva como o Orion deve construir o design da pagina...
-
-Exemplo:
-- Use uma paleta escura com fundo #0a0a0a e dourado #C9A84C como cor principal
-- Hero com titulo grande centralizado e CTA em destaque
-- Secao de beneficios em grid de 3 colunas com cards escuros
-- Tipografia: Playfair Display para titulos, DM Sans para textos
-- Secao de depoimentos com fundo levemente diferente
-- Rodape simples com logo e link de venda
-- Layout responsivo para mobile"></textarea>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px;color:var(--text-dim)">Usado na Etapa 3 — geracao do HTML</div>
-          <button class="btn-gold" id="btn-salvar-orion">Salvar instrucoes</button>
-        </div>
-        <div id="orion-msg" style="font-size:12px;color:#5db870;margin-top:12px;display:none;text-align:right">Instrucoes do Orion salvas!</div>
-      </div>
-
-      <!-- Lyra -->
-      <div class="table-wrap" style="padding:32px">
-        <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px">
-          <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#9b6bc9,#4a1a8a);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px">✍️</div>
-          <div>
-            <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:4px">Lyra <span style="font-size:12px;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:2px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;font-weight:500;vertical-align:middle;margin-left:6px">Copywriter</span></div>
-            <div style="font-size:13px;color:var(--text-muted);line-height:1.6">Responsavel pelo conteudo persuasivo da pagina. Escreve titulos, subtitulos, descricoes e chamadas para acao com foco em conversao.</div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Instrucoes da Lyra</label>
-          <textarea class="form-input" id="lyra-prompt" rows="10" style="font-size:13px;line-height:1.8" placeholder="Descreva como a Lyra deve escrever os textos da pagina...
-
-Exemplo:
-- Tom de voz: direto, empoderador e acolhedor — sem exageros
-- Titulo principal deve conter a promessa de transformacao em ate 10 palavras
-- Subtitulo reforça a dor resolvida com empatia
-- Beneficios em frases curtas orientadas a resultado (ex: 'Voce vai...')
-- CTA principal: urgente e especifico (ex: 'Quero comecar agora')
-- Depoimentos: reescrever para soar natural e humano
-- Garantia: enfatizar segurança e ausencia de risco
-- Evitar: hiperboles, superlativos excessivos e promessas impossíveis"></textarea>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px;color:var(--text-dim)">Usada na Etapa 2 — geracao do conteudo</div>
-          <button class="btn-gold" id="btn-salvar-lyra">Salvar instrucoes</button>
-        </div>
-        <div id="lyra-msg" style="font-size:12px;color:#5db870;margin-top:12px;display:none;text-align:right">Instrucoes da Lyra salvas!</div>
-      </div>
-
-    </div>
 
   </main>
 </div>
@@ -569,190 +790,75 @@ document.getElementById('btn-logout').onmouseover = function(){ this.style.color
 document.getElementById('btn-logout').onmouseout = function(){ this.style.color='var(--text-dim)'; };
 
 // NAVIGATION
+function toggleMateriais() {
+  var sub = document.getElementById('materiais-subitens');
+  var chev = document.getElementById('materiais-chevron');
+  var open = sub.style.display !== 'none';
+  sub.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function showMateriais(categoria) {
+  document.getElementById('materiais-subitens').style.display = 'block';
+  document.getElementById('materiais-chevron').style.transform = 'rotate(180deg)';
+  // Esconde todas as sections (incluindo fluxos)
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config',
+   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.style.display = 'none';
+  });
+  // Mostra só a section de materiais
+  document.getElementById('section-'+categoria).style.display = '';
+  document.querySelectorAll('.nav-item, .nav-subitem').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('nav-materiais').classList.add('active');
+  var navEl = document.getElementById('nav-'+categoria);
+  if (navEl) navEl.classList.add('active');
+  carregarMateriais(categoria);
+}
+
+function toggleFluxos() {
+  var sub = document.getElementById('fluxos-subitens');
+  var chev = document.getElementById('fluxos-chevron');
+  var open = sub.style.display !== 'none';
+  sub.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function showFluxo(nome) {
+  document.getElementById('fluxos-subitens').style.display = 'block';
+  document.getElementById('fluxos-chevron').style.transform = 'rotate(180deg)';
+  // Esconde todas as sections (materiais e fluxo)
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config',
+   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.style.display = 'none';
+  });
+  // Mostra só a section de fluxo correta
+  var sec = document.getElementById('section-fluxo-'+nome);
+  if (sec) sec.style.display = '';
+  document.querySelectorAll('.nav-item, .nav-subitem').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('nav-fluxos').classList.add('active');
+  var navEl = document.getElementById('nav-fluxo-'+nome);
+  if (navEl) navEl.classList.add('active');
+}
+
 function showSection(name) {
-  ['clientes','materiais','paginas','config','agentes'].forEach(function(s) {
-    document.getElementById('section-'+s).style.display = (s===name)?'':'none';
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config',
+   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.style.display = (s===name)?'':'none';
     var n = document.getElementById('nav-'+s);
     if (n) n.classList.toggle('active', s===name);
   });
+  // Fecha menus de materiais e fluxos
+  document.getElementById('fluxos-subitens').style.display = 'none';
+  document.getElementById('fluxos-chevron').style.transform = '';
+  document.getElementById('materiais-subitens').style.display = 'none';
+  document.getElementById('materiais-chevron').style.transform = '';
+  document.querySelectorAll('#nav-fluxos, #nav-materiais').forEach(function(n){ if(n) n.classList.remove('active'); });
+  // Fecha subitens de fluxos e limpa active
+  document.querySelectorAll('.nav-subitem').forEach(function(el){ el.classList.remove('active'); });
   if (name==='config') document.getElementById('config-openai-key').value = localStorage.getItem('openai_key')||'';
-  if (name==='agentes') {
-    document.getElementById('orion-prompt').value = localStorage.getItem('orion_prompt') || `NOME: ORION — Webdesigner Sênior (Páginas de Alta Conversão)
-
-PAPEL
-Você é o ORION, webdesigner sênior especialista em páginas premium, elegantes e minimalistas (Apple-like), com carregamento rápido. Você recebe os inputs estruturados vindos da copywriter (NÃO reescreve, NÃO melhora, NÃO altera palavras) e transforma em uma página completa em HTML, mobile-first, com hierarquia visual clara, princípios de conversão e primal branding.
-
-REGRA DE COMPATIBILIDADE (OBRIGATÓRIA)
-Você deve devolver COMO OUTPUT:
-1) O HTML completo da página
-2) OS MESMOS OUTPUTS QUE VOCÊ RECEBEU COMO INPUTS (mesma estrutura, mesmos campos, mesmos valores), sem alterações de texto.
-   - Se você precisou preencher algo que estava vazio (ex.: placeholder de imagem), você NÃO inventa: você marca como PENDÊNCIA no campo correspondente e mantém placeholder no HTML.
-
-ESTILO (APPLE-LIKE) — GUIA
-- Premium, minimalista, muito respiro, grid limpo, "design padrão Apple".
-- Você escolhe entre DARK ou CLEAN com base no produto/nicho/promessa.
-- Componentes: cards com cantos arredondados, sombras suaves, divisórias sutis, botões em pílula.
-- Sem emojis no HTML e em nenhum texto.
-- Performance: sem bibliotecas pesadas, sem efeitos caros, CSS enxuto, imagens otimizadas (dimensões definidas + lazy-loading onde aplicável).
-- Acessibilidade básica: contraste adequado, headings semânticos, foco visível, aria/labels quando necessário.
-- Cores: é PROIBIDO usar combinações de baixo contraste juntas (ex.: texto claro em fundo claro).
-
-REGRAS DE OURO (NUNCA QUEBRAR)
-1) NÃO alterar a copy fornecida (nenhuma palavra em nenhum campo de texto).
-2) NÃO usar emojis.
-3) NÃO inventar dados (preço, garantias, bônus, credenciais, resultados, números).
-4) IMAGENS OBRIGATÓRIAS: você DEVE inserir imagens (URLs) em:
-   - HERO (Seção 1 — campo 4)
-   - RESULTADOS (Seção 5 — você deve ter 3 imagens de resultados)
-   - QUEM SOU EU (Seção 7 — campo 40)
-   Se algum link de imagem estiver faltando/inválido, use placeholder no HTML e marque PENDÊNCIA no output estruturado.
-5) Sempre entregar para HUMANO aprovar antes de publicar.
-6) Se detectar risco alto (legal/reputação/claims sensíveis, saúde/finanças, garantias absolutas) → escalar para HUMANO ANTES de concluir.
-
-TIPOS DE PÁGINA (VOCÊ INFERES NATURALMENTE)
-A) Página de vendas — incluir FAQ
-B) Página de captura (lead) — sem FAQ
-C) Relatório — sem FAQ
-
-ESTRUTURA DE ENTRADA (SEÇÕES 1 A 8)
-SEÇÃO 1 (HERO): nome, produto, promessa, foto hero, botão CTA + link
-SEÇÃO 2 (DOR E SOLUÇÃO): pergunta de objeção, 3 sintomas, solução
-SEÇÃO 3 (PARA QUEM É): título, 5 desejos, botão CTA + link
-SEÇÃO 4 (BENEFÍCIOS): abertura, 3 benefícios com explicação
-SEÇÃO 5 (RESULTADOS): 3 resultados com explicação + imagens 30a/30b/30c
-SEÇÃO 6 (OFERTA): título card, entrega, garantia, acesso, bônus, preço, botão + link
-SEÇÃO 7 (QUEM SOU EU): título, descrição, foto autor
-SEÇÃO 8 (RODAPÉ): nome, copyright, e-mail suporte
-
-DESIGN SYSTEM (OBRIGATÓRIO)
-- Fonte: system-ui (-apple-system, BlinkMacSystemFont, Segoe UI)
-- Layout: container central, grid responsivo, espaçamentos amplos
-- Componentes: cards arredondados, botões pílula, bordas sutis, sombra suave
-- Tema: escolher dark ou clean conforme produto/nicho
-- CSS puro em <style>, sem frameworks pesados
-
-SAÍDA (OUTPUT)
-Entregue APENAS:
-1) HTML COMPLETO (começando com <!DOCTYPE html>)
-2) OUTPUTS ESTRUTURADOS (mesmos campos recebidos, sem alterar textos)
-3) RESUMO FINAL: ações executadas, pendências, confiança, tipo de página
-
-CHECKLIST ANTES DE ENTREGAR
-- Mobile-first: 320px sem overflow
-- Sem emojis
-- Copy preservada (não alterada)
-- Links válidos nos CTAs
-- Imagens com width/height e lazy-loading
-- Acessibilidade básica (headings, contraste, foco visível)`;
-    document.getElementById('lyra-prompt').value = localStorage.getItem('lyra_prompt') || `PROMPT — LYRA | Copywriter Sênior de Páginas de Vendas (Alta Conversão)
-Você é Lyra, copywriter sênior especialista em páginas de vendas de alta conversão, com referências de escrita em David Ogilvy (clareza, especificidade, benefício acima de adjetivo, prova e credibilidade).
-Você escreve uma página seguindo EXATAMENTE o template de saída (itens 1 a 43), respeitando limites de caracteres (tolerância de ±3).
-
-1) Missão
-Gerar a copy completa de uma página de vendas em português, usando os inputs do cliente, com foco em:
-- promessa clara e crível
-- conexão com dor e objeções
-- benefícios concretos
-- resultados visuais e palpáveis
-- chamada para ação objetiva
-
-2) Regras de escrita (obrigatórias)
-- Linguagem: português (Brasil).
-- Não usar travessão (—). Se precisar, use ponto, vírgula, dois-pontos ou parênteses.
-- Evitar palavras em inglês, a não ser que venham no input (ex.: nome do método, termo do nicho, marca).
-- Evitar antíteses (ex.: "não é só X, é Y"). Reescreva de forma direta.
-- Escrever de forma simples, humana e assertiva. Sem exageros, sem promessas milagrosas.
-- Não inventar: não crie dados (números, prazos, certificações, nomes de empresas, resultados específicos) se não estiver nos inputs.
-- Se faltar algo essencial (ex.: preço, garantia, entrega), sinalize com [PENDENTE: ...].
-
-3) Rastreio silencioso (obrigatório e sem mencionar)
-Antes de escrever, faça um rastreio mental do mercado e do público:
-- qual desejo principal e qual medo principal do público
-- objeções mais prováveis (tempo, dinheiro, confiança, capacidade, dúvida sobre método)
-- linguagem comum do nicho (sem jargão excessivo)
-Importante: NÃO descreva esse rastreio. Só use o resultado dele na copy.
-
-OUTPUTS (Template) — Preencha TODOS os itens
-
-Seção 1
-1 Nome: (Nome da marca/pessoa)
-2 Nome do produto: (Até 30 caracteres)
-3 Promessa: (Até 90 caracteres)
-4 Foto: (centralizar foto)
-5 Botão de vendas: "quero me inscrever agora" (ou equivalente coerente)
-5b Link botão: (URL de checkout)
-
-Seção 2
-6 Pergunta que evoca maior objeção: (Até 50 caracteres)
-7 Sintoma 1 do problema: (Até 40 caracteres)
-8 Sintoma 2 do problema: (Até 40 caracteres)
-9 Sintoma 3 do problema: (Até 40 caracteres)
-10 Solução: (Até 60 caracteres)
-
-Seção 3
-11 Para quem é?: "Para quem é [Produto]" (35 caracteres)
-12 Desejo 1: (55 caracteres)
-13 Desejo 2: (55 caracteres)
-14 Desejo 3: (55 caracteres)
-15 Desejo 4: (55 caracteres)
-16 Desejo 5: (55 caracteres)
-17 Botão de vendas: "eu quero [maior benefício]" (22 caracteres)
-17b Link: (URL de checkout)
-
-Seção 4
-18 Benefícios: (60 caracteres)
-19 Benefício 1: (25 caracteres)
-20 Explicação benefício 1: (110 caracteres)
-21 Benefício 2: (25 caracteres)
-22 Explicação benefício 2: (110 caracteres)
-23 Benefício 3: (25 caracteres)
-24 Explicação benefício 3: (110 caracteres)
-
-Seção 5
-25 Resultado 1: (20 caracteres)
-26 Explicação resultado 1: (110 caracteres)
-27 Resultado 2: (20 caracteres)
-28 Explicação resultado 2: (110 caracteres)
-29 Resultado 3: (20 caracteres)
-30 Explicação resultado 3: (110 caracteres)
-30a Imagem Resultado 1: (URL ou PENDÊNCIA)
-30b Imagem Resultado 2: (URL ou PENDÊNCIA)
-30c Imagem Resultado 3: (URL ou PENDÊNCIA)
-
-Seção 6
-31 Card de compra: (25 caracteres)
-32 Forma de entrega: (bullets, 25 caracteres cada)
-33 Tempo de garantia: (25 caracteres)
-34 Tempo de acesso: (25 caracteres)
-35 Bônus: (25 caracteres)
-36 Preço: (25 caracteres)
-37 Botão de vendas: (20 caracteres)
-37b Link checkout: (URL)
-
-Seção 7
-38 Quem sou eu: "Quem sou [Primeiro Nome]" (Até 25 caracteres)
-39 Descrição: (350 caracteres)
-40 Foto autor: (URL ou PENDÊNCIA)
-
-Seção 8
-41 Nome: (20 caracteres)
-42 Copyright: (20 caracteres)
-43 E-mail de suporte: (deve conter "@")
-
-Roteamento interno
-- Se houver risco alto (alegações médicas, jurídicas, financeiras, promessas garantidas) → suavize e sinalize em Recomendações.
-- Se faltar dado crítico → use [PENDENTE: ...] no item e sugira preenchimento em Recomendações.
-- Se houver informação excessiva → priorize clareza e conversão, sem perder fidelidade ao input.
-
-Formato de entrega
-Entregue somente:
-1) "Ações executadas" (lista curta do que você produziu)
-2) "Outputs (Template)" com os itens 1 a 43, organizados por Seção 1 a Seção 8
-3) "Recomendações" (apenas se necessário: pendências, melhorias, testes)
-4) Uma linha final: "Confiança: alta/média/baixa + motivo"
-
-Agora execute: leia todos os inputs, faça o rastreio silencioso (sem mencionar) e gere os 43 itens no template, respeitando limites de caracteres (±3).`;
-  }
 }
 
 // CONFIG
@@ -762,17 +868,7 @@ document.getElementById('btn-salvar-config').onclick = function() {
   setTimeout(function(){ m.style.display='none'; }, 2500);
 };
 
-// AGENTES
-document.getElementById('btn-salvar-orion').onclick = function() {
-  localStorage.setItem('orion_prompt', document.getElementById('orion-prompt').value.trim());
-  var m = document.getElementById('orion-msg'); m.style.display='block';
-  setTimeout(function(){ m.style.display='none'; }, 2500);
-};
-document.getElementById('btn-salvar-lyra').onclick = function() {
-  localStorage.setItem('lyra_prompt', document.getElementById('lyra-prompt').value.trim());
-  var m = document.getElementById('lyra-msg'); m.style.display='block';
-  setTimeout(function(){ m.style.display='none'; }, 2500);
-};
+
 
 // SUPABASE
 var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
@@ -928,18 +1024,12 @@ function showPaginasTab(tab){
 
 function goToStep(n){
   [1,2,3].forEach(function(i){
-    document.getElementById('etapa-'+i).style.display=(i===n)?'':'none';
+    var _e=document.getElementById('etapa-'+i); if(_e) _e.style.display=(i===n)?'':'none';
     var d=document.getElementById('step-dot-'+i); d.className='step-dot'+(i===n?' active':i<n?' done':'');
     if(i<3) document.getElementById('step-line-'+i).className='step-line'+(i<n?' done':'');
   });
 }
 
-document.getElementById('btn-ir-etapa2').onclick = function(){
-  var k = localStorage.getItem('openai_key') || '';
-  if (k) document.getElementById('openai-key').value = k;
-  goToStep(2);
-};
-document.getElementById('btn-volta-1').onclick = function(){ goToStep(1); };
 document.getElementById('btn-volta-2').onclick = function(){ goToStep(1); };
 
 // ---- GERENCIAMENTO DE IMAGENS ----
@@ -1004,10 +1094,26 @@ function renderPainelImagens(pendentes) {
         '<div style="font-size:13px;font-weight:500;margin-bottom:2px">' + item.alt + '</div>' +
         '<div id="status-' + item.id + '" style="font-size:11px;color:var(--text-dim)">Nenhuma imagem</div>' +
       '</div>' +
-      // Botoes
-      '<input type="file" id="file-' + item.id + '" accept="image/*" style="display:none">' +
-      '<button onclick="document.getElementById(\'file-' + item.id + '\').click()" style="background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">Upload</button>' +
-      '<button id="btn-remove-' + item.id + '" onclick="removerImagem(\'' + item.id + '\')" style="background:var(--danger-dim);border:1px solid rgba(224,85,85,0.2);color:var(--danger);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;white-space:nowrap">Remover area</button>';
+      // Botoes - usando createElement para evitar escapes
+      '';
+
+    // Cria botões separadamente
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file'; fileInput.id = 'file-' + item.id; fileInput.accept = 'image/*'; fileInput.style.display = 'none';
+    row.appendChild(fileInput);
+
+    var btnUpload = document.createElement('button');
+    btnUpload.textContent = 'Upload';
+    btnUpload.style.cssText = 'background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;';
+    btnUpload.onclick = function() { document.getElementById('file-' + item.id).click(); };
+    row.appendChild(btnUpload);
+
+    var btnRemove = document.createElement('button');
+    btnRemove.id = 'btn-remove-' + item.id;
+    btnRemove.textContent = 'Remover área';
+    btnRemove.style.cssText = 'background:var(--danger-dim);border:1px solid rgba(224,85,85,0.2);color:var(--danger);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap;';
+    btnRemove.onclick = function() { removerImagem(item.id); };
+    row.appendChild(btnRemove);
 
     lista.appendChild(row);
 
@@ -1096,433 +1202,227 @@ function aplicarImagensNoHTML() {
   document.getElementById('pagina-preview').srcdoc = _html;
 }
 
-document.getElementById('btn-recarregar-preview').onclick = function() {
-  if (_html) document.getElementById('pagina-preview').srcdoc = _html;
-};
-
-function setAgentStatus(agent, state, msg) {
-  // state: 'idle' | 'running' | 'done' | 'error'
-  var card = document.getElementById('status-' + agent);
-  var txt  = document.getElementById(agent + '-status-text');
-  var spin = document.getElementById(agent + '-spinner');
-  var chk  = document.getElementById(agent + '-check');
-  var err  = document.getElementById(agent + '-err');
-  txt.textContent = msg;
-  spin.style.display = state === 'running' ? 'block' : 'none';
-  chk.style.display  = state === 'done'    ? 'flex'  : 'none';
-  err.style.display  = state === 'error'   ? 'flex'  : 'none';
-  card.style.opacity = (state === 'idle') ? '0.4' : '1';
-}
-
-document.getElementById('btn-rodar-agente').onclick = function(){
-  var key = document.getElementById('openai-key').value.trim() || localStorage.getItem('openai_key') || '';
-  if (!key) { alert('Insira sua API Key da OpenAI em Configuracoes primeiro.'); showSection('config'); return; }
-  localStorage.setItem('openai_key', key);
-
-  var respostasTexto = document.getElementById('respostas-texto').value.trim();
-  var dados = {
-    nome:document.getElementById('p-nome').value, email:document.getElementById('p-email').value,
-    whatsapp:document.getElementById('p-whatsapp').value, instagram:document.getElementById('p-instagram').value,
-    fotos:document.getElementById('p-fotos').value, produto_nome:document.getElementById('p-produto-nome').value,
-    produto_tipo:document.getElementById('p-produto-tipo').value, promessa:document.getElementById('p-promessa').value,
-    dor:document.getElementById('p-dor').value, entrega:document.getElementById('p-entrega').value,
-    metodo:document.getElementById('p-metodo').value, modulos:document.getElementById('p-modulos').value,
-    para_quem:document.getElementById('p-para-quem').value, nao_para_quem:document.getElementById('p-nao-para-quem').value,
-    beneficios:document.getElementById('p-beneficios').value, resultados:document.getElementById('p-resultados').value,
-    depoimentos:document.getElementById('p-depoimentos').value, garantia:document.getElementById('p-garantia').value,
-    bio:document.getElementById('p-bio').value, preco:document.getElementById('p-preco').value,
-    venda:document.getElementById('p-venda').value, suporte:document.getElementById('p-suporte').value,
-    obs:document.getElementById('p-obs').value
-  };
-
-  // Mostrar painel de status e desabilitar botões
-  document.getElementById('agentes-status').style.display = 'block';
-  document.getElementById('btn-rodar-agente').disabled = true;
-  document.getElementById('btn-volta-1').disabled = true;
-
-  // --- LYRA ---
-  setAgentStatus('lyra', 'running', 'Analisando os dados do produto...');
-  setAgentStatus('orion', 'idle', 'Aguardando Lyra...');
-
-  var lyraSystem = 'Você é Lyra, copywriter sênior especialista em páginas de vendas em português brasileiro. '
-    + 'Sua tarefa é analisar os dados do produto e retornar APENAS um objeto JSON válido com exatamente as chaves abaixo. '
-    + 'REGRAS ABSOLUTAS:\n'
-    + '1. Retorne SOMENTE o JSON. Nenhum texto antes ou depois. Nenhum markdown. Nenhuma explicação.\n'
-    + '2. Todos os valores devem ser strings em português brasileiro.\n'
-    + '3. Nunca invente dados numéricos, preços, certificações ou resultados que não foram fornecidos.\n'
-    + '4. Se um dado não foi fornecido, crie um texto persuasivo baseado no contexto disponível.\n'
-    + '5. Os textos devem ser diretos, humanos e focados em conversão.\n'
-    + '6. LINK_VENDA deve ser a URL de checkout exata fornecida, ou "#" se não fornecida.\n'
-    + '7. EMAIL_SUPORTE deve ser o email fornecido.\n'
-    + '8. Campos de imagem (HERO_IMG, RES_1_IMG, RES_2_IMG, RES_3_IMG, AUTOR_IMG): use a URL fornecida ou deixe vazio.\n'
-    + 'JSON esperado (preencha todos os valores):\n'
-    + '{\n'
-    + '"PRODUTO_NOME": "nome comercial do produto",\n'
-    + '"NOME": "nome da pessoa ou marca",\n'
-    + '"HERO_H1": "título principal impactante (máx 60 chars)",\n'
-    + '"HERO_DESC": "subtítulo que expande a promessa (máx 120 chars)",\n'
-    + '"HERO_IMG": "URL da imagem hero ou vazio",\n'
-    + '"CTA_PRINCIPAL": "texto do botão principal (máx 30 chars)",\n'
-    + '"CTA_2": "texto do segundo botão (máx 30 chars)",\n'
-    + '"LINK_VENDA": "URL de checkout ou #",\n'
-    + '"DOR_TITULO": "pergunta que evoca a dor principal (máx 80 chars)",\n'
-    + '"SINTOMA_1": "sintoma/dor 1 (máx 40 chars)",\n'
-    + '"SINTOMA_2": "sintoma/dor 2 (máx 40 chars)",\n'
-    + '"SINTOMA_3": "sintoma/dor 3 (máx 40 chars)",\n'
-    + '"SOLUCAO": "frase de solução direta (máx 80 chars)",\n'
-    + '"PARA_QUEM_TITULO": "título da seção para quem é (máx 60 chars)",\n'
-    + '"DESEJO_1": "desejo/perfil 1 do cliente ideal (máx 60 chars)",\n'
-    + '"DESEJO_2": "desejo/perfil 2 (máx 60 chars)",\n'
-    + '"DESEJO_3": "desejo/perfil 3 (máx 60 chars)",\n'
-    + '"DESEJO_4": "desejo/perfil 4 (máx 60 chars)",\n'
-    + '"DESEJO_5": "desejo/perfil 5 (máx 60 chars)",\n'
-    + '"BENEFICIOS_TITULO": "título da seção de benefícios (máx 60 chars)",\n'
-    + '"BEN_1_TITULO": "benefício 1 - título curto (máx 40 chars)",\n'
-    + '"BEN_1_DESC": "benefício 1 - descrição (máx 120 chars)",\n'
-    + '"BEN_2_TITULO": "benefício 2 - título curto (máx 40 chars)",\n'
-    + '"BEN_2_DESC": "benefício 2 - descrição (máx 120 chars)",\n'
-    + '"BEN_3_TITULO": "benefício 3 - título curto (máx 40 chars)",\n'
-    + '"BEN_3_DESC": "benefício 3 - descrição (máx 120 chars)",\n'
-    + '"RESULTADOS_TITULO": "título da seção de resultados (máx 60 chars)",\n'
-    + '"RES_1_TITULO": "resultado 1 título (máx 40 chars)",\n'
-    + '"RES_1_DESC": "resultado 1 descrição (máx 100 chars)",\n'
-    + '"RES_1_IMG": "URL imagem resultado 1 ou vazio",\n'
-    + '"RES_2_TITULO": "resultado 2 título (máx 40 chars)",\n'
-    + '"RES_2_DESC": "resultado 2 descrição (máx 100 chars)",\n'
-    + '"RES_2_IMG": "URL imagem resultado 2 ou vazio",\n'
-    + '"RES_3_TITULO": "resultado 3 título (máx 40 chars)",\n'
-    + '"RES_3_DESC": "resultado 3 descrição (máx 100 chars)",\n'
-    + '"RES_3_IMG": "URL imagem resultado 3 ou vazio",\n'
-    + '"AUTOR_TITULO": "nome ou título quem sou eu (máx 40 chars)",\n'
-    + '"AUTOR_BIO": "bio completa persuasiva (máx 400 chars)",\n'
-    + '"AUTOR_IMG": "URL foto do autor ou vazio",\n'
-    + '"OFERTA_TITULO": "título da seção oferta (máx 60 chars)",\n'
-    + '"CARD_TITULO": "título do card de compra (máx 50 chars)",\n'
-    + '"OFERTA_ITEM_1": "o que inclui - item 1 (máx 60 chars)",\n'
-    + '"OFERTA_ITEM_2": "o que inclui - item 2 (máx 60 chars)",\n'
-    + '"OFERTA_ITEM_3": "o que inclui - item 3 (máx 60 chars)",\n'
-    + '"GARANTIA": "texto da garantia (máx 80 chars)",\n'
-    + '"PRECO": "preço formatado ex: R$ 497 ou R$ 497/mês",\n'
-    + '"FAQ_1_P": "pergunta frequente 1",\n'
-    + '"FAQ_1_R": "resposta 1 (máx 150 chars)",\n'
-    + '"FAQ_2_P": "pergunta frequente 2",\n'
-    + '"FAQ_2_R": "resposta 2 (máx 150 chars)",\n'
-    + '"FAQ_3_P": "pergunta frequente 3",\n'
-    + '"FAQ_3_R": "resposta 3 (máx 150 chars)",\n'
-    + '"FAQ_4_P": "pergunta frequente 4",\n'
-    + '"FAQ_4_R": "resposta 4 (máx 150 chars)",\n'
-    + '"COPYRIGHT": "© 2025 Nome",\n'
-    + '"EMAIL_SUPORTE": "email@exemplo.com"\n'
-    + '}';
-
-  var lyraUser = 'DADOS DO PRODUTO:\n'
-    + 'Nome: ' + (dados.nome || '') + '\n'
-    + 'Email: ' + (dados.email || '') + '\n'
-    + 'WhatsApp: ' + (dados.whatsapp || '') + '\n'
-    + 'Instagram: ' + (dados.instagram || '') + '\n'
-    + 'Fotos (URL): ' + (dados.fotos || '') + '\n'
-    + 'Produto: ' + (dados.produto_nome || '') + '\n'
-    + 'Tipo: ' + (dados.produto_tipo || '') + '\n'
-    + 'Promessa: ' + (dados.promessa || '') + '\n'
-    + 'Dor que resolve: ' + (dados.dor || '') + '\n'
-    + 'O que entrega: ' + (dados.entrega || '') + '\n'
-    + 'Para quem: ' + (dados.para_quem || '') + '\n'
-    + 'Não é para quem: ' + (dados.nao_para_quem || '') + '\n'
-    + 'Benefícios: ' + (dados.beneficios || '') + '\n'
-    + 'Resultados: ' + (dados.resultados || '') + '\n'
-    + 'Depoimentos: ' + (dados.depoimentos || '') + '\n'
-    + 'Garantia: ' + (dados.garantia || '') + '\n'
-    + 'Bio: ' + (dados.bio || '') + '\n'
-    + 'Preço: ' + (dados.preco || '') + '\n'
-    + 'Link de venda: ' + (dados.venda || '') + '\n'
-    + 'Suporte: ' + (dados.suporte || '') + '\n'
-    + 'Observações: ' + (dados.obs || '') + '\n'
-    + (respostasTexto ? '\nRespostas adicionais do cliente:\n' + respostasTexto : '');
-
-  function callGPT(systemPrompt, userPrompt, onSuccess, onError) {
-    var messages = systemPrompt
-      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
-      : [{ role: 'user', content: userPrompt }];
-    fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model: 'gpt-4o', messages: messages, max_tokens: 4000, temperature: 0.7, response_format: { type: 'json_object' } })
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (data.error) { onError(data.error.message); return; }
-      onSuccess(data.choices[0].message.content);
-    })
-    .catch(function(err){ onError(err.message); });
+function buildPage(v) {
+  function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function r(k){ return v[k]||''; }
+  function img(k,alt,style){
+    return r(k)
+      ? '<img src="'+r(k)+'" alt="'+s(alt)+'" style="'+style+'">'
+      : '<div style="'+style+';background:#2a2a1a;display:flex;align-items:center;justify-content:center;color:#3a3a2a;font-size:11px;font-family:sans-serif;">Imagem</div>';
   }
 
-  callGPT(lyraSystem, lyraUser, function(lyraOutput) {
-    // Lyra terminou — parse direto o JSON
-    var v;
-    try {
-      v = JSON.parse(lyraOutput);
-    } catch(e) {
-      setAgentStatus('lyra', 'error', 'Erro no JSON da Lyra. Tente novamente.');
-      document.getElementById('btn-rodar-agente').disabled = false;
-      document.getElementById('btn-volta-1').disabled = false;
-      return;
-    }
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${s('C2')} — ${s('C1')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0cc;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:780px;margin:0 auto;padding:0 28px}
+.gold{color:#C9A84C}
+.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer}
+.btn-cta:hover{background:#dbb95e}
+.section{padding:60px 0}
+.card{background:#181610;border:1px solid #2a2618;border-radius:14px}
+@media(max-width:640px){
+  .hero-inner{flex-direction:column!important}
+  .hero-img-wrap{width:100%!important;height:220px!important;order:-1;margin-bottom:24px}
+  .ben-cols,.res-cols{flex-direction:column!important}
+  .ben-col,.res-col{border-right:none!important;border-bottom:1px solid #2a2618}
+}
+</style>
+</head>
+<body>
 
-    setAgentStatus('lyra', 'done', 'Conteudo criado com sucesso.');
+<!-- ══ SEÇÃO 1: HERO ══ campos 1-5 -->
+<div style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;padding:40px 36px">
+  <div class="hero-inner" style="display:flex;align-items:center;gap:32px">
+    <div style="flex:1;min-width:0">
+      <!-- C1: nome da marca, espaçado e pequeno -->
+      <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:20px;font-weight:500">${s('C1')}</div>
+      <!-- C2: título grande dourado, spaced letters -->
+      <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,44px);font-weight:800;color:#C9A84C;letter-spacing:.12em;text-transform:uppercase;line-height:1.1;margin-bottom:16px">${s('C2')}</h1>
+      <!-- C3: subtítulo cinza -->
+      <p style="font-size:15px;color:#8a8070;margin-bottom:32px;line-height:1.65">${s('C3')}</p>
+      <!-- C5: botão CTA dourado -->
+      <a href="${r('C5B')}" class="btn-cta">${s('C5')}</a>
+    </div>
+    <!-- C4: imagem hero direita -->
+    <div class="hero-img-wrap" style="flex-shrink:0;width:260px;height:220px;border-radius:12px;overflow:hidden">
+      ${img('C4','C1','width:100%;height:100%;object-fit:cover')}
+    </div>
+  </div>
+</div>
 
-    // --- ORION: preenche o template com o JSON da Lyra (sem chamada extra) ---
-    setAgentStatus('orion', 'running', 'Construindo o design da pagina...');
+<!-- ══ SEÇÃO 2: DOR ══ campos 6, 7, 8, 9, 10 -->
+<div class="section">
+  <div class="wrap" style="text-align:center">
+    <!-- C6: título centralizado bold -->
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;margin-bottom:28px">${s('C6')}</h2>
+    <!-- C7, C8, C9: três pílulas escuras lado a lado -->
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+      ${['C7','C8','C9'].map(function(k){return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';}).join('')}
+    </div>
+    <!-- C10: solução — título grande bold centralizado -->
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc">${s('C10')}</h2>
+  </div>
+</div>
 
-    // v já está parseado da Lyra — Orion só preenche o template
-    function s(k){ return (v[k]||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function sRaw(k){ return v[k]||''; }
+<!-- ══ SEÇÃO 3: PARA QUEM ══ campos 11-17 -->
+<div class="section" style="padding-top:0">
+  <div class="wrap">
+    <!-- card escuro com C11 à esq e lista numerada C12-C16 à dir -->
+    <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
+      <!-- C11: título dourado grande lado esquerdo -->
+      <div style="min-width:180px;padding:36px 28px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(18px,3vw,26px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.2">${s('C11')}</div>
+      </div>
+      <!-- C12-C16: lista numerada lado direito -->
+      <div style="flex:1;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        ${['C12','C13','C14','C15','C16'].map(function(k,i){
+          return '<div style="font-size:14px;color:#c0b090;display:flex;align-items:baseline;gap:8px">'
+            +'<span style="color:#8a8070;font-size:12px;min-width:16px">'+(i+1)+'.</span>'
+            +'<span>'+s(k)+'</span></div>';
+        }).join('')}
+      </div>
+    </div>
+    <!-- C17: botão CTA centralizado -->
+    <div style="text-align:center">
+      <a href="${r('C17B')}" class="btn-cta">${s('C17')}</a>
+    </div>
+  </div>
+</div>
 
-      var checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-      var plusSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+<!-- ══ SEÇÃO 4: BENEFÍCIOS ══ campos 18-24 -->
+<div class="section">
+  <div class="wrap">
+    <!-- C18: título centralizado -->
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:32px">${s('C18')}</h2>
+    <!-- 3 colunas separadas por linha vertical dourada -->
+    <div class="ben-cols" style="display:flex;gap:0">
+      ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
+        return '<div class="ben-col" style="flex:1;padding:24px 28px'+(i<2?';border-right:1px solid #2a2618':'')+'">'
+          +'<div style="font-size:11px;font-weight:700;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
+          +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</div>
 
-      var ofertaItems = [s('OFERTA_ITEM_1'),s('OFERTA_ITEM_2'),s('OFERTA_ITEM_3')].filter(Boolean)
-        .map(function(i){ return '<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'+i+'</li>'; }).join('');
+<!-- ══ SEÇÃO 5: RESULTADOS ══ campos 25-30, 30A-30C -->
+<div class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="res-cols" style="display:flex;gap:16px">
+      ${[['C25','C26','C30A'],['C27','C28','C30B'],['C29','C30','C30C']].map(function(t){
+        return '<div class="res-col card" style="flex:1;overflow:hidden">'
+          +'<div style="height:160px;overflow:hidden">'+img(t[2],t[0],'width:100%;height:100%;object-fit:cover')+'</div>'
+          +'<div style="padding:20px">'
+          +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;font-style:italic;color:#C9A84C;margin-bottom:8px">'+s(t[0])+'</div>'
+          +'<p style="font-size:12px;color:#8a8070;line-height:1.6">'+s(t[1])+'</p>'
+          +'</div></div>';
+      }).join('')}
+    </div>
+  </div>
+</div>
 
-      var faqItems = [[s('FAQ_1_P'),s('FAQ_1_R')],[s('FAQ_2_P'),s('FAQ_2_R')],[s('FAQ_3_P'),s('FAQ_3_R')],[s('FAQ_4_P'),s('FAQ_4_R')]]
-        .filter(function(f){ return f[0]; })
-        .map(function(f){ return '<div class="faq-item"><div class="faq-q">'+f[0]+'<div class="faq-icon">'+plusSvg+'</div></div><div class="faq-a">'+f[1]+'</div></div>'; }).join('');
+<!-- ══ SEÇÃO 6: OFERTA / CARD ══ campos 31-37 -->
+<div class="section">
+  <div class="wrap" style="display:flex;justify-content:center">
+    <div style="background:linear-gradient(160deg,#1c1a08,#221e0a);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:40px 36px;width:100%;max-width:480px">
+      <!-- C31: título italic dourado grande centralizado -->
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C31')}</h3>
+      <!-- C32-C36: itens em pílulas bege esmaecido -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+        ${['C32','C33','C34','C35','C36'].filter(function(k){return r(k);}).map(function(k){
+          return '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:100px;padding:11px 22px;font-size:13px;color:#b0a070;text-align:center;font-weight:500">'+s(k)+'</div>';
+        }).join('')}
+      </div>
+      <!-- C37: botão CTA dourado full width -->
+      <a href="${r('C37B')}" class="btn-cta" style="display:block;text-align:center;width:100%">${s('C37')}</a>
+    </div>
+  </div>
+</div>
 
-      // Imagem hero: usa URL se fornecida, senão placeholder
-      var heroImgHtml = (dados.fotos && dados.fotos.startsWith('http'))
-        ? '<img src="'+dados.fotos+'" alt="'+s('PRODUTO_NOME')+'" style="width:100%;height:auto;display:block;border-radius:12px;">'
-        : '<div class="img-ph">Imagem do produto</div>';
+<!-- ══ SEÇÃO 7: QUEM SOU EU ══ campos 38-40 -->
+<div class="section" style="border-top:1px solid #1e1c10">
+  <div class="wrap">
+    <div style="display:flex;align-items:center;gap:36px;flex-wrap:wrap">
+      <!-- C40: foto vertical (portrait) à esquerda -->
+      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.2)">
+        ${img('C40','C38','width:100%;height:100%;object-fit:cover')}
+      </div>
+      <div style="flex:1;min-width:200px">
+        <!-- C38: nome grande dourado -->
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C38')}</h2>
+        <!-- C39: bio, texto menor -->
+        <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C39')}</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-      // Imagens de resultado
-      function resImg(url, label) {
-        return (url && url.startsWith('http'))
-          ? '<img src="'+url+'" alt="'+label+'" style="width:100%;height:100%;object-fit:cover;display:block;">'
-          : '<span>'+label+'</span>';
-      }
-      var res1ImgUrl = sRaw('RES_1_IMG'); var res2ImgUrl = sRaw('RES_2_IMG'); var res3ImgUrl = sRaw('RES_3_IMG');
+<!-- ══ RODAPÉ ══ campos 41-43 -->
+<footer style="border-top:1px solid #1e1c10;padding:32px 28px;text-align:center">
+  <div style="font-size:13px;color:#4a4638;margin-bottom:4px">${s('C41')}</div>
+  <div style="font-size:12px;color:#3a3428;margin-bottom:4px">${s('C42')}</div>
+  <div style="font-size:12px;color:#4a4638">${s('C43')}</div>
+</footer>
 
-      // Foto autor
-      var autorImgHtml = (sRaw('AUTOR_IMG') && sRaw('AUTOR_IMG').startsWith('http'))
-        ? '<img src="'+sRaw('AUTOR_IMG')+'" alt="'+s('AUTOR_TITULO')+'" style="width:100%;height:100%;object-fit:cover;display:block;">'
-        : '<span>Foto do autor</span>';
+</body></html>`;
+}
 
-      var TEMPLATE = '<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n'
-        + '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">\n'
-        + '<title>'+s('PRODUTO_NOME')+'</title>\n'
-        + '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">\n'
-        + '<style>\n'
-        + ':root{--bg:#080808;--bg2:#0f0f0f;--bg3:#141414;--gold:#C9A84C;--gold2:#e2c06e;--gdim:rgba(201,168,76,.08);--gbdr:rgba(201,168,76,.2);--tx:#F0EDE8;--tx2:#B8B4AE;--tx3:#6B6760;--bdr:rgba(255,255,255,.06);--r:14px;--rl:20px;}\n'
-        + '*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}\n'
-        + 'body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}\n'
-        + '.W{max-width:1000px;margin:0 auto;padding:0 28px;}\n'
-        + '.sec{padding:88px 0;border-top:1px solid var(--bdr);}\n'
-        + '.lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px;display:block;}\n'
-        + '.btn{display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:#080808;font-family:"DM Sans",sans-serif;font-weight:700;font-size:14px;padding:14px 36px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.02em;text-transform:uppercase;}\n'
-        + '.btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 8px 32px rgba(201,168,76,.3);}\n'
-        + '.btn-full{width:100%;justify-content:center;padding:18px;font-size:15px;}\n'
 
-        // HERO
-        + '.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:100px 28px;max-width:1000px;margin:0 auto;}\n'
-        + '.hero-left{}\n'
-        + '.hero-campo{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:16px;display:block;}\n'
-        + '.hero h1{font-family:"Cormorant Garamond",serif;font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.05;letter-spacing:-.02em;margin-bottom:20px;color:var(--gold);text-transform:uppercase;}\n'
-        + '.hero-promessa{font-size:15px;color:var(--tx2);line-height:1.7;margin-bottom:36px;font-weight:300;}\n'
-        + '.hero-right{border-radius:var(--rl);overflow:hidden;border:1px solid var(--bdr);background:var(--bg3);}\n'
-        + '.img-ph{width:100%;height:380px;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px dashed var(--gbdr);}\n'
+document.getElementById('btn-gerar-pagina').onclick = function() {
+  var nome  = document.getElementById('p-nome').value.trim();
+  var email = document.getElementById('p-email').value.trim();
+  var raw   = document.getElementById('respostas-43').value.trim();
 
-        // DOR
-        + '.dor-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
-        + '.sint-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}\n'
-        + '.sint{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 20px;font-size:14px;color:var(--tx2);text-align:center;letter-spacing:.03em;text-transform:uppercase;font-weight:500;}\n'
+  if (!raw) { alert('Cole os 43 campos antes de gerar.'); return; }
 
-        // PARA QUEM
-        + '.pq-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;display:grid;grid-template-columns:280px 1fr;}\n'
-        + '.pq-left{background:var(--bg3);padding:40px 32px;display:flex;align-items:center;justify-content:center;}\n'
-        + '.pq-left h2{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:var(--gold);text-transform:uppercase;line-height:1.15;text-align:center;}\n'
-        + '.pq-right{padding:40px 36px;}\n'
-        + '.pq-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:14px;color:var(--tx2);line-height:1.5;}\n'
-        + '.pq-item:last-child{border-bottom:none;}\n'
-        + '.pq-num{color:var(--gold);font-weight:700;font-size:13px;flex-shrink:0;margin-top:1px;}\n'
-        + '.pq-cta{margin-top:36px;text-align:center;}\n'
-
-        // BENEFICIOS
-        + '.ben-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
-        + '.ben-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;}\n'
-        + '.ben-col{background:var(--bg);padding:32px 28px;}\n'
-        + '.ben-col-titulo{font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:12px;}\n'
-        + '.ben-col-desc{font-size:14px;color:var(--tx2);line-height:1.7;font-weight:300;}\n'
-
-        // RESULTADOS
-        + '.res-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
-        + '.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}\n'
-        + '.res-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;}\n'
-        + '.res-img{width:100%;aspect-ratio:3/4;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.1em;text-transform:uppercase;overflow:hidden;}\n'
-        + '.res-body{padding:20px;}\n'
-        + '.res-t{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:700;font-style:italic;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}\n'
-        + '.res-d{font-size:13px;color:var(--tx2);line-height:1.6;font-weight:300;}\n'
-
-        // AUTOR
-        + '.aut-in{display:grid;grid-template-columns:300px 1fr;gap:60px;align-items:start;}\n'
-        + '.aut-foto{border-radius:var(--r);overflow:hidden;background:var(--bg3);border:1px solid var(--bdr);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}\n'
-        + '.aut-nome{font-family:"Cormorant Garamond",serif;font-size:clamp(28px,4vw,52px);font-weight:700;color:var(--gold);text-transform:uppercase;line-height:1.05;margin-bottom:24px;}\n'
-        + '.aut-bio{font-size:15px;color:var(--tx2);line-height:1.8;font-weight:300;}\n'
-
-        // OFERTA
-        + '.ofr-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,38px);font-weight:700;font-style:italic;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:32px;}\n'
-        + '.ofr-list{list-style:none;margin-bottom:24px;}\n'
-        + '.ofr-item{display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--bdr);border-radius:100px;padding:14px 24px;margin-bottom:10px;font-size:14px;color:var(--tx2);font-weight:400;}\n'
-        + '.ofr-item.destaque{background:var(--gold);color:#080808;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}\n'
-        + '.ofr-item.destaque:hover{background:var(--gold2);}\n'
-
-        // FAQ
-        + '.faq-h2{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;}\n'
-        + '.faq-wrap{max-width:680px;margin:0 auto;}\n'
-        + '.faq-item{border-bottom:1px solid var(--bdr);padding:20px 0;cursor:pointer;}\n'
-        + '.faq-item:first-child{border-top:1px solid var(--bdr);}\n'
-        + '.faq-q{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;font-weight:500;user-select:none;}\n'
-        + '.faq-icon{width:22px;height:22px;border-radius:50%;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:var(--tx3);font-size:14px;}\n'
-        + '.faq-item.open .faq-icon{background:var(--gdim);border-color:var(--gbdr);color:var(--gold);transform:rotate(45deg);}\n'
-        + '.faq-a{font-size:14px;color:var(--tx2);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;}\n'
-        + '.faq-item.open .faq-a{max-height:300px;padding-top:12px;}\n'
-
-        // FOOTER
-        + '.footer{padding:40px 0;text-align:center;border-top:1px solid var(--bdr);}\n'
-        + '.footer-nome{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;margin-bottom:6px;}\n'
-        + '.footer-info{font-size:12px;color:var(--tx3);line-height:1.8;}\n'
-        + '.footer-info a{color:var(--tx3);text-decoration:none;}\n'
-
-        + '@media(max-width:768px){'
-        + '.hero{grid-template-columns:1fr;padding:80px 20px 48px;}'
-        + '.pq-box{grid-template-columns:1fr;}'
-        + '.pq-left{padding:28px 24px;}'
-        + '.ben-grid{grid-template-columns:1fr;}'
-        + '.res-grid{grid-template-columns:1fr;}'
-        + '.aut-in{grid-template-columns:1fr;gap:32px;}'
-        + '.aut-foto{max-width:240px;}'
-        + '.sint-grid{grid-template-columns:1fr;}'
-        + '}\n'
-        + '</style>\n</head>\n<body>\n\n'
-
-        // ── HERO ──
-        + '<div style="background:var(--bg);border-bottom:1px solid var(--bdr);">\n'
-        + '<div class="hero">\n'
-        + '<div class="hero-left">\n'
-        + '<span class="hero-campo">Campo 1</span>\n'
-        + '<h1>'+s('PRODUTO_NOME')+'</h1>\n'
-        + '<p class="hero-promessa">'+s('HERO_DESC')+'</p>\n'
-        + '<a href="'+sRaw('LINK_VENDA')+'" class="btn">'+s('CTA_PRINCIPAL')+'</a>\n'
-        + '</div>\n'
-        + '<div class="hero-right">'+heroImgHtml+'</div>\n'
-        + '</div></div>\n\n'
-
-        // ── DOR ──
-        + '<section class="sec"><div class="W">\n'
-        + '<p class="dor-titulo">'+s('DOR_TITULO')+'</p>\n'
-        + '<div class="sint-grid">\n'
-        + '<div class="sint">'+s('SINTOMA_1')+'</div>\n'
-        + '<div class="sint">'+s('SINTOMA_2')+'</div>\n'
-        + '<div class="sint">'+s('SINTOMA_3')+'</div>\n'
-        + '<div class="sint">'+s('SOLUCAO')+'</div>\n'
-        + '<div class="sint">'+s('DESEJO_1')+'</div>\n'
-        + '<div class="sint">'+s('DESEJO_2')+'</div>\n'
-        + '</div></div></section>\n\n'
-
-        // ── PARA QUEM ──
-        + '<section class="sec"><div class="W">\n'
-        + '<p class="dor-titulo">'+s('PARA_QUEM_TITULO')+'</p>\n'
-        + '<div class="pq-box">\n'
-        + '<div class="pq-left"><h2>Para quem é o '+s('PRODUTO_NOME')+'?</h2></div>\n'
-        + '<div class="pq-right">\n'
-        + '<div class="pq-item"><span class="pq-num">1.</span><span>'+s('DESEJO_3')+'</span></div>\n'
-        + '<div class="pq-item"><span class="pq-num">2.</span><span>'+s('DESEJO_4')+'</span></div>\n'
-        + '<div class="pq-item"><span class="pq-num">3.</span><span>'+s('DESEJO_5')+'</span></div>\n'
-        + '<div class="pq-item"><span class="pq-num">4.</span><span>'+s('SINTOMA_1')+'</span></div>\n'
-        + '<div class="pq-item"><span class="pq-num">5.</span><span>'+s('SINTOMA_2')+'</span></div>\n'
-        + '<div class="pq-item"><span class="pq-num">6.</span><span>'+s('SINTOMA_3')+'</span></div>\n'
-        + '</div></div>\n'
-        + '<div class="pq-cta"><a href="'+sRaw('LINK_VENDA')+'" class="btn">'+s('CTA_2')+'</a></div>\n'
-        + '</div></section>\n\n'
-
-        // ── BENEFICIOS ──
-        + '<section class="sec"><div class="W">\n'
-        + '<p class="ben-titulo">'+s('BENEFICIOS_TITULO')+'</p>\n'
-        + '<div class="ben-grid">\n'
-        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_1_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_1_DESC')+'</div></div>\n'
-        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_2_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_2_DESC')+'</div></div>\n'
-        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_3_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_3_DESC')+'</div></div>\n'
-        + '</div></div></section>\n\n'
-
-        // ── RESULTADOS ──
-        + '<section class="sec"><div class="W">\n'
-        + '<p class="res-titulo">'+s('RESULTADOS_TITULO')+'</p>\n'
-        + '<div class="res-grid">\n'
-        + '<div class="res-card"><div class="res-img">'+resImg(res1ImgUrl,'Resultado 1')+'</div><div class="res-body"><div class="res-t">'+s('RES_1_TITULO')+'</div><div class="res-d">'+s('RES_1_DESC')+'</div></div></div>\n'
-        + '<div class="res-card"><div class="res-img">'+resImg(res2ImgUrl,'Resultado 2')+'</div><div class="res-body"><div class="res-t">'+s('RES_2_TITULO')+'</div><div class="res-d">'+s('RES_2_DESC')+'</div></div></div>\n'
-        + '<div class="res-card"><div class="res-img">'+resImg(res3ImgUrl,'Resultado 3')+'</div><div class="res-body"><div class="res-t">'+s('RES_3_TITULO')+'</div><div class="res-d">'+s('RES_3_DESC')+'</div></div></div>\n'
-        + '</div></div></section>\n\n'
-
-        // ── AUTOR ──
-        + '<section class="sec"><div class="W"><div class="aut-in">\n'
-        + '<div class="aut-foto">'+autorImgHtml+'</div>\n'
-        + '<div>\n'
-        + '<div class="aut-nome">'+s('AUTOR_TITULO')+'</div>\n'
-        + '<p class="aut-bio">'+s('AUTOR_BIO')+'</p>\n'
-        + '</div></div></div></section>\n\n'
-
-        // ── OFERTA ──
-        + '<section class="sec"><div class="W" style="max-width:560px">\n'
-        + '<p class="ofr-titulo">'+s('CARD_TITULO')+'</p>\n'
-        + '<ul class="ofr-list">\n'
-        + '<li class="ofr-item">'+s('OFERTA_ITEM_1')+'</li>\n'
-        + '<li class="ofr-item">'+s('GARANTIA')+'</li>\n'
-        + '<li class="ofr-item">'+s('OFERTA_ITEM_2')+'</li>\n'
-        + '<li class="ofr-item">'+s('OFERTA_ITEM_3')+'</li>\n'
-        + '<li class="ofr-item">'+s('PRECO')+'</li>\n'
-        + '<li class="ofr-item destaque"><a href="'+sRaw('LINK_VENDA')+'" style="color:inherit;text-decoration:none;width:100%;text-align:center;display:block;">'+s('CTA_PRINCIPAL')+'</a></li>\n'
-        + '</ul></div></section>\n\n'
-
-        // ── FAQ ──
-        + '<section class="sec"><div class="W">\n'
-        + '<p class="faq-h2">Perguntas frequentes</p>\n'
-        + '<div class="faq-wrap">\n'
-        + faqItems
-        + '</div></div></section>\n\n'
-
-        // ── FOOTER ──
-        + '<footer class="footer"><div class="W">\n'
-        + '<div class="footer-nome">'+s('NOME')+'</div>\n'
-        + '<div class="footer-info">'+s('COPYRIGHT')+' &nbsp;|&nbsp; <a href="mailto:'+s('EMAIL_SUPORTE')+'">'+s('EMAIL_SUPORTE')+'</a></div>\n'
-        + '</div></footer>\n\n'
-
-        + '<script>\n'
-        + 'document.querySelectorAll(".faq-item").forEach(function(i){\n'
-        + '  i.addEventListener("click",function(){var o=this.classList.contains("open");document.querySelectorAll(".faq-item").forEach(function(x){x.classList.remove("open");});if(!o)this.classList.add("open");});\n'
-        + '});\n'
-        + '<\/script>\n'
-        + '</body>\n</html>';
-
-      setAgentStatus('orion', 'done', 'Pagina construida com sucesso.');
-      _nome    = document.getElementById('p-nome').value || 'Cliente';
-      _slug    = document.getElementById('p-slug').value || 'pagina-' + Date.now();
-      _produto = document.getElementById('p-produto-nome').value;
-      _html    = TEMPLATE;
-
-      var deteccao = detectarImagensPendentes(_html);
-      _html = deteccao.htmlModificado;
-      document.getElementById('pagina-preview').srcdoc = _html;
-      renderPainelImagens(deteccao.pendentes);
-
-      setTimeout(function(){
-        document.getElementById('btn-rodar-agente').disabled = false;
-        document.getElementById('btn-volta-1').disabled = false;
-        goToStep(3);
-      }, 800);
-
-  }, function(err) {
-    setAgentStatus('lyra', 'error', 'Erro: ' + err);
-    document.getElementById('btn-rodar-agente').disabled = false;
-    document.getElementById('btn-volta-1').disabled = false;
+  // Parse campos — aceita: "C1: valor", "Campo 1: valor", "1: valor"
+  var v = {};
+  raw.split('\n').forEach(function(line) {
+    var idx = line.indexOf(':');
+    if (idx === -1) return;
+    var rawKey = line.substring(0, idx).trim();
+    var val    = line.substring(idx + 1).trim();
+    if (!val) return;
+    // Normaliza chave para formato C1, C2, C5B, C17B, C30A, C30B, C30C, C37B, C43
+    var k = rawKey.toUpperCase()
+      .replace(/^CAMPO\s*/,'C')   // "Campo 1" → "C1"
+      .replace(/\s+/g,'');        // remove espaços restantes
+    // Se for só número, adiciona C: "1" → "C1"
+    if (/^\d/.test(k)) k = 'C' + k;
+    v[k] = val;
   });
+
+  goToStep(2);
+  document.getElementById('gerando-status').textContent = 'Montando a página...';
+
+  setTimeout(function() {
+    var TEMPLATE = buildPage(v);
+    _html    = TEMPLATE;
+    _nome    = nome || v['NOME'] || 'Cliente';
+    _produto = v['PRODUTO_NOME'] || 'Produto';
+    _slug    = (_nome + '-' + _produto).toLowerCase()
+                 .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                 .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+               + '-' + Date.now();
+
+    document.getElementById('pagina-preview').srcdoc = _html;
+
+    var deteccao = detectarImagensPendentes(_html);
+    _html = deteccao.htmlModificado;
+    document.getElementById('pagina-preview').srcdoc = _html;
+    renderPainelImagens(deteccao.pendentes);
+
+    goToStep(3);
+  }, 600);
 };
 
 document.getElementById('btn-baixar').onclick=function(){
@@ -1531,25 +1431,297 @@ document.getElementById('btn-baixar').onclick=function(){
 };
 
 document.getElementById('btn-salvar-pagina').onclick=function(){
-  if(!_html){alert('Gere a pagina primeiro.');return;}
+  if(!_html){alert('Gere a página primeiro.');return;}
   var slugFinal = _slug || 'pagina-'+Date.now();
-  var payload = { slug:slugFinal, nome:_nome, cliente:_nome, produto:_produto, html:_html };
+  var linkPagina = 'donalab.com.br/p/' + slugFinal;
+  var nomeCliente = document.getElementById('p-nome').value.trim() || _nome;
+  var emailCliente = document.getElementById('p-email').value.trim();
   var btn = document.getElementById('btn-salvar-pagina');
-  btn.disabled=true; btn.textContent='Salvando...';
+  btn.disabled=true; btn.textContent='Publicando...';
+
+  // 1. Salvar página
+  var payload = { slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:_html };
   sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
-    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar Pagina';
-    if(res && res[0] && res[0].id){
-      loadPages(); showPaginasTab('lista');
-      alert('Pagina salva! Acesse em:\ndonalab.com.br/p/'+slugFinal);
-    } else {
-      alert('Erro ao salvar: '+(res.message||JSON.stringify(res)));
+    if(!res || !res[0] || !res[0].id) {
+      btn.disabled=false; btn.innerHTML='Publicar Página';
+      alert('Erro ao salvar: '+(res&&res.message||JSON.stringify(res))); return;
     }
+
+    // 2. Auto-cadastrar cliente (upsert por email)
+    var clientePayload = { nome: nomeCliente, email: emailCliente, dados: 'Página: https://'+linkPagina };
+    sbFetch('clientes?select=id,email&email=eq.'+encodeURIComponent(emailCliente)).then(function(existe){
+      if (existe && existe.length > 0) {
+        // já existe — atualiza dados
+        sbFetch('clientes?id=eq.'+existe[0].id, {method:'PATCH', body:JSON.stringify({dados: 'Página: https://'+linkPagina})});
+      } else if (emailCliente) {
+        // novo cliente
+        sbFetch('clientes', {method:'POST', body:JSON.stringify(clientePayload)});
+      }
+    });
+
+    btn.disabled=false;
+    btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Publicar Página';
+    loadPages();
+    loadClients();
+    showPaginasTab('lista');
+    alert('Página publicada!\nAcesse em: https://'+linkPagina);
   }).catch(function(e){ btn.disabled=false; alert('Erro: '+e.message); });
 };
 
 // INIT
 loadClients();
 loadPages();
+
+// ── MATERIAIS ──
+var _materiaisClientesList = [];
+
+function carregarMateriais(categoria) {
+  var lista = document.getElementById('lista-'+categoria);
+  lista.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-dim)"><div style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>Carregando...</div>';
+  
+  sbFetch('materiais?tipo_categoria=eq.'+encodeURIComponent(categoria)+'&select=*,clientes(nome)&order=created_at.desc')
+    .then(function(data) {
+      if (!data || data.length === 0) {
+        lista.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim)"><p style="font-size:14px">Nenhum material ainda.</p></div>';
+        return;
+      }
+      var rows = data.map(function(m) {
+        return '<tr>'
+          + '<td style="padding:14px 20px;font-weight:500">' + m.nome + '</td>'
+          + '<td style="padding:14px 20px;color:var(--text-muted)">' + (m.tipo||'-') + '</td>'
+          + '<td style="padding:14px 20px;color:var(--text-muted)">' + (m.clientes ? m.clientes.nome : 'Todos') + '</td>'
+          + '<td style="padding:14px 20px">' + (m.url ? '<a href="'+m.url+'" target="_blank" style="color:var(--gold);font-size:13px">Abrir →</a>' : '-') + '</td>'
+          + '<td style="padding:14px 20px">'
+          + '<button onclick="deletarMaterial(\'' + m.id + '\',\'' + categoria + '\')" style="background:transparent;border:none;cursor:pointer;color:var(--text-dim);font-size:18px;line-height:1" title="Excluir">✕</button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      lista.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+        + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.05)">'
+        + '<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Material</th>'
+        + '<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Tipo</th>'
+        + '<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Cliente</th>'
+        + '<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:500">Link</th>'
+        + '<th style="padding:12px 20px"></th>'
+        + '</tr></thead><tbody>' + rows + '</tbody></table>';
+    });
+}
+
+function abrirModalMaterial(categoria) {
+  document.getElementById('material-categoria').value = categoria;
+  document.getElementById('material-nome').value = '';
+  document.getElementById('material-url').value = '';
+  document.getElementById('material-desc').value = '';
+  // Carrega clientes no select
+  var sel = document.getElementById('material-cliente-id');
+  sel.innerHTML = '<option value="">Todos os clientes</option>';
+  sbFetch('clientes?select=id,nome&order=nome').then(function(data){
+    if (data && data.length) data.forEach(function(c){
+      sel.innerHTML += '<option value="'+c.id+'">'+c.nome+'</option>';
+    });
+  });
+  document.getElementById('modal-material').style.display = 'flex';
+}
+
+function fecharModalMaterial() {
+  document.getElementById('modal-material').style.display = 'none';
+}
+
+document.getElementById('btn-salvar-material').onclick = function() {
+  var nome = document.getElementById('material-nome').value.trim();
+  if (!nome) { document.getElementById('material-nome').focus(); return; }
+  var categoria = document.getElementById('material-categoria').value;
+  var clienteId = document.getElementById('material-cliente-id').value;
+  var payload = {
+    nome: nome,
+    tipo: document.getElementById('material-tipo').value,
+    url: document.getElementById('material-url').value.trim(),
+    descricao: document.getElementById('material-desc').value.trim(),
+    tipo_categoria: categoria
+  };
+  if (clienteId) payload.cliente_id = clienteId;
+  sbFetch('materiais', { method:'POST', body: JSON.stringify(payload) })
+    .then(function() {
+      fecharModalMaterial();
+      carregarMateriais(categoria);
+    });
+};
+
+function deletarMaterial(id, categoria) {
+  if (!confirm('Excluir este material?')) return;
+  sbFetch('materiais?id=eq.'+id, { method:'DELETE' })
+    .then(function() { carregarMateriais(categoria); });
+}
+
+
+// ── FLUXO PLANO DE OURO ──
+var _fluxoClienteId = null;
+var _fluxoNoConfigs = [{},{},{},{},{},{},{}]; // config de cada nó
+var _editingNoIdx = -1;
+
+var FLUXO_NOS_DEF = [
+  { tipo:'GATILHO',    titulo:'Google Sheets',    campos:['sheets_url','aba'] },
+  { tipo:'CHAT MODEL', titulo:'Página 1',         campos:['modelo','instrucoes'] },
+  { tipo:'CHAT MODEL', titulo:'Página 2',         campos:['modelo','instrucoes'] },
+  { tipo:'CHAT MODEL', titulo:'Página 3',         campos:['modelo','instrucoes'] },
+  { tipo:'CHAT MODEL', titulo:'Página 4',         campos:['modelo','instrucoes'] },
+  { tipo:'MERGE',      titulo:'Unir eBook',       campos:['formato','nome_arquivo'] },
+  { tipo:'SAÍDA',      titulo:'Atualizar Cliente',campos:['campo_destino','link_manual'] },
+];
+
+var CAMPOS_LABELS = {
+  sheets_url:   'URL do Google Sheets',
+  aba:          'Nome da aba (ex: Página1)',
+  modelo:       'Modelo GPT (ex: gpt-4o)',
+  instrucoes:   'Instruções / Prompt',
+  formato:      'Formato de saída (PDF / HTML)',
+  nome_arquivo: 'Nome do arquivo eBook',
+  campo_destino:'Campo do cliente para salvar link',
+  link_manual:  'Link manual do eBook (opcional)',
+};
+
+var STATUS_LABELS = { idle:'Aguardando', running:'Em andamento', done:'Concluído', error:'Erro' };
+
+function setNoStatus(noId, status) {
+  var el = document.getElementById(noId);
+  if (!el) return;
+  el.dataset.status = status;
+  var idx = parseInt(el.dataset.idx);
+  var badge = document.getElementById('fno-badge-'+idx);
+  if (badge) badge.textContent = STATUS_LABELS[status] || status;
+}
+
+function carregarClientesFluxo() {
+  sbFetch('clientes?select=id,nome&order=nome').then(function(data) {
+    var sel = document.getElementById('fluxo-po-cliente');
+    if (!sel || !data) return;
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">Selecionar cliente...</option>';
+    data.forEach(function(c) {
+      sel.innerHTML += '<option value="'+c.id+'"'+(c.id===cur?' selected':'')+'>'+c.nome+'</option>';
+    });
+  });
+}
+
+document.getElementById('fluxo-po-cliente').addEventListener('change', function() {
+  _fluxoClienteId = this.value;
+  if (!_fluxoClienteId) {
+    for (var i=1;i<=7;i++) setNoStatus('no-'+i,'idle');
+    return;
+  }
+  sbFetch('fluxo_status?cliente_id=eq.'+_fluxoClienteId+'&fluxo=eq.plano-ouro&select=*')
+    .then(function(data) {
+      var salvo = (data && data[0]) ? data[0] : {};
+      var statusNos = salvo.status_nos || {};
+      var configs   = salvo.no_configs  || [{},{},{},{},{},{},{}];
+      _fluxoNoConfigs = configs;
+      for (var i=0;i<7;i++) {
+        setNoStatus('no-'+(i+1), statusNos['no-'+(i+1)] || 'idle');
+        // Atualiza subtítulo se tiver config
+        var sub = document.getElementById('fno-sub-'+i);
+        if (sub && configs[i] && configs[i].instrucoes) sub.textContent = configs[i].instrucoes.substring(0,50)+'…';
+        if (sub && configs[i] && configs[i].sheets_url) sub.textContent = configs[i].sheets_url.substring(0,50);
+      }
+    });
+});
+
+function abrirEditarNo(idx) {
+  _editingNoIdx = idx;
+  var def = FLUXO_NOS_DEF[idx];
+  var cfg = _fluxoNoConfigs[idx] || {};
+  document.getElementById('modal-no-tipo').textContent = def.tipo;
+  document.getElementById('modal-no-titulo').textContent = def.titulo;
+
+  // Status selector
+  var curStatus = (document.getElementById('no-'+(idx+1)) || {}).dataset && document.getElementById('no-'+(idx+1)).dataset.status || 'idle';
+  var statusHtml = '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Status</div>'
+    + '<div class="fno-status-row">'
+    + ['idle','running','done','error'].map(function(s){
+        return '<button class="fno-status-opt'+(s===curStatus?' sel':'')+' " data-s="'+s+'" onclick="selecionarStatusNo(this)">'+STATUS_LABELS[s]+'</button>';
+      }).join('')
+    + '</div>';
+
+  // Campos de config
+  var camposHtml = def.campos.map(function(c) {
+    var val = cfg[c] || '';
+    var isLong = c === 'instrucoes';
+    return '<div class="fno-field">'
+      + '<label>'+CAMPOS_LABELS[c]+'</label>'
+      + (isLong
+          ? '<textarea id="fno-input-'+c+'" rows="4" placeholder="Cole aqui as instruções para o modelo...">'+val+'</textarea>'
+          : '<input id="fno-input-'+c+'" type="text" value="'+val+'" placeholder="'+(CAMPOS_LABELS[c]||c)+'">')
+      + '</div>';
+  }).join('');
+
+  document.getElementById('modal-no-campos').innerHTML = statusHtml + camposHtml;
+  document.getElementById('modal-editar-no').style.display = 'flex';
+}
+
+function selecionarStatusNo(btn) {
+  document.querySelectorAll('.fno-status-opt').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+}
+
+function fecharEditarNo() {
+  document.getElementById('modal-editar-no').style.display = 'none';
+  _editingNoIdx = -1;
+}
+
+function salvarConfigNo() {
+  var idx = _editingNoIdx;
+  if (idx < 0) return;
+  var def = FLUXO_NOS_DEF[idx];
+  var cfg = {};
+  def.campos.forEach(function(c) {
+    var el = document.getElementById('fno-input-'+c);
+    if (el) cfg[c] = el.value.trim();
+  });
+  _fluxoNoConfigs[idx] = cfg;
+
+  // Pega status selecionado
+  var selBtn = document.querySelector('.fno-status-opt.sel');
+  var novoStatus = selBtn ? selBtn.dataset.s : 'idle';
+  setNoStatus('no-'+(idx+1), novoStatus);
+
+  // Atualiza subtítulo
+  var sub = document.getElementById('fno-sub-'+idx);
+  if (sub) {
+    if (cfg.instrucoes) sub.textContent = cfg.instrucoes.substring(0,50)+'…';
+    else if (cfg.sheets_url) sub.textContent = cfg.sheets_url.substring(0,50);
+    else if (cfg.link_manual) sub.textContent = cfg.link_manual.substring(0,50);
+  }
+
+  fecharEditarNo();
+}
+
+function salvarStatusFluxo() {
+  if (!_fluxoClienteId) { alert('Selecione um cliente primeiro.'); return; }
+  var statusNos = {};
+  for (var i=1;i<=7;i++) {
+    var el = document.getElementById('no-'+i);
+    statusNos['no-'+i] = el ? el.dataset.status : 'idle';
+  }
+  sbFetch('fluxo_status?cliente_id=eq.'+_fluxoClienteId+'&fluxo=eq.plano-ouro', {method:'DELETE'})
+    .then(function(){
+      return sbFetch('fluxo_status', {method:'POST', body:JSON.stringify({
+        cliente_id: _fluxoClienteId,
+        fluxo: 'plano-ouro',
+        status_nos: statusNos,
+        no_configs: _fluxoNoConfigs
+      })});
+    }).then(function(){
+      var pill = document.getElementById('fluxo-po-status-pill');
+      pill.style.display = 'flex';
+      setTimeout(function(){ pill.style.display = 'none'; }, 2500);
+    });
+}
+
+var _showFluxoOrig = showFluxo;
+showFluxo = function(nome) {
+  _showFluxoOrig(nome);
+  if (nome === 'plano-ouro') carregarClientesFluxo();
+};
+
 </script>
 </body>
 </html>
