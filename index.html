@@ -770,6 +770,10 @@ C43: (e-mail suporte)"></textarea>
       </div>
     </div>
     <input type="hidden" id="edit-page-id">
+    <div id="edit-loading-msg" style="display:none;font-size:12px;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      <div style="width:12px;height:12px;border:2px solid var(--gold-border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
+      Carregando dados da página...
+    </div>
     <div class="form-group">
       <label class="form-label">Título da página (nome)</label>
       <input class="form-input" id="edit-page-titulo" placeholder="Nome do cliente / título">
@@ -1060,32 +1064,42 @@ function deletePage(id){
 function editarPagina(id){
   var p = pages.find(function(x){ return x.id===id; });
   if(!p) return;
-  // Preenche modal de edição
+
+  // Abre modal imediatamente com o que já temos em memória
   document.getElementById('edit-page-id').value = id;
   document.getElementById('edit-page-titulo').value = p.nome || '';
-  document.getElementById('edit-page-slug').value = p.slug || '';
-  // Carregar HTML da página para extrair C4, C31, C37B
-  sbFetch('paginas?id=eq.'+id+'&select=html').then(function(res){
-    if(!res || !res[0]) return;
-    var html = res[0].html || '';
+  document.getElementById('edit-c4').value = '';
+  document.getElementById('edit-c40').value = '';
+  document.getElementById('edit-c37b').value = '';
+  document.getElementById('edit-c37').value = '';
+  document.getElementById('edit-c31').value = '';
+  document.getElementById('edit-page-modal').style.display = 'flex';
+
+  // Tenta carregar dados do HTML em background (não bloqueia o modal)
+  var loadingMsg = document.getElementById('edit-loading-msg');
+  if(loadingMsg) loadingMsg.style.display = 'block';
+
+  fetch(SB_URL + '/rest/v1/paginas?id=eq.'+id+'&select=html', {
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    if(loadingMsg) loadingMsg.style.display = 'none';
+    if(!res || !res[0] || !res[0].html) return;
+    var html = res[0].html;
     var parser = new DOMParser();
     var doc = parser.parseFromString(html, 'text/html');
-    // C4: hero img
-    var heroImg = doc.querySelector('.hero-img-wrap img');
-    document.getElementById('edit-c4').value = heroImg ? heroImg.getAttribute('src') : '';
-    // C40: autor img
+    var heroImg  = doc.querySelector('.hero-img-wrap img');
     var autorImg = doc.querySelector('.autor-inner img');
-    document.getElementById('edit-c40').value = autorImg ? autorImg.getAttribute('src') : '';
-    // C37B: link do botão da seção 6
-    var btnSec6 = doc.querySelector('#sec6 a.btn-cta');
-    document.getElementById('edit-c37b').value = btnSec6 ? btnSec6.getAttribute('href') : '';
-    // C37: texto do botão
-    document.getElementById('edit-c37').value = btnSec6 ? btnSec6.textContent.trim() : '';
-    // C31: título da oferta
-    var titulo31 = doc.querySelector('#sec6 h3');
-    document.getElementById('edit-c31').value = titulo31 ? titulo31.textContent.trim() : '';
-  });
-  document.getElementById('edit-page-modal').style.display='flex';
+    var btnSec6  = doc.querySelector('#sec6 a.btn-cta');
+    var h3Sec6   = doc.querySelector('#sec6 h3');
+    if(heroImg)  document.getElementById('edit-c4').value   = heroImg.getAttribute('src') || '';
+    if(autorImg) document.getElementById('edit-c40').value  = autorImg.getAttribute('src') || '';
+    if(btnSec6)  document.getElementById('edit-c37b').value = btnSec6.getAttribute('href') || '';
+    if(btnSec6)  document.getElementById('edit-c37').value  = btnSec6.textContent.trim();
+    if(h3Sec6)   document.getElementById('edit-c31').value  = h3Sec6.textContent.trim();
+  })
+  .catch(function(){ if(loadingMsg) loadingMsg.style.display = 'none'; });
 }
 
 function salvarEdicaoPagina(){
