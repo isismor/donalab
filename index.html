@@ -342,12 +342,8 @@
         <div id="etapa-2" style="display:none">
           <div class="table-wrap" style="padding:32px">
 
-            <!-- API Key -->
-            <div class="form-group" style="max-width:480px">
-              <label class="form-label">API Key OpenAI</label>
-              <input class="form-input" type="password" id="openai-key" placeholder="sk-..." style="font-family:monospace">
-              <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Salva automaticamente. Configure uma vez em <a href="#" onclick="showSection('config');return false;" style="color:var(--gold)">Configuracoes</a>.</div>
-            </div>
+            <!-- API Key oculta -->
+            <input type="hidden" id="openai-key">
 
             <!-- Status dos agentes -->
             <div id="agentes-status" style="display:none;margin-top:8px;margin-bottom:8px">
@@ -527,6 +523,7 @@ Exemplo:
     <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="input-email" placeholder="email@exemplo.com"></div>
     <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" type="text" id="input-whatsapp" placeholder="(11) 99999-9999"></div>
     <div class="form-group"><label class="form-label">Dados</label><textarea class="form-input" id="input-dados" placeholder="Anotacoes sobre o cliente..."></textarea></div>
+    <div class="form-group"><label class="form-label">Senha de acesso (área do cliente)</label><input class="form-input" type="text" id="input-senha" placeholder="Ex: minhasenha123"></div>
     <div class="form-actions"><button class="btn-outline" onclick="closeModal('form-modal')">Cancelar</button><button class="btn-gold" onclick="saveClient()">Salvar</button></div>
   </div>
 </div>
@@ -839,6 +836,7 @@ function openEdit(id){
   document.getElementById('input-nome').value=c.nome;
   document.getElementById('input-email').value=c.email||'';
   document.getElementById('input-whatsapp').value=c.whatsapp||'';
+  document.getElementById('input-senha').value=c.senha||'';
   document.getElementById('input-dados').value=c.dados||'';
   closeModal('profile-modal'); openModal('form-modal');
 }
@@ -848,7 +846,7 @@ function editFromProfile(){ if(viewingId!==null)openEdit(viewingId); }
 function saveClient(){
   var nome=document.getElementById('input-nome').value.trim();
   if(!nome){document.getElementById('input-nome').focus();return;}
-  var d={nome:nome,email:document.getElementById('input-email').value.trim(),whatsapp:document.getElementById('input-whatsapp').value.trim(),dados:document.getElementById('input-dados').value.trim()};
+  var d={nome:nome,email:document.getElementById('input-email').value.trim(),whatsapp:document.getElementById('input-whatsapp').value.trim(),dados:document.getElementById('input-dados').value.trim(),senha:document.getElementById('input-senha').value.trim()};
   closeModal('form-modal');
   if(editingId!==null){
     sbFetch('clientes?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(d)}).then(function(){ loadClients(); editingId=null; });
@@ -1137,10 +1135,7 @@ document.getElementById('btn-rodar-agente').onclick = function(){
     obs:document.getElementById('p-obs').value
   };
 
-  var lyraInstrucoes = localStorage.getItem('lyra_prompt') || '';
-  var orionInstrucoes = localStorage.getItem('orion_prompt') || '';
-
-  // Mostrar painel de status
+  // Mostrar painel de status e desabilitar botões
   document.getElementById('agentes-status').style.display = 'block';
   document.getElementById('btn-rodar-agente').disabled = true;
   document.getElementById('btn-volta-1').disabled = true;
@@ -1149,38 +1144,109 @@ document.getElementById('btn-rodar-agente').onclick = function(){
   setAgentStatus('lyra', 'running', 'Analisando os dados do produto...');
   setAgentStatus('orion', 'idle', 'Aguardando Lyra...');
 
-  var lyraPrompt = 'Você é Lyra. Siga RIGOROSAMENTE suas instruções abaixo.\n\n'
-    + lyraInstrucoes
-    + '\n\n---\nINPUTS DO CLIENTE:\n'
-    + 'Nome completo: ' + (dados.nome || '') + '\n'
-    + 'E-mail: ' + (dados.email || '') + '\n'
+  var lyraSystem = 'Você é Lyra, copywriter sênior especialista em páginas de vendas em português brasileiro. '
+    + 'Sua tarefa é analisar os dados do produto e retornar APENAS um objeto JSON válido com exatamente as chaves abaixo. '
+    + 'REGRAS ABSOLUTAS:\n'
+    + '1. Retorne SOMENTE o JSON. Nenhum texto antes ou depois. Nenhum markdown. Nenhuma explicação.\n'
+    + '2. Todos os valores devem ser strings em português brasileiro.\n'
+    + '3. Nunca invente dados numéricos, preços, certificações ou resultados que não foram fornecidos.\n'
+    + '4. Se um dado não foi fornecido, crie um texto persuasivo baseado no contexto disponível.\n'
+    + '5. Os textos devem ser diretos, humanos e focados em conversão.\n'
+    + '6. LINK_VENDA deve ser a URL de checkout exata fornecida, ou "#" se não fornecida.\n'
+    + '7. EMAIL_SUPORTE deve ser o email fornecido.\n'
+    + '8. Campos de imagem (HERO_IMG, RES_1_IMG, RES_2_IMG, RES_3_IMG, AUTOR_IMG): use a URL fornecida ou deixe vazio.\n'
+    + 'JSON esperado (preencha todos os valores):\n'
+    + '{\n'
+    + '"PRODUTO_NOME": "nome comercial do produto",\n'
+    + '"NOME": "nome da pessoa ou marca",\n'
+    + '"HERO_H1": "título principal impactante (máx 60 chars)",\n'
+    + '"HERO_DESC": "subtítulo que expande a promessa (máx 120 chars)",\n'
+    + '"HERO_IMG": "URL da imagem hero ou vazio",\n'
+    + '"CTA_PRINCIPAL": "texto do botão principal (máx 30 chars)",\n'
+    + '"CTA_2": "texto do segundo botão (máx 30 chars)",\n'
+    + '"LINK_VENDA": "URL de checkout ou #",\n'
+    + '"DOR_TITULO": "pergunta que evoca a dor principal (máx 80 chars)",\n'
+    + '"SINTOMA_1": "sintoma/dor 1 (máx 40 chars)",\n'
+    + '"SINTOMA_2": "sintoma/dor 2 (máx 40 chars)",\n'
+    + '"SINTOMA_3": "sintoma/dor 3 (máx 40 chars)",\n'
+    + '"SOLUCAO": "frase de solução direta (máx 80 chars)",\n'
+    + '"PARA_QUEM_TITULO": "título da seção para quem é (máx 60 chars)",\n'
+    + '"DESEJO_1": "desejo/perfil 1 do cliente ideal (máx 60 chars)",\n'
+    + '"DESEJO_2": "desejo/perfil 2 (máx 60 chars)",\n'
+    + '"DESEJO_3": "desejo/perfil 3 (máx 60 chars)",\n'
+    + '"DESEJO_4": "desejo/perfil 4 (máx 60 chars)",\n'
+    + '"DESEJO_5": "desejo/perfil 5 (máx 60 chars)",\n'
+    + '"BENEFICIOS_TITULO": "título da seção de benefícios (máx 60 chars)",\n'
+    + '"BEN_1_TITULO": "benefício 1 - título curto (máx 40 chars)",\n'
+    + '"BEN_1_DESC": "benefício 1 - descrição (máx 120 chars)",\n'
+    + '"BEN_2_TITULO": "benefício 2 - título curto (máx 40 chars)",\n'
+    + '"BEN_2_DESC": "benefício 2 - descrição (máx 120 chars)",\n'
+    + '"BEN_3_TITULO": "benefício 3 - título curto (máx 40 chars)",\n'
+    + '"BEN_3_DESC": "benefício 3 - descrição (máx 120 chars)",\n'
+    + '"RESULTADOS_TITULO": "título da seção de resultados (máx 60 chars)",\n'
+    + '"RES_1_TITULO": "resultado 1 título (máx 40 chars)",\n'
+    + '"RES_1_DESC": "resultado 1 descrição (máx 100 chars)",\n'
+    + '"RES_1_IMG": "URL imagem resultado 1 ou vazio",\n'
+    + '"RES_2_TITULO": "resultado 2 título (máx 40 chars)",\n'
+    + '"RES_2_DESC": "resultado 2 descrição (máx 100 chars)",\n'
+    + '"RES_2_IMG": "URL imagem resultado 2 ou vazio",\n'
+    + '"RES_3_TITULO": "resultado 3 título (máx 40 chars)",\n'
+    + '"RES_3_DESC": "resultado 3 descrição (máx 100 chars)",\n'
+    + '"RES_3_IMG": "URL imagem resultado 3 ou vazio",\n'
+    + '"AUTOR_TITULO": "nome ou título quem sou eu (máx 40 chars)",\n'
+    + '"AUTOR_BIO": "bio completa persuasiva (máx 400 chars)",\n'
+    + '"AUTOR_IMG": "URL foto do autor ou vazio",\n'
+    + '"OFERTA_TITULO": "título da seção oferta (máx 60 chars)",\n'
+    + '"CARD_TITULO": "título do card de compra (máx 50 chars)",\n'
+    + '"OFERTA_ITEM_1": "o que inclui - item 1 (máx 60 chars)",\n'
+    + '"OFERTA_ITEM_2": "o que inclui - item 2 (máx 60 chars)",\n'
+    + '"OFERTA_ITEM_3": "o que inclui - item 3 (máx 60 chars)",\n'
+    + '"GARANTIA": "texto da garantia (máx 80 chars)",\n'
+    + '"PRECO": "preço formatado ex: R$ 497 ou R$ 497/mês",\n'
+    + '"FAQ_1_P": "pergunta frequente 1",\n'
+    + '"FAQ_1_R": "resposta 1 (máx 150 chars)",\n'
+    + '"FAQ_2_P": "pergunta frequente 2",\n'
+    + '"FAQ_2_R": "resposta 2 (máx 150 chars)",\n'
+    + '"FAQ_3_P": "pergunta frequente 3",\n'
+    + '"FAQ_3_R": "resposta 3 (máx 150 chars)",\n'
+    + '"FAQ_4_P": "pergunta frequente 4",\n'
+    + '"FAQ_4_R": "resposta 4 (máx 150 chars)",\n'
+    + '"COPYRIGHT": "© 2025 Nome",\n'
+    + '"EMAIL_SUPORTE": "email@exemplo.com"\n'
+    + '}';
+
+  var lyraUser = 'DADOS DO PRODUTO:\n'
+    + 'Nome: ' + (dados.nome || '') + '\n'
+    + 'Email: ' + (dados.email || '') + '\n'
     + 'WhatsApp: ' + (dados.whatsapp || '') + '\n'
     + 'Instagram: ' + (dados.instagram || '') + '\n'
-    + 'Link de fotos: ' + (dados.fotos || '') + '\n'
-    + 'Nome do produto: ' + (dados.produto_nome || '') + '\n'
-    + 'Tipo de produto: ' + (dados.produto_tipo || '') + '\n'
+    + 'Fotos (URL): ' + (dados.fotos || '') + '\n'
+    + 'Produto: ' + (dados.produto_nome || '') + '\n'
+    + 'Tipo: ' + (dados.produto_tipo || '') + '\n'
     + 'Promessa: ' + (dados.promessa || '') + '\n'
-    + 'O que resolve: ' + (dados.dor || '') + '\n'
+    + 'Dor que resolve: ' + (dados.dor || '') + '\n'
     + 'O que entrega: ' + (dados.entrega || '') + '\n'
-    + 'Para quem é: ' + (dados.para_quem || '') + '\n'
-    + 'Para quem não é: ' + (dados.nao_para_quem || '') + '\n'
+    + 'Para quem: ' + (dados.para_quem || '') + '\n'
+    + 'Não é para quem: ' + (dados.nao_para_quem || '') + '\n'
     + 'Benefícios: ' + (dados.beneficios || '') + '\n'
     + 'Resultados: ' + (dados.resultados || '') + '\n'
     + 'Depoimentos: ' + (dados.depoimentos || '') + '\n'
     + 'Garantia: ' + (dados.garantia || '') + '\n'
-    + 'Quem sou eu: ' + (dados.bio || '') + '\n'
+    + 'Bio: ' + (dados.bio || '') + '\n'
     + 'Preço: ' + (dados.preco || '') + '\n'
-    + 'Por onde vende: ' + (dados.venda || '') + '\n'
+    + 'Link de venda: ' + (dados.venda || '') + '\n'
     + 'Suporte: ' + (dados.suporte || '') + '\n'
     + 'Observações: ' + (dados.obs || '') + '\n'
-    + (respostasTexto ? '\nRespostas adicionais:\n' + respostasTexto : '')
-    + '\n\nGere os 43 itens no template (Seções 1 a 8), respeitando os limites de caracteres (±3). Entregue no formato: Ações executadas → Outputs (Template) → Recomendações → Confiança.';
+    + (respostasTexto ? '\nRespostas adicionais do cliente:\n' + respostasTexto : '');
 
-  function callGPT(prompt, onSuccess, onError) {
+  function callGPT(systemPrompt, userPrompt, onSuccess, onError) {
+    var messages = systemPrompt
+      ? [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]
+      : [{ role: 'user', content: userPrompt }];
     fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], max_tokens: 2500, temperature: 0.7 })
+      body: JSON.stringify({ model: 'gpt-4o', messages: messages, max_tokens: 4000, temperature: 0.7, response_format: { type: 'json_object' } })
     })
     .then(function(r){ return r.json(); })
     .then(function(data){
@@ -1190,48 +1256,259 @@ document.getElementById('btn-rodar-agente').onclick = function(){
     .catch(function(err){ onError(err.message); });
   }
 
-  callGPT(lyraPrompt, function(lyraOutput) {
-    // Lyra terminou — ela retorna texto estruturado, não JSON
+  callGPT(lyraSystem, lyraUser, function(lyraOutput) {
+    // Lyra terminou — parse direto o JSON
+    var v;
+    try {
+      v = JSON.parse(lyraOutput);
+    } catch(e) {
+      setAgentStatus('lyra', 'error', 'Erro no JSON da Lyra. Tente novamente.');
+      document.getElementById('btn-rodar-agente').disabled = false;
+      document.getElementById('btn-volta-1').disabled = false;
+      return;
+    }
+
     setAgentStatus('lyra', 'done', 'Conteudo criado com sucesso.');
 
-    // Passa o output completo da Lyra diretamente para o Orion
-    var lyraJSON = { _rawOutput: lyraOutput };
-
-    // --- ORION ---
+    // --- ORION: preenche o template com o JSON da Lyra (sem chamada extra) ---
     setAgentStatus('orion', 'running', 'Construindo o design da pagina...');
 
-    var orionPrompt = 'Você é Orion. Siga RIGOROSAMENTE suas instruções abaixo.\n\n'
-      + orionInstrucoes
-      + '\n\n---\nA Lyra (copywriter) gerou o conteúdo completo abaixo no formato de template estruturado (Seções 1 a 8, itens 1 a 43).'
-      + '\nSua tarefa: usar EXATAMENTE esses textos para montar o HTML completo da página, sem alterar nenhuma palavra.'
-      + '\n\nDados de contexto adicionais:'
-      + '\n- Link de fotos do cliente: ' + (dados.fotos || 'PENDÊNCIA: enviar URL válida')
-      + '\n- Por onde vende/checkout: ' + (dados.venda || '')
-      + '\n\nOUTPUT DA LYRA (use este conteúdo para o HTML):\n\n'
-      + lyraJSON._rawOutput
-      + '\n\n---\nATENÇÃO: Retorne APENAS o HTML completo começando com <!DOCTYPE html>. Sem markdown, sem explicações, sem blocos de código.';
+    // v já está parseado da Lyra — Orion só preenche o template
+    function s(k){ return (v[k]||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function sRaw(k){ return v[k]||''; }
 
-    callGPT(orionPrompt, function(orionOutput) {
-      // Orion terminou
-      var htmlLimpo = orionOutput.replace(/^```html|^```|```$/gm, '').trim();
-      if (!htmlLimpo.includes('<!DOCTYPE') && !htmlLimpo.includes('<html')) {
-        setAgentStatus('orion', 'error', 'Erro ao gerar o HTML.');
-        document.getElementById('btn-rodar-agente').disabled = false;
-        document.getElementById('btn-volta-1').disabled = false;
-        return;
+      var checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      var plusSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+
+      var ofertaItems = [s('OFERTA_ITEM_1'),s('OFERTA_ITEM_2'),s('OFERTA_ITEM_3')].filter(Boolean)
+        .map(function(i){ return '<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'+i+'</li>'; }).join('');
+
+      var faqItems = [[s('FAQ_1_P'),s('FAQ_1_R')],[s('FAQ_2_P'),s('FAQ_2_R')],[s('FAQ_3_P'),s('FAQ_3_R')],[s('FAQ_4_P'),s('FAQ_4_R')]]
+        .filter(function(f){ return f[0]; })
+        .map(function(f){ return '<div class="faq-item"><div class="faq-q">'+f[0]+'<div class="faq-icon">'+plusSvg+'</div></div><div class="faq-a">'+f[1]+'</div></div>'; }).join('');
+
+      // Imagem hero: usa URL se fornecida, senão placeholder
+      var heroImgHtml = (dados.fotos && dados.fotos.startsWith('http'))
+        ? '<img src="'+dados.fotos+'" alt="'+s('PRODUTO_NOME')+'" style="width:100%;height:auto;display:block;border-radius:12px;">'
+        : '<div class="img-ph">Imagem do produto</div>';
+
+      // Imagens de resultado
+      function resImg(url, label) {
+        return (url && url.startsWith('http'))
+          ? '<img src="'+url+'" alt="'+label+'" style="width:100%;height:100%;object-fit:cover;display:block;">'
+          : '<span>'+label+'</span>';
       }
-      setAgentStatus('orion', 'done', 'Pagina construida com sucesso.');
+      var res1ImgUrl = sRaw('RES_1_IMG'); var res2ImgUrl = sRaw('RES_2_IMG'); var res3ImgUrl = sRaw('RES_3_IMG');
 
-      // Guardar
+      // Foto autor
+      var autorImgHtml = (sRaw('AUTOR_IMG') && sRaw('AUTOR_IMG').startsWith('http'))
+        ? '<img src="'+sRaw('AUTOR_IMG')+'" alt="'+s('AUTOR_TITULO')+'" style="width:100%;height:100%;object-fit:cover;display:block;">'
+        : '<span>Foto do autor</span>';
+
+      var TEMPLATE = '<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n'
+        + '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">\n'
+        + '<title>'+s('PRODUTO_NOME')+'</title>\n'
+        + '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">\n'
+        + '<style>\n'
+        + ':root{--bg:#080808;--bg2:#0f0f0f;--bg3:#141414;--gold:#C9A84C;--gold2:#e2c06e;--gdim:rgba(201,168,76,.08);--gbdr:rgba(201,168,76,.2);--tx:#F0EDE8;--tx2:#B8B4AE;--tx3:#6B6760;--bdr:rgba(255,255,255,.06);--r:14px;--rl:20px;}\n'
+        + '*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}\n'
+        + 'body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}\n'
+        + '.W{max-width:1000px;margin:0 auto;padding:0 28px;}\n'
+        + '.sec{padding:88px 0;border-top:1px solid var(--bdr);}\n'
+        + '.lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:10px;display:block;}\n'
+        + '.btn{display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:#080808;font-family:"DM Sans",sans-serif;font-weight:700;font-size:14px;padding:14px 36px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.02em;text-transform:uppercase;}\n'
+        + '.btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 8px 32px rgba(201,168,76,.3);}\n'
+        + '.btn-full{width:100%;justify-content:center;padding:18px;font-size:15px;}\n'
+
+        // HERO
+        + '.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:100px 28px;max-width:1000px;margin:0 auto;}\n'
+        + '.hero-left{}\n'
+        + '.hero-campo{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:16px;display:block;}\n'
+        + '.hero h1{font-family:"Cormorant Garamond",serif;font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.05;letter-spacing:-.02em;margin-bottom:20px;color:var(--gold);text-transform:uppercase;}\n'
+        + '.hero-promessa{font-size:15px;color:var(--tx2);line-height:1.7;margin-bottom:36px;font-weight:300;}\n'
+        + '.hero-right{border-radius:var(--rl);overflow:hidden;border:1px solid var(--bdr);background:var(--bg3);}\n'
+        + '.img-ph{width:100%;height:380px;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px dashed var(--gbdr);}\n'
+
+        // DOR
+        + '.dor-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
+        + '.sint-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}\n'
+        + '.sint{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:16px 20px;font-size:14px;color:var(--tx2);text-align:center;letter-spacing:.03em;text-transform:uppercase;font-weight:500;}\n'
+
+        // PARA QUEM
+        + '.pq-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;display:grid;grid-template-columns:280px 1fr;}\n'
+        + '.pq-left{background:var(--bg3);padding:40px 32px;display:flex;align-items:center;justify-content:center;}\n'
+        + '.pq-left h2{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:var(--gold);text-transform:uppercase;line-height:1.15;text-align:center;}\n'
+        + '.pq-right{padding:40px 36px;}\n'
+        + '.pq-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:14px;color:var(--tx2);line-height:1.5;}\n'
+        + '.pq-item:last-child{border-bottom:none;}\n'
+        + '.pq-num{color:var(--gold);font-weight:700;font-size:13px;flex-shrink:0;margin-top:1px;}\n'
+        + '.pq-cta{margin-top:36px;text-align:center;}\n'
+
+        // BENEFICIOS
+        + '.ben-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
+        + '.ben-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;}\n'
+        + '.ben-col{background:var(--bg);padding:32px 28px;}\n'
+        + '.ben-col-titulo{font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:12px;}\n'
+        + '.ben-col-desc{font-size:14px;color:var(--tx2);line-height:1.7;font-weight:300;}\n'
+
+        // RESULTADOS
+        + '.res-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;line-height:1.3;}\n'
+        + '.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}\n'
+        + '.res-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;}\n'
+        + '.res-img{width:100%;aspect-ratio:3/4;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.1em;text-transform:uppercase;overflow:hidden;}\n'
+        + '.res-body{padding:20px;}\n'
+        + '.res-t{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:700;font-style:italic;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}\n'
+        + '.res-d{font-size:13px;color:var(--tx2);line-height:1.6;font-weight:300;}\n'
+
+        // AUTOR
+        + '.aut-in{display:grid;grid-template-columns:300px 1fr;gap:60px;align-items:start;}\n'
+        + '.aut-foto{border-radius:var(--r);overflow:hidden;background:var(--bg3);border:1px solid var(--bdr);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}\n'
+        + '.aut-nome{font-family:"Cormorant Garamond",serif;font-size:clamp(28px,4vw,52px);font-weight:700;color:var(--gold);text-transform:uppercase;line-height:1.05;margin-bottom:24px;}\n'
+        + '.aut-bio{font-size:15px;color:var(--tx2);line-height:1.8;font-weight:300;}\n'
+
+        // OFERTA
+        + '.ofr-titulo{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,38px);font-weight:700;font-style:italic;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:32px;}\n'
+        + '.ofr-list{list-style:none;margin-bottom:24px;}\n'
+        + '.ofr-item{display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--bdr);border-radius:100px;padding:14px 24px;margin-bottom:10px;font-size:14px;color:var(--tx2);font-weight:400;}\n'
+        + '.ofr-item.destaque{background:var(--gold);color:#080808;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;}\n'
+        + '.ofr-item.destaque:hover{background:var(--gold2);}\n'
+
+        // FAQ
+        + '.faq-h2{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.5vw,36px);font-weight:600;text-align:center;margin-bottom:40px;}\n'
+        + '.faq-wrap{max-width:680px;margin:0 auto;}\n'
+        + '.faq-item{border-bottom:1px solid var(--bdr);padding:20px 0;cursor:pointer;}\n'
+        + '.faq-item:first-child{border-top:1px solid var(--bdr);}\n'
+        + '.faq-q{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;font-weight:500;user-select:none;}\n'
+        + '.faq-icon{width:22px;height:22px;border-radius:50%;border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:var(--tx3);font-size:14px;}\n'
+        + '.faq-item.open .faq-icon{background:var(--gdim);border-color:var(--gbdr);color:var(--gold);transform:rotate(45deg);}\n'
+        + '.faq-a{font-size:14px;color:var(--tx2);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;}\n'
+        + '.faq-item.open .faq-a{max-height:300px;padding-top:12px;}\n'
+
+        // FOOTER
+        + '.footer{padding:40px 0;text-align:center;border-top:1px solid var(--bdr);}\n'
+        + '.footer-nome{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;margin-bottom:6px;}\n'
+        + '.footer-info{font-size:12px;color:var(--tx3);line-height:1.8;}\n'
+        + '.footer-info a{color:var(--tx3);text-decoration:none;}\n'
+
+        + '@media(max-width:768px){'
+        + '.hero{grid-template-columns:1fr;padding:80px 20px 48px;}'
+        + '.pq-box{grid-template-columns:1fr;}'
+        + '.pq-left{padding:28px 24px;}'
+        + '.ben-grid{grid-template-columns:1fr;}'
+        + '.res-grid{grid-template-columns:1fr;}'
+        + '.aut-in{grid-template-columns:1fr;gap:32px;}'
+        + '.aut-foto{max-width:240px;}'
+        + '.sint-grid{grid-template-columns:1fr;}'
+        + '}\n'
+        + '</style>\n</head>\n<body>\n\n'
+
+        // ── HERO ──
+        + '<div style="background:var(--bg);border-bottom:1px solid var(--bdr);">\n'
+        + '<div class="hero">\n'
+        + '<div class="hero-left">\n'
+        + '<span class="hero-campo">Campo 1</span>\n'
+        + '<h1>'+s('PRODUTO_NOME')+'</h1>\n'
+        + '<p class="hero-promessa">'+s('HERO_DESC')+'</p>\n'
+        + '<a href="'+sRaw('LINK_VENDA')+'" class="btn">'+s('CTA_PRINCIPAL')+'</a>\n'
+        + '</div>\n'
+        + '<div class="hero-right">'+heroImgHtml+'</div>\n'
+        + '</div></div>\n\n'
+
+        // ── DOR ──
+        + '<section class="sec"><div class="W">\n'
+        + '<p class="dor-titulo">'+s('DOR_TITULO')+'</p>\n'
+        + '<div class="sint-grid">\n'
+        + '<div class="sint">'+s('SINTOMA_1')+'</div>\n'
+        + '<div class="sint">'+s('SINTOMA_2')+'</div>\n'
+        + '<div class="sint">'+s('SINTOMA_3')+'</div>\n'
+        + '<div class="sint">'+s('SOLUCAO')+'</div>\n'
+        + '<div class="sint">'+s('DESEJO_1')+'</div>\n'
+        + '<div class="sint">'+s('DESEJO_2')+'</div>\n'
+        + '</div></div></section>\n\n'
+
+        // ── PARA QUEM ──
+        + '<section class="sec"><div class="W">\n'
+        + '<p class="dor-titulo">'+s('PARA_QUEM_TITULO')+'</p>\n'
+        + '<div class="pq-box">\n'
+        + '<div class="pq-left"><h2>Para quem é o '+s('PRODUTO_NOME')+'?</h2></div>\n'
+        + '<div class="pq-right">\n'
+        + '<div class="pq-item"><span class="pq-num">1.</span><span>'+s('DESEJO_3')+'</span></div>\n'
+        + '<div class="pq-item"><span class="pq-num">2.</span><span>'+s('DESEJO_4')+'</span></div>\n'
+        + '<div class="pq-item"><span class="pq-num">3.</span><span>'+s('DESEJO_5')+'</span></div>\n'
+        + '<div class="pq-item"><span class="pq-num">4.</span><span>'+s('SINTOMA_1')+'</span></div>\n'
+        + '<div class="pq-item"><span class="pq-num">5.</span><span>'+s('SINTOMA_2')+'</span></div>\n'
+        + '<div class="pq-item"><span class="pq-num">6.</span><span>'+s('SINTOMA_3')+'</span></div>\n'
+        + '</div></div>\n'
+        + '<div class="pq-cta"><a href="'+sRaw('LINK_VENDA')+'" class="btn">'+s('CTA_2')+'</a></div>\n'
+        + '</div></section>\n\n'
+
+        // ── BENEFICIOS ──
+        + '<section class="sec"><div class="W">\n'
+        + '<p class="ben-titulo">'+s('BENEFICIOS_TITULO')+'</p>\n'
+        + '<div class="ben-grid">\n'
+        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_1_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_1_DESC')+'</div></div>\n'
+        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_2_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_2_DESC')+'</div></div>\n'
+        + '<div class="ben-col"><div class="ben-col-titulo">'+s('BEN_3_TITULO')+'</div><div class="ben-col-desc">'+s('BEN_3_DESC')+'</div></div>\n'
+        + '</div></div></section>\n\n'
+
+        // ── RESULTADOS ──
+        + '<section class="sec"><div class="W">\n'
+        + '<p class="res-titulo">'+s('RESULTADOS_TITULO')+'</p>\n'
+        + '<div class="res-grid">\n'
+        + '<div class="res-card"><div class="res-img">'+resImg(res1ImgUrl,'Resultado 1')+'</div><div class="res-body"><div class="res-t">'+s('RES_1_TITULO')+'</div><div class="res-d">'+s('RES_1_DESC')+'</div></div></div>\n'
+        + '<div class="res-card"><div class="res-img">'+resImg(res2ImgUrl,'Resultado 2')+'</div><div class="res-body"><div class="res-t">'+s('RES_2_TITULO')+'</div><div class="res-d">'+s('RES_2_DESC')+'</div></div></div>\n'
+        + '<div class="res-card"><div class="res-img">'+resImg(res3ImgUrl,'Resultado 3')+'</div><div class="res-body"><div class="res-t">'+s('RES_3_TITULO')+'</div><div class="res-d">'+s('RES_3_DESC')+'</div></div></div>\n'
+        + '</div></div></section>\n\n'
+
+        // ── AUTOR ──
+        + '<section class="sec"><div class="W"><div class="aut-in">\n'
+        + '<div class="aut-foto">'+autorImgHtml+'</div>\n'
+        + '<div>\n'
+        + '<div class="aut-nome">'+s('AUTOR_TITULO')+'</div>\n'
+        + '<p class="aut-bio">'+s('AUTOR_BIO')+'</p>\n'
+        + '</div></div></div></section>\n\n'
+
+        // ── OFERTA ──
+        + '<section class="sec"><div class="W" style="max-width:560px">\n'
+        + '<p class="ofr-titulo">'+s('CARD_TITULO')+'</p>\n'
+        + '<ul class="ofr-list">\n'
+        + '<li class="ofr-item">'+s('OFERTA_ITEM_1')+'</li>\n'
+        + '<li class="ofr-item">'+s('GARANTIA')+'</li>\n'
+        + '<li class="ofr-item">'+s('OFERTA_ITEM_2')+'</li>\n'
+        + '<li class="ofr-item">'+s('OFERTA_ITEM_3')+'</li>\n'
+        + '<li class="ofr-item">'+s('PRECO')+'</li>\n'
+        + '<li class="ofr-item destaque"><a href="'+sRaw('LINK_VENDA')+'" style="color:inherit;text-decoration:none;width:100%;text-align:center;display:block;">'+s('CTA_PRINCIPAL')+'</a></li>\n'
+        + '</ul></div></section>\n\n'
+
+        // ── FAQ ──
+        + '<section class="sec"><div class="W">\n'
+        + '<p class="faq-h2">Perguntas frequentes</p>\n'
+        + '<div class="faq-wrap">\n'
+        + faqItems
+        + '</div></div></section>\n\n'
+
+        // ── FOOTER ──
+        + '<footer class="footer"><div class="W">\n'
+        + '<div class="footer-nome">'+s('NOME')+'</div>\n'
+        + '<div class="footer-info">'+s('COPYRIGHT')+' &nbsp;|&nbsp; <a href="mailto:'+s('EMAIL_SUPORTE')+'">'+s('EMAIL_SUPORTE')+'</a></div>\n'
+        + '</div></footer>\n\n'
+
+        + '<script>\n'
+        + 'document.querySelectorAll(".faq-item").forEach(function(i){\n'
+        + '  i.addEventListener("click",function(){var o=this.classList.contains("open");document.querySelectorAll(".faq-item").forEach(function(x){x.classList.remove("open");});if(!o)this.classList.add("open");});\n'
+        + '});\n'
+        + '<\/script>\n'
+        + '</body>\n</html>';
+
+      setAgentStatus('orion', 'done', 'Pagina construida com sucesso.');
       _nome    = document.getElementById('p-nome').value || 'Cliente';
       _slug    = document.getElementById('p-slug').value || 'pagina-' + Date.now();
       _produto = document.getElementById('p-produto-nome').value;
+      _html    = TEMPLATE;
 
-      // Detectar imagens pendentes e injetar data-img-id no HTML
-      var deteccao = detectarImagensPendentes(htmlLimpo);
+      var deteccao = detectarImagensPendentes(_html);
       _html = deteccao.htmlModificado;
-
-      // Mostrar preview e painel de imagens
       document.getElementById('pagina-preview').srcdoc = _html;
       renderPainelImagens(deteccao.pendentes);
 
@@ -1240,12 +1517,6 @@ document.getElementById('btn-rodar-agente').onclick = function(){
         document.getElementById('btn-volta-1').disabled = false;
         goToStep(3);
       }, 800);
-
-    }, function(err) {
-      setAgentStatus('orion', 'error', 'Erro: ' + err);
-      document.getElementById('btn-rodar-agente').disabled = false;
-      document.getElementById('btn-volta-1').disabled = false;
-    });
 
   }, function(err) {
     setAgentStatus('lyra', 'error', 'Erro: ' + err);
