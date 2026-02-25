@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Como acessar sua área — Dona Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#e2c06e;--gold-dim:rgba(201,168,76,0.08);--gold-border:rgba(201,168,76,0.2);
+  --bg:#0a0a08;--surface:#111109;--surface2:#181610;--surface3:#1e1b0e;
+  --text:#F0EDE8;--muted:#7a7060;--dim:#333;--border:rgba(255,255,255,0.06);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;}
+
+/* ── HEADER ── */
+.header{max-width:720px;margin:0 auto;padding:40px 28px 0;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:.04em;}
+.logo-sub{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
+
+/* ── HERO ── */
+.hero{max-width:720px;margin:0 auto;padding:60px 28px 40px;}
+.hero-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold);display:inline-block;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.1;margin-bottom:20px;color:var(--text);}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero p{font-size:16px;color:var(--muted);line-height:1.75;max-width:540px;}
+
+/* ── DIVIDER ── */
+.divider{max-width:720px;margin:0 auto;padding:0 28px;}
+.divider hr{border:none;border-top:1px solid var(--border);}
+
+/* ── SECTION ── */
+.section{max-width:720px;margin:0 auto;padding:56px 28px;}
+
+.section-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:32px;display:flex;align-items:center;gap:12px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--gold-border);}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:24px;padding:28px 0;border-bottom:1px solid var(--border);position:relative;}
+.step:last-child{border-bottom:none;}
+.step-num{flex-shrink:0;width:44px;height:44px;border-radius:50%;border:1px solid var(--gold-border);background:var(--gold-dim);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);margin-top:2px;}
+.step-body{flex:1;}
+.step-title{font-size:17px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:14px;color:var(--muted);line-height:1.75;}
+.step-desc strong{color:var(--text);font-weight:600;}
+
+/* ── HIGHLIGHT BOX ── */
+.highlight{background:var(--surface2);border:1px solid var(--gold-border);border-radius:14px;padding:20px 24px;margin-top:16px;display:flex;gap:14px;align-items:flex-start;}
+.highlight-icon{flex-shrink:0;margin-top:2px;color:var(--gold);}
+.highlight-text{font-size:13px;color:var(--muted);line-height:1.7;}
+.highlight-text strong{color:var(--text);}
+
+/* ── CODE / EXAMPLE ── */
+.code-box{background:var(--surface3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-top:12px;font-family:'DM Mono',monospace,sans-serif;font-size:13px;color:var(--gold);letter-spacing:.02em;}
+
+/* ── SCREENSHOT MOCKUP ── */
+.mockup{background:var(--surface2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:20px;}
+.mockup-bar{background:var(--surface3);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:8px;}
+.mockup-dot{width:10px;height:10px;border-radius:50%;background:var(--dim);}
+.mockup-url{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);flex:1;max-width:280px;margin-left:8px;}
+.mockup-body{padding:24px;}
+
+/* ── FIELD DEMO ── */
+.field-demo{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--muted);margin-top:8px;display:flex;align-items:center;justify-content:space-between;}
+.field-demo-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.field-demo-edit{font-size:11px;color:var(--gold);cursor:pointer;}
+
+/* ── TAB MOCKUP ── */
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab-item{padding:10px 18px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;border-bottom:2px solid transparent;cursor:default;}
+.tab-item.active-tab{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ── EDITOR MOCKUP ── */
+.editor-layout{display:flex;gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:20px;min-height:200px;}
+.editor-side{width:180px;flex-shrink:0;background:var(--surface2);border-right:1px solid var(--border);padding:16px;}
+.editor-prev{flex:1;background:var(--surface3);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;}
+
+/* ── URL SECTION ── */
+.url-demo{display:flex;align-items:center;gap:0;margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.url-prefix{padding:12px 14px;font-size:13px;color:var(--muted);background:var(--surface3);border-right:1px solid var(--border);white-space:nowrap;}
+.url-slug{padding:12px 14px;font-size:13px;color:var(--gold);font-weight:600;flex:1;}
+.url-arrow{padding:12px 14px;color:var(--muted);}
+.url-new{padding:12px 14px;font-size:13px;color:var(--success, #5db870);font-weight:600;background:rgba(93,184,112,0.06);border-left:1px solid var(--border);}
+
+/* ── CTA FOOTER ── */
+.cta-section{max-width:720px;margin:0 auto;padding:20px 28px 80px;}
+.cta-box{background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--gold-border);border-radius:18px;padding:40px 36px;text-align:center;}
+.cta-box h2{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:700;font-style:italic;color:var(--gold);margin-bottom:12px;}
+.cta-box p{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.7;}
+.btn-cta{display:inline-block;background:var(--gold);color:#0a0a08;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;padding:14px 40px;border-radius:100px;text-decoration:none;text-transform:uppercase;transition:background .2s;}
+.btn-cta:hover{background:var(--gold2);}
+
+/* ── PROGRESS INDICATOR ── */
+.progress{display:flex;gap:0;margin-bottom:48px;}
+.prog-step{flex:1;text-align:center;position:relative;}
+.prog-step::after{content:'';position:absolute;top:15px;left:50%;width:100%;height:1px;background:var(--border);}
+.prog-step:last-child::after{display:none;}
+.prog-dot{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);margin:0 auto 8px;position:relative;z-index:1;}
+.prog-dot.done{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold);}
+.prog-label{font-size:11px;color:var(--muted);letter-spacing:.04em;}
+
+@media(max-width:600px){
+  .editor-layout{flex-direction:column;}
+  .editor-side{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+  .url-demo{flex-wrap:wrap;}
+  .progress{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="logo">Dona Lab</div>
+    <div class="logo-sub">Área do Cliente</div>
+  </div>
+  <a href="https://donalab.com.br/cliente" style="font-size:12px;color:var(--gold);text-decoration:none;border:1px solid var(--gold-border);padding:8px 18px;border-radius:100px;letter-spacing:.06em;font-weight:600;text-transform:uppercase;transition:all .2s" onmouseover="this.style.background='var(--gold-dim)'" onmouseout="this.style.background='transparent'">Acessar minha área →</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Tutorial do cliente</div>
+  <h1>Sua página está pronta.<br><em>Veja como acessar e editar.</em></h1>
+  <p>Em poucos passos você acessa sua área, visualiza sua página de vendas e faz os ajustes que quiser — sem precisar de ninguém.</p>
+</div>
+
+<!-- PROGRESSO -->
+<div class="section" style="padding-top:0;padding-bottom:32px">
+  <div class="progress">
+    <div class="prog-step"><div class="prog-dot done">1</div><div class="prog-label">Acesso</div></div>
+    <div class="prog-step"><div class="prog-dot done">2</div><div class="prog-label">Login</div></div>
+    <div class="prog-step"><div class="prog-dot done">3</div><div class="prog-label">Editar</div></div>
+    <div class="prog-step"><div class="prog-dot done">4</div><div class="prog-label">URL própria</div></div>
+    <div class="prog-step"><div class="prog-dot done">5</div><div class="prog-label">Salvar</div></div>
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- PARTE 1: ACESSO -->
+<div class="section">
+  <div class="section-label">Parte 1 — Como acessar</div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Receba seu login pelo WhatsApp</div>
+        <div class="step-desc">Assim que sua página estiver pronta, você receberá uma mensagem no WhatsApp com <strong>e-mail de acesso</strong> e sua <strong>senha inicial</strong>. Guarde esse dado — você vai precisar sempre que quiser entrar na sua área.</div>
+        <div class="highlight">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </div>
+          <div class="highlight-text">
+            A mensagem vai parecer assim:<br><br>
+            <strong>Olá! Sua página está no ar 🎉</strong><br>
+            Acesse sua área em: donalab.com.br/cliente<br>
+            E-mail: <strong>seu@email.com</strong><br>
+            Senha: <strong>suasenha123</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Abra a área do cliente no navegador</div>
+        <div class="step-desc">Acesse o endereço abaixo em qualquer navegador — funciona no celular, tablet e computador:</div>
+        <div class="code-box">donalab.com.br/cliente</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Digite e-mail e senha e clique em Entrar</div>
+        <div class="step-desc">Use o e-mail e senha que você recebeu no WhatsApp. Após o login, você verá todas as suas páginas disponíveis.</div>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-url">donalab.com.br/cliente</div>
+          </div>
+          <div class="mockup-body">
+            <div style="max-width:260px;margin:0 auto">
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:700;margin-bottom:4px">Dona Lab</div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:24px;letter-spacing:.08em;text-transform:uppercase">Área do Cliente</div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase">E-mail</div>
+              <div style="background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted);margin-bottom:10px">seu@email.com</div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:5px;letter-spacing:.08em;text-transform:uppercase">Senha</div>
+              <div style="background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--muted);margin-bottom:16px">••••••••</div>
+              <div style="background:var(--gold);color:#0a0a08;font-weight:700;font-size:13px;border-radius:100px;padding:11px;text-align:center;letter-spacing:.08em;text-transform:uppercase">Entrar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- PARTE 2: EDITAR -->
+<div class="section">
+  <div class="section-label">Parte 2 — Como editar sua página</div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Clique em "✏️ Editar" no card da sua página</div>
+        <div class="step-desc">Após fazer login, você verá os cards das suas páginas — uma versão <strong>Dark</strong> (escura) e uma versão <strong>Clean</strong> (clara). Clique no botão <strong>✏️ Editar</strong> para abrir o editor.</div>
+        <div class="mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+            <div class="mockup-url">donalab.com.br/cliente</div>
+          </div>
+          <div class="mockup-body">
+            <div style="background:var(--surface3);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:320px">
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <span style="background:#1a1a1a;border:1px solid #333;border-radius:100px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gold)">A — DARK</span>
+                <span style="background:#f5f0e4;border:1px solid #ddd;border-radius:100px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.08em;color:#555">B — CLEAN</span>
+              </div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:3px">Minha Página</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Criada em 20/02/2026</div>
+              <div style="display:flex;gap:8px">
+                <div style="background:var(--gold);color:#0a0a08;font-size:12px;font-weight:700;border-radius:100px;padding:8px 16px;display:inline-flex;align-items:center;gap:4px">✏️ Editar</div>
+                <div style="border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;border-radius:100px;padding:8px 14px">🌑 Dark</div>
+                <div style="border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;border-radius:100px;padding:8px 14px">☀️ Clean</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Use as abas para navegar pelos campos</div>
+        <div class="step-desc">O editor tem <strong>4 abas</strong>, cada uma com os campos de uma parte da sua página. Basta clicar no campo que quer mudar, digitar o novo texto e ver a prévia atualizar automaticamente ao lado direito.</div>
+        <div class="editor-layout">
+          <div class="editor-side">
+            <div class="tab-row" style="margin-bottom:16px;gap:0;border-bottom:1px solid var(--border);">
+              <div class="tab-item active-tab" style="padding:8px 10px;font-size:10px">Hero</div>
+              <div class="tab-item" style="padding:8px 10px;font-size:10px">Conteúdo</div>
+              <div class="tab-item" style="padding:8px 10px;font-size:10px">Oferta</div>
+              <div class="tab-item" style="padding:8px 10px;font-size:10px">Sobre</div>
+            </div>
+            <div class="field-demo-label">Nome do produto</div>
+            <div class="field-demo">Meu Produto <span class="field-demo-edit">editar</span></div>
+            <div class="field-demo-label" style="margin-top:12px">Promessa</div>
+            <div class="field-demo" style="font-size:12px">Transforme seus resultados...</div>
+          </div>
+          <div class="editor-prev">Prévia ao vivo →</div>
+        </div>
+        <div class="highlight" style="margin-top:16px">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="highlight-text">
+            <strong>As 4 abas do editor:</strong><br>
+            <strong>Hero</strong> — nome, produto, promessa, foto principal, botão e sintomas<br>
+            <strong>Conteúdo</strong> — para quem é, benefícios, antes e depois<br>
+            <strong>Oferta</strong> — card de compra, preço, link do checkout, rodapé<br>
+            <strong>Sobre + FAQ</strong> — sua bio, foto, perguntas frequentes
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Para trocar fotos, use o botão "Upload"</div>
+        <div class="step-desc">Nos campos de imagem (foto hero e foto do autor), você pode <strong>fazer upload direto do celular ou computador</strong> — ou colar o link de uma imagem que já está na internet.</div>
+        <div class="highlight">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="highlight-text">Formatos aceitos: <strong>JPG, PNG, WEBP</strong>. Prefira fotos com boa iluminação e fundo limpo para melhores resultados.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Clique em "Salvar alterações" para publicar</div>
+        <div class="step-desc">Após fazer os ajustes, clique no botão <strong>"Salvar alterações"</strong> no topo do editor. As duas versões da sua página (Dark e Clean) são atualizadas ao mesmo tempo.</div>
+        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#0a0a08;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;padding:12px 22px;border-radius:100px;letter-spacing:.04em">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+          Salvar alterações
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- PARTE 3: URL PRÓPRIA -->
+<div class="section">
+  <div class="section-label">Parte 3 — Usar sua própria URL</div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <div class="step-title">Vá em "Configurações" no menu</div>
+        <div class="step-desc">Na área do cliente, clique na aba <strong>Configurações</strong>. Lá você encontra a opção de <strong>Domínio personalizado</strong> para usar um endereço próprio como <strong>meusite.com.br</strong>.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <div class="step-title">Aponte seu domínio para a Dona Lab</div>
+        <div class="step-desc">No painel do seu domínio (Registro.br, GoDaddy, Hostinger etc.), crie um registro <strong>CNAME</strong> apontando para <strong>donalab.com.br</strong>. Se não souber como fazer isso, peça ajuda ao suporte da empresa onde comprou o domínio.</div>
+        <div class="highlight">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="highlight-text">
+            <strong>Tipo:</strong> CNAME<br>
+            <strong>Nome/Host:</strong> @ ou www (dependendo do provedor)<br>
+            <strong>Valor/Destino:</strong> donalab.com.br<br>
+            <strong>TTL:</strong> 3600 (ou automático)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <div class="step-title">Digite o domínio na área do cliente e salve</div>
+        <div class="step-desc">Depois de configurar o DNS, volte à área do cliente, vá em <strong>Configurações → Domínio personalizado</strong>, digite seu domínio e clique em Salvar.</div>
+        <div class="url-demo">
+          <div class="url-prefix">Antes:</div>
+          <div class="url-slug">donalab.com.br/p/hilmara-1</div>
+        </div>
+        <div class="url-demo" style="margin-top:8px">
+          <div class="url-prefix">Depois:</div>
+          <div class="url-new">meusite.com.br</div>
+        </div>
+        <div class="highlight" style="margin-top:16px">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="highlight-text">A propagação do DNS pode levar <strong>até 24 horas</strong> para funcionar — é normal. Enquanto isso, sua página continua acessível pelo link original da Dona Lab.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="divider"><hr></div>
+
+<!-- PARTE 4: PIXEL -->
+<div class="section">
+  <div class="section-label">Bônus — Pixel do Facebook</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">★</div>
+      <div class="step-body">
+        <div class="step-title">Conecte o Pixel do Facebook para rastrear visitantes</div>
+        <div class="step-desc">Se você faz tráfego pago, pode colar o código do <strong>Pixel do Facebook/Meta</strong> direto na área do cliente. Ele será injetado automaticamente na sua página toda vez que você salvar.</div>
+        <div class="highlight">
+          <div class="highlight-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.7A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.15a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+          </div>
+          <div class="highlight-text">Vá em <strong>Configurações → Pixel do Facebook</strong>, cole o código completo fornecido pelo Gerenciador de Eventos da Meta e clique em Salvar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA FINAL -->
+<div class="cta-section">
+  <div class="cta-box">
+    <h2>Pronto para acessar?</h2>
+    <p>Sua página está publicada e esperando por você.<br>Faça login e comece a personalizar agora mesmo.</p>
+    <a href="https://donalab.com.br/cliente" class="btn-cta">Acessar minha área</a>
+  </div>
+</div>
+
+</body>
+</html>
