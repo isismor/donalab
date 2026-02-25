@@ -313,8 +313,8 @@ a{color:inherit;text-decoration:none;}
           <div class="fgroup"><label class="flabel">Link checkout separado (C38B)</label><input class="finput" id="ce-c38b" placeholder="https://..."></div>
 
           <div class="fsection">Rodapé</div>
-          <div class="fgroup"><label class="flabel">Direitos reservados (C44)</label><input class="finput" id="ce-c44"></div>
-          <div class="fgroup"><label class="flabel">E-mail de suporte (C45)</label><input class="finput" id="ce-c45" placeholder="contato@..."></div>
+          <div class="fgroup"><label class="flabel">Direitos reservados (C55)</label><input class="finput" id="ce-c55" placeholder="Todos os direitos reservados."></div>
+          <div class="fgroup"><label class="flabel">Texto de contato (C56)</label><input class="finput" id="ce-c56" placeholder="Entre em contato conosco"></div>
         </div>
 
         <!-- ABA 4: SOBRE + FAQ -->
@@ -335,11 +335,19 @@ a{color:inherit;text-decoration:none;}
           </div>
 
           <div class="fsection">Seção 8 — FAQ</div>
-          <div class="fgroup"><label class="flabel">Título do FAQ (C42)</label><input class="finput" id="ce-c42" placeholder="Perguntas frequentes"></div>
-          <div class="fgroup"><label class="flabel">Perguntas e respostas (C43)</label>
-            <textarea class="finput" id="ce-c43" rows="5" placeholder="Pergunta 1? Resposta 1.,Pergunta 2? Resposta 2."></textarea>
-            <div style="font-size:11px;color:var(--muted);margin-top:4px">Formato: Pergunta? Resposta.,Pergunta? Resposta.</div>
-          </div>
+          <div class="fgroup"><label class="flabel">Título do FAQ (C42)</label><input class="finput" id="ce-c42" placeholder="Perguntas mais frequentes"></div>
+          <div class="fgroup"><label class="flabel">Pergunta 1 (C43)</label><input class="finput" id="ce-c43" placeholder="Preciso ter experiência prévia?"></div>
+          <div class="fgroup"><label class="flabel">Resposta 1 (C44)</label><input class="finput" id="ce-c44" placeholder="Não, o método é para quem está começando."></div>
+          <div class="fgroup"><label class="flabel">Pergunta 2 (C45)</label><input class="finput" id="ce-c45"></div>
+          <div class="fgroup"><label class="flabel">Resposta 2 (C46)</label><input class="finput" id="ce-c46"></div>
+          <div class="fgroup"><label class="flabel">Pergunta 3 (C47)</label><input class="finput" id="ce-c47"></div>
+          <div class="fgroup"><label class="flabel">Resposta 3 (C48)</label><input class="finput" id="ce-c48"></div>
+          <div class="fgroup"><label class="flabel">Pergunta 4 (C49)</label><input class="finput" id="ce-c49"></div>
+          <div class="fgroup"><label class="flabel">Resposta 4 (C50)</label><input class="finput" id="ce-c50"></div>
+          <div class="fgroup"><label class="flabel">Pergunta 5 (C51)</label><input class="finput" id="ce-c51"></div>
+          <div class="fgroup"><label class="flabel">Resposta 5 (C52)</label><input class="finput" id="ce-c52"></div>
+          <div class="fgroup"><label class="flabel">Pergunta 6 (C53)</label><input class="finput" id="ce-c53"></div>
+          <div class="fgroup"><label class="flabel">Resposta 6 (C54)</label><input class="finput" id="ce-c54"></div>
         </div>
 
       </div><!-- /sidebar-body -->
@@ -646,7 +654,9 @@ function coletarCampos(){
     'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
     'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
     'C32','C33','C34','C35','C36','C37','C38','C38B',
-    'C39','C40','C41','C42','C43','C44','C45'];
+    'C39','C40','C41','C42',
+    'C43','C44','C45','C46','C47','C48','C49','C50','C51','C52','C53','C54',
+    'C55','C56'];
 
   // Base: campos carregados do meta tag (pagina existente)
   var v = Object.assign({}, _editingV);
@@ -812,21 +822,14 @@ function buildPage(v, paletaId) {
   var grainColor   = isLight ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.035)';
 
   // FAQ
+  // FAQ — pares C43/C44, C45/C46 ... C53/C54
   var faqItens = [];
-  var c43raw = r('C43');
-  if(c43raw){
-    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
-    c43raw.split(/\.,\s*/).forEach(function(item){
-      item = item.replace(/^"|"$|^'|'$/g,'').trim();
-      if(!item) return;
-      var qIdx = item.indexOf('?');
-      if(qIdx !== -1){
-        var pergunta = item.substring(0, qIdx+1).trim();
-        var resposta = item.substring(qIdx+1).trim().replace(/\.$/, '');
-        if(pergunta) faqItens.push([pergunta, resposta]);
-      }
-    });
-  }
+  var faqPairs = [['C43','C44'],['C45','C46'],['C47','C48'],['C49','C50'],['C51','C52'],['C53','C54']];
+  faqPairs.forEach(function(pair){
+    var fp = r(pair[0]); var fr = r(pair[1]);
+    if(fp) faqItens.push([fp, fr]);
+  });
+  // Fallback: formato antigo
   if(!faqItens.length){
     for(var i=1;i<=6;i++){
       var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
@@ -987,8 +990,8 @@ ${faqHtml}
 
 <!-- ══ RODAPÉ ══ -->
 <footer style="border-top:1px solid var(--gb);padding:32px 28px;text-align:center">
-  <div style="font-size:13px;color:var(--texto3);margin-bottom:4px">${s('C44')}</div>
-  ${r('C45') ? '<div style="font-size:12px;color:var(--texto3);margin-top:4px">'+s('C45')+'</div>' : ''}
+  <div style="font-size:13px;color:var(--texto3);margin-bottom:4px">${s('C55')||s('C44')}</div>
+  ${(r('C56')||r('C45')) ? '<div style="font-size:12px;color:var(--texto3);margin-top:4px">'+(s('C56')||s('C45'))+'</div>' : ''}
 </footer>
 
 </body></html>`;

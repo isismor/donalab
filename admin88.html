@@ -246,6 +246,11 @@
             Conteúdo de Alto Alcance
           </a>
         </div>
+        <a class="nav-item" id="nav-lote" href="#" onclick="showSection('lote');return false;">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Lote
+        </a>
+
         <a class="nav-item" id="nav-principal" href="#" onclick="showSection('principal');return false;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 000 20"/><path d="M12 2a10 10 0 010 20"/><path d="M2 12h20"/></svg>
           Site Principal
@@ -663,21 +668,21 @@ C38B: (link checkout separado — opcional)
 C39: (Quem eu sou? [Primeiro Nome] — até 25)
 C40: (credenciais e autoridade — até 350)
 C41: (URL foto autor)
-C42: (Perguntas mais frequentes — até 50)
-C43_1P: (pergunta 1)
-C43_1R: (resposta 1)
-C43_2P: (pergunta 2)
-C43_2R: (resposta 2)
-C43_3P: (pergunta 3)
-C43_3R: (resposta 3)
-C43_4P: (pergunta 4)
-C43_4R: (resposta 4)
-C43_5P: (pergunta 5)
-C43_5R: (resposta 5)
-C43_6P: (pergunta 6)
-C43_6R: (resposta 6)
-C44: (direitos reservados — até 20)
-C45: (e-mail de suporte — opcional)"></textarea>
+C42: (Perguntas mais frequentes — título da seção)
+C43: (pergunta 1)
+C44: (resposta 1)
+C45: (pergunta 2)
+C46: (resposta 2)
+C47: (pergunta 3)
+C48: (resposta 3)
+C49: (pergunta 4)
+C50: (resposta 4)
+C51: (pergunta 5)
+C52: (resposta 5)
+C53: (pergunta 6)
+C54: (resposta 6)
+C55: (direitos reservados — ex: Todos os direitos reservados.)
+C56: (texto de contato/suporte — opcional)"></textarea>
             </div>
 
             <div style="display:flex;justify-content:flex-end;margin-top:8px">
@@ -766,6 +771,121 @@ C45: (e-mail de suporte — opcional)"></textarea>
     </div>
 
 
+
+    <!-- ══ LOTE ══ -->
+    <div id="section-lote" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Publicação em Lote</div>
+      </div>
+
+      <!-- STEP 1: UPLOAD -->
+      <div id="lote-step1">
+        <div class="card" style="padding:32px;max-width:700px">
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:20px">📂 Passo 1 — Envie a planilha</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.7">
+            Envie um <strong style="color:var(--text)">.xlsx ou .csv</strong> com as colunas:
+            <code style="background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:12px;color:var(--gold)">Nome</code>
+            <code style="background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:12px;color:var(--gold)">Email</code>
+            <code style="background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:12px;color:var(--gold)">WhatsApp</code>
+            <code style="background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:12px;color:var(--gold)">Copy</code>
+          </p>
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:24px;line-height:1.65">A coluna <strong style="color:var(--text)">Copy</strong> deve conter o bloco de campos no mesmo formato do textarea de criação (C1: valor, C2: valor...). Email e WhatsApp são opcionais por linha.</p>
+
+          <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:2px dashed rgba(255,255,255,.1);border-radius:14px;padding:40px 28px;cursor:pointer;transition:border-color .2s;background:var(--surface2)" id="lote-drop-area" ondragover="event.preventDefault();this.style.borderColor='var(--gold)'" ondragleave="this.style.borderColor='rgba(255,255,255,.1)'" ondrop="loteOnDrop(event)">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div style="font-size:14px;color:var(--text-muted)">Arraste ou clique para selecionar</div>
+            <div style="font-size:11px;color:var(--text-dim)">.xlsx · .csv</div>
+            <input type="file" accept=".xlsx,.csv" style="display:none" id="lote-file-input" onchange="loteOnFile(this.files[0])">
+          </label>
+          <div style="margin-top:16px;font-size:12px;color:var(--text-dim)">
+            Não tem planilha no formato certo?
+            <a href="#" onclick="loteBaixarModelo();return false;" style="color:var(--gold);text-decoration:underline">Baixar modelo .csv</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: PREVIEW + PALETA -->
+      <div id="lote-step2" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px">📋 Passo 2 — Confira e publique</div>
+            <div style="font-size:13px;color:var(--text-muted)"><span id="lote-count">0</span> páginas encontradas na planilha</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:var(--text-muted)">Paleta padrão:</span>
+              <select id="lote-paleta-sel" style="background:var(--surface2);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);cursor:pointer"></select>
+            </div>
+            <button class="btn-outline" onclick="loteVoltar()" style="font-size:12px;padding:7px 16px">← Voltar</button>
+            <button class="btn-gold" id="btn-publicar-lote" onclick="lotePublicar()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+              Publicar Lote
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela preview -->
+        <div class="card" style="overflow:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,.07)">
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600;white-space:nowrap">#</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Nome</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">E-mail</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">WhatsApp</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Paleta</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Campos</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Status</th>
+              </tr>
+            </thead>
+            <tbody id="lote-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- STEP 3: PROGRESSO -->
+      <div id="lote-step3" style="display:none">
+        <div class="card" style="padding:32px;max-width:700px">
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:20px">⚡ Publicando...</div>
+          <div style="background:var(--surface2);border-radius:100px;height:8px;overflow:hidden;margin-bottom:12px">
+            <div id="lote-prog-bar" style="height:100%;background:var(--gold);border-radius:100px;width:0%;transition:width .4s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:24px">
+            <span id="lote-prog-txt">Preparando...</span>
+            <span id="lote-prog-pct">0%</span>
+          </div>
+          <div id="lote-log" style="background:var(--surface2);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;font-size:12px;font-family:monospace;color:var(--text-muted);max-height:260px;overflow-y:auto;line-height:1.8"></div>
+        </div>
+      </div>
+
+      <!-- STEP 4: RESULTADO -->
+      <div id="lote-step4" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px">✅ Lote publicado!</div>
+            <div style="font-size:13px;color:var(--text-muted)"><span id="lote-ok-count">0</span> páginas publicadas com sucesso</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn-outline" onclick="loteExportarCSV()" style="font-size:12px;padding:7px 16px">⬇ Exportar resultado .csv</button>
+            <button class="btn-gold" onclick="loteNovo()" style="font-size:12px;padding:7px 16px">+ Novo lote</button>
+          </div>
+        </div>
+        <div class="card" style="overflow:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,.07)">
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Nome</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Link da Página</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">E-mail</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Senha</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Status</th>
+              </tr>
+            </thead>
+            <tbody id="lote-result-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- ══ PRINCIPAL ══ -->
     <div id="section-principal" style="display:none">
@@ -1005,16 +1125,26 @@ C45: (e-mail de suporte — opcional)"></textarea>
 
       <!-- SEÇÃO 8 FAQ -->
       <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 8 — FAQ</div>
-      <div class="form-group"><label class="form-label">C42 — Título do FAQ</label><input class="form-input" id="ef-c42" placeholder="Perguntas frequentes"></div>
-      <div class="form-group"><label class="form-label">C43 — Perguntas e respostas</label>
-        <textarea class="form-input" id="ef-c43" rows="4" placeholder="Pergunta 1? Resposta 1.,Pergunta 2? Resposta 2."></textarea>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Formato: Pergunta? Resposta.,Pergunta? Resposta.</div>
+      <div class="form-group"><label class="form-label">C42 — Título da seção</label><input class="form-input" id="ef-c42" placeholder="Perguntas mais frequentes"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group"><label class="form-label">C43 — Pergunta 1</label><input class="form-input" id="ef-c43"></div>
+        <div class="form-group"><label class="form-label">C44 — Resposta 1</label><input class="form-input" id="ef-c44"></div>
+        <div class="form-group"><label class="form-label">C45 — Pergunta 2</label><input class="form-input" id="ef-c45"></div>
+        <div class="form-group"><label class="form-label">C46 — Resposta 2</label><input class="form-input" id="ef-c46"></div>
+        <div class="form-group"><label class="form-label">C47 — Pergunta 3</label><input class="form-input" id="ef-c47"></div>
+        <div class="form-group"><label class="form-label">C48 — Resposta 3</label><input class="form-input" id="ef-c48"></div>
+        <div class="form-group"><label class="form-label">C49 — Pergunta 4</label><input class="form-input" id="ef-c49"></div>
+        <div class="form-group"><label class="form-label">C50 — Resposta 4</label><input class="form-input" id="ef-c50"></div>
+        <div class="form-group"><label class="form-label">C51 — Pergunta 5</label><input class="form-input" id="ef-c51"></div>
+        <div class="form-group"><label class="form-label">C52 — Resposta 5</label><input class="form-input" id="ef-c52"></div>
+        <div class="form-group"><label class="form-label">C53 — Pergunta 6</label><input class="form-input" id="ef-c53"></div>
+        <div class="form-group"><label class="form-label">C54 — Resposta 6</label><input class="form-input" id="ef-c54"></div>
       </div>
 
       <!-- RODAPÉ -->
       <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Rodapé</div>
-      <div class="form-group"><label class="form-label">C44 — Direitos reservados</label><input class="form-input" id="ef-c44"></div>
-      <div class="form-group"><label class="form-label">C45 — E-mail de suporte (opcional)</label><input class="form-input" id="ef-c45" placeholder="contato@..."></div>
+      <div class="form-group"><label class="form-label">C55 — Direitos reservados</label><input class="form-input" id="ef-c55" placeholder="Todos os direitos reservados."></div>
+      <div class="form-group"><label class="form-label">C56 — Texto de contato (opcional)</label><input class="form-input" id="ef-c56" placeholder="Entre em contato conosco"></div>
 
     </div>
 
@@ -1070,7 +1200,7 @@ function showMateriais(categoria) {
   document.getElementById('materiais-subitens').style.display = 'block';
   document.getElementById('materiais-chevron').style.transform = 'rotate(180deg)';
   // Esconde todas as sections (incluindo fluxos)
-  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal',
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
@@ -1096,7 +1226,7 @@ function showFluxo(nome) {
   document.getElementById('fluxos-subitens').style.display = 'block';
   document.getElementById('fluxos-chevron').style.transform = 'rotate(180deg)';
   // Esconde todas as sections (materiais e fluxo)
-  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal',
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
@@ -1111,7 +1241,7 @@ function showFluxo(nome) {
 }
 
 function showSection(name) {
-  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal',
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = (s===name)?'':'none';
@@ -1410,7 +1540,9 @@ function salvarEdicaoPagina(){
     'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
     'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
     'C32','C33','C34','C35','C36','C37','C38','C38B',
-    'C39','C40','C41','C42','C43','C44','C45'];
+    'C39','C40','C41','C42',
+    'C43','C44','C45','C46','C47','C48','C49','C50','C51','C52','C53','C54',
+    'C55','C56'];
   var v = Object.assign({}, _editingPageV);
   fields.forEach(function(f){
     var el = document.getElementById('ef-'+f.toLowerCase());
@@ -1702,21 +1834,14 @@ function buildPage(v, paletaId) {
   var grainColor   = isLight ? 'rgba(0,0,0,.04)' : 'rgba(255,255,255,.035)';
 
   // FAQ
+  // FAQ — pares C43/C44, C45/C46 ... C53/C54
   var faqItens = [];
-  var c43raw = r('C43');
-  if(c43raw){
-    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
-    c43raw.split(/\.,\s*/).forEach(function(item){
-      item = item.replace(/^"|"$|^'|'$/g,'').trim();
-      if(!item) return;
-      var qIdx = item.indexOf('?');
-      if(qIdx !== -1){
-        var pergunta = item.substring(0, qIdx+1).trim();
-        var resposta = item.substring(qIdx+1).trim().replace(/\.$/, '');
-        if(pergunta) faqItens.push([pergunta, resposta]);
-      }
-    });
-  }
+  var faqPairs = [['C43','C44'],['C45','C46'],['C47','C48'],['C49','C50'],['C51','C52'],['C53','C54']];
+  faqPairs.forEach(function(pair){
+    var fp = r(pair[0]); var fr = r(pair[1]);
+    if(fp) faqItens.push([fp, fr]);
+  });
+  // Fallback: formato antigo C43_1P / C43_1R
   if(!faqItens.length){
     for(var i=1;i<=6;i++){
       var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
@@ -1877,8 +2002,8 @@ ${faqHtml}
 
 <!-- ══ RODAPÉ ══ -->
 <footer style="border-top:1px solid var(--gb);padding:32px 28px;text-align:center">
-  <div style="font-size:13px;color:var(--texto3);margin-bottom:4px">${s('C44')}</div>
-  ${r('C45') ? '<div style="font-size:12px;color:var(--texto3);margin-top:4px">'+s('C45')+'</div>' : ''}
+  <div style="font-size:13px;color:var(--texto3);margin-bottom:4px">${s('C55')||s('C44')}</div>
+  ${(r('C56')||r('C45')) ? '<div style="font-size:12px;color:var(--texto3);margin-top:4px">'+(s('C56')||s('C45'))+'</div>' : ''}
 </footer>
 
 </body></html>`;
@@ -1892,22 +2017,39 @@ document.getElementById('btn-gerar-pagina').onclick = function() {
 
   if (!raw) { alert('Cole os campos antes de gerar.'); return; }
 
-  // Parse campos — aceita: "C1: valor", "C43_1P: valor", "Campo 1: valor", "1: valor"
+  // Parse campos — aceita "C1: valor" e também "C1:\nvalor" (valor na linha seguinte)
   var v = {};
-  raw.split('\n').forEach(function(line) {
+  var lines = raw.split('\n');
+  var pendingKey = null;
+  lines.forEach(function(line) {
     var idx = line.indexOf(':');
-    if (idx === -1) return;
-    var rawKey = line.substring(0, idx).trim();
-    // Valor é tudo após o primeiro ':'
-    var val = line.substring(idx + 1).trim();
-    if (!val) return;
-    // Normaliza chave: uppercase, remove espaços, mantém underscore e letras
-    var k = rawKey.toUpperCase().replace(/\s+/g,'');
-    // "CAMPO 1" → "C1", "Campo1" → "C1"
-    k = k.replace(/^CAMPO/,'C');
-    // Se começar com número, adiciona C
-    if (/^\d/.test(k)) k = 'C' + k;
-    v[k] = val;
+    // Linha com chave (ex: "C1: valor" ou "C1:")
+    if (idx !== -1) {
+      var rawKey = line.substring(0, idx).trim();
+      var val    = line.substring(idx + 1).trim();
+      // Normaliza chave
+      var k = rawKey.toUpperCase().replace(/\s+/g,'');
+      k = k.replace(/^CAMPO/,'C');
+      if (/^\d/.test(k)) k = 'C' + k;
+      // Chave válida?
+      if (/^C[0-9]/.test(k) || /^C[0-9]+[A-Z]?/.test(k)) {
+        if (val) {
+          v[k] = val;
+          pendingKey = null;
+        } else {
+          // Valor vazio — aguarda próxima linha
+          pendingKey = k;
+        }
+        return;
+      }
+    }
+    // Linha sem chave — pode ser valor de pendingKey
+    if (pendingKey) {
+      var txt = line.trim();
+      if (txt) { v[pendingKey] = txt; pendingKey = null; }
+      return;
+    }
+    pendingKey = null;
   });
 
   goToStep(2);
@@ -2045,13 +2187,13 @@ function buildWppLink(cli){
   var email  = cli.email || '(não informado)';
   var senha  = cli.senha || '(não informada)';
   var msg =
-    'Olá! 🎉 Sua página está pronta!\n\n'
-    + '🔗 *Link da sua página:*\n' + linkPag + '\n\n'
-    + '✏️ *Para fazer alterações acesse:*\n' + linkCliente + '\n'
-    + '📧 E-mail: ' + email + '\n'
-    + '🔑 Senha: ' + senha + '\n\n'
-    + '📚 *Tutorial de como editar sua página:*\n' + linkTutorial + '\n\n'
-    + 'Qualquer dúvida, é só falar com a gente! 💛';
+    'Olá! Sua página está pronta!\n\n'
+    + '*Link da sua página:*\n' + linkPag + '\n\n'
+    + '*Para fazer alterações acesse:*\n' + linkCliente + '\n'
+    + 'E-mail: ' + email + '\n'
+    + 'Senha: ' + senha + '\n\n'
+    + '*Tutorial de como editar sua página:*\n' + linkTutorial + '\n\n'
+    + 'Qualquer dúvida, é só falar com a gente!';
   return 'https://wa.me/' + numero + '?text=' + encodeURIComponent(msg);
 }
 
@@ -2382,6 +2524,351 @@ showFluxo = function(nome) {
 
 
 // ══════════════════════════════════════════
+
+// ══════════════════════════════════════════
+// LOTE
+// ══════════════════════════════════════════
+var _loteRows = [];    // linhas parseadas da planilha
+var _loteResults = []; // resultados da publicação
+
+// Popula select de paleta
+function loteInitPaletaSel(){
+  var sel = document.getElementById('lote-paleta-sel');
+  if(!sel || sel.options.length > 0) return;
+  PALETAS.forEach(function(p){
+    var opt = document.createElement('option');
+    opt.value = p.id; opt.textContent = p.nome;
+    sel.appendChild(opt);
+  });
+}
+
+// Drag & drop
+function loteOnDrop(e){
+  e.preventDefault();
+  document.getElementById('lote-drop-area').style.borderColor = 'rgba(255,255,255,.1)';
+  var file = e.dataTransfer.files[0];
+  if(file) loteOnFile(file);
+}
+
+// Entrada de arquivo
+function loteOnFile(file){
+  if(!file) return;
+  var name = file.name.toLowerCase();
+  if(name.endsWith('.csv')){
+    var reader = new FileReader();
+    reader.onload = function(e){ loteParseCSV(e.target.result); };
+    reader.readAsText(file, 'UTF-8');
+  } else if(name.endsWith('.xlsx')){
+    loteParseXLSX(file);
+  } else {
+    alert('Formato não suportado. Use .xlsx ou .csv');
+  }
+}
+
+// Parse CSV
+function loteParseCSV(text){
+  var lines = text.split('\n').map(function(l){ return l.replace(/\r$/,''); }).filter(function(l){ return l.trim(); });
+  if(lines.length < 2){ alert('Planilha vazia ou sem dados.'); return; }
+  // Detecta separador
+  var sep = lines[0].indexOf(';') !== -1 ? ';' : ',';
+  var headers = loteCSVSplit(lines[0], sep).map(function(h){ return h.trim().toLowerCase(); });
+  var rows = [];
+  for(var i=1;i<lines.length;i++){
+    var cols = loteCSVSplit(lines[i], sep);
+    var row = {};
+    headers.forEach(function(h,j){ row[h] = (cols[j]||'').trim(); });
+    if(row['nome'] || row['copy']) rows.push(row);
+  }
+  loteShowPreview(rows);
+}
+
+// Splita CSV respeitando aspas
+function loteCSVSplit(line, sep){
+  var result=[]; var cur=''; var inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch==='"'){ inQ=!inQ; }
+    else if(ch===sep && !inQ){ result.push(cur); cur=''; }
+    else { cur+=ch; }
+  }
+  result.push(cur);
+  return result;
+}
+
+// Parse XLSX usando SheetJS via CDN
+function loteParseXLSX(file){
+  // Carrega SheetJS dinamicamente se não estiver carregado
+  if(typeof XLSX === 'undefined'){
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = function(){ loteParseXLSX(file); };
+    document.head.appendChild(script);
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var wb = XLSX.read(e.target.result, {type:'array'});
+    var ws = wb.Sheets[wb.SheetNames[0]];
+    var data = XLSX.utils.sheet_to_json(ws, {defval:''});
+    var rows = data.map(function(row){
+      var norm = {};
+      Object.keys(row).forEach(function(k){ norm[k.toLowerCase().trim()] = String(row[k]||'').trim(); });
+      return norm;
+    }).filter(function(r){ return r['nome']||r['copy']; });
+    loteShowPreview(rows);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Exibe tabela de preview
+function loteShowPreview(rows){
+  _loteRows = rows;
+  loteInitPaletaSel();
+  document.getElementById('lote-count').textContent = rows.length;
+  var tbody = document.getElementById('lote-tbody');
+  tbody.innerHTML = '';
+  rows.forEach(function(row, i){
+    var campos = loteParseCampos(row['copy']||'');
+    var nCampos = Object.keys(campos).length;
+    var nome = row['nome'] || campos['C1'] || '—';
+    var tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid rgba(255,255,255,.05)';
+    tr.innerHTML =
+      '<td style="padding:10px 14px;color:var(--text-dim)">'+(i+1)+'</td>'+
+      '<td style="padding:10px 14px;font-weight:600">'+nome+'</td>'+
+      '<td style="padding:10px 14px;color:var(--text-muted)">'+(row['email']||'<span style="color:var(--text-dim)">—</span>')+'</td>'+
+      '<td style="padding:10px 14px;color:var(--text-muted)">'+(row['whatsapp']||row['wpp']||row['whats']||'<span style="color:var(--text-dim)">—</span>')+'</td>'+
+      '<td style="padding:10px 14px">'+
+        '<select data-idx="'+i+'" class="lote-pal-row" style="background:var(--surface2);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--text);cursor:pointer"></select>'+
+      '</td>'+
+      '<td style="padding:10px 14px"><span style="font-size:11px;color:'+(nCampos>5?'var(--gold)':'#e07050')+'">'+ nCampos +' campos</span></td>'+
+      '<td style="padding:10px 14px"><span id="lote-status-'+i+'" style="font-size:11px;color:var(--text-dim)">Aguardando</span></td>';
+    tbody.appendChild(tr);
+  });
+  // Preenche selects por linha
+  document.querySelectorAll('.lote-pal-row').forEach(function(sel){
+    PALETAS.forEach(function(p){
+      var opt = document.createElement('option');
+      opt.value = p.id; opt.textContent = p.nome;
+      sel.appendChild(opt);
+    });
+  });
+  document.getElementById('lote-step1').style.display = 'none';
+  document.getElementById('lote-step2').style.display = '';
+}
+
+// Parseia o bloco de campos (mesmo lógica do btn-gerar)
+function loteParseCampos(raw){
+  var v = {};
+  if(!raw) return v;
+  var lines = raw.split('\n');
+  var pendingKey = null;
+  lines.forEach(function(line){
+    var idx = line.indexOf(':');
+    if(idx !== -1){
+      var rawKey = line.substring(0,idx).trim();
+      var val    = line.substring(idx+1).trim();
+      var k = rawKey.toUpperCase().replace(/\s+/g,'').replace(/^CAMPO/,'C');
+      if(/^\d/.test(k)) k='C'+k;
+      if(/^C\d/.test(k)){
+        if(val){ v[k]=val; pendingKey=null; }
+        else { pendingKey=k; }
+        return;
+      }
+    }
+    if(pendingKey){ var txt=line.trim(); if(txt){ v[pendingKey]=txt; pendingKey=null; } return; }
+    pendingKey=null;
+  });
+  return v;
+}
+
+// Publica lote
+function lotePublicar(){
+  var paletaPadrao = document.getElementById('lote-paleta-sel').value || 'noir-dourado';
+  document.getElementById('lote-step2').style.display = 'none';
+  document.getElementById('lote-step3').style.display = '';
+  _loteResults = [];
+  var log = document.getElementById('lote-log');
+  log.innerHTML = '';
+
+  function logLine(txt, cor){
+    var d = document.createElement('div');
+    d.style.color = cor||'var(--text-muted)';
+    d.textContent = txt;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setProgress(done, total){
+    var pct = Math.round(done/total*100);
+    document.getElementById('lote-prog-bar').style.width = pct+'%';
+    document.getElementById('lote-prog-pct').textContent = pct+'%';
+    document.getElementById('lote-prog-txt').textContent = 'Publicando '+done+' de '+total+'...';
+  }
+
+  // Publica um por vez (sequencial para não sobrecarregar Supabase)
+  var total = _loteRows.length;
+  var idx = 0;
+
+  function publicarProximo(){
+    if(idx >= total){ loteFinish(); return; }
+    var row = _loteRows[idx];
+    var i   = idx; idx++;
+
+    var rowPalSel = document.querySelector('.lote-pal-row[data-idx="'+i+'"]');
+    var paletaId  = (rowPalSel && rowPalSel.value) ? rowPalSel.value : paletaPadrao;
+    var campos    = loteParseCampos(row['copy']||'');
+    var nome      = row['nome'] || campos['C1'] || 'cliente';
+    var email     = row['email'] || null;
+    var wpp       = normWpp(row['whatsapp']||row['wpp']||row['whats']||'');
+
+    var statusEl = document.getElementById('lote-status-'+i);
+    if(statusEl){ statusEl.textContent='⏳ Publicando...'; statusEl.style.color='var(--gold)'; }
+    logLine('→ ['+nome+'] Gerando HTML...');
+
+    campos['PALETA'] = paletaId;
+    var html = buildPage(campos, paletaId);
+
+    // Gera slug
+    var slugBase = nome.split(' ')[0].toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/[^a-z0-9]/g,'') || 'pagina';
+
+    // Verifica slugs existentes e escolhe sufixo
+    sbFetch('paginas?select=slug&slug=like.'+encodeURIComponent(slugBase)+'*').then(function(existing){
+      var usedNums = (existing||[]).map(function(p){
+        var m = p.slug.match(/-(\d+)$/);
+        return m ? parseInt(m[1]) : 1;
+      });
+      var num = 1;
+      while(usedNums.indexOf(num) !== -1) num++;
+      var slug = slugBase + '-' + num;
+
+      // Insere meta de campos no HTML
+      var meta = "<meta name='page-fields' content='"+encodeURIComponent(JSON.stringify(campos))+"'>";
+      html = html.replace('</head>', meta+'</head>');
+
+      logLine('   Slug: '+slug);
+
+      // Salva na tabela paginas
+      return sbFetch('paginas', {method:'POST', body:JSON.stringify({
+        slug: slug,
+        nome: nome,
+        cliente: nome,
+        produto: campos['C2']||'',
+        html: html
+      })}).then(function(){
+        // Registra cliente
+        var senha = gerarSenha();
+        var dados = 'https://donalab.com.br/p/'+slug;
+        return sbFetch('clientes?email=eq.'+encodeURIComponent(email||'NOEMAIL'+i)+'&select=id').then(function(ex){
+          var clientePayload = {nome:nome, email:email||null, whatsapp:wpp||null, senha:senha, dados:dados};
+          var req = (ex&&ex[0])
+            ? sbFetch('clientes?id=eq.'+ex[0].id, {method:'PATCH', body:JSON.stringify(clientePayload)})
+            : sbFetch('clientes', {method:'POST', body:JSON.stringify(clientePayload)});
+          return req.then(function(){
+            return {slug:slug, nome:nome, email:email, senha:senha, link:dados, wpp:wpp, ok:true};
+          });
+        });
+      });
+    }).then(function(result){
+      _loteResults.push(result);
+      if(statusEl){ statusEl.textContent='✓ Publicado'; statusEl.style.color='#5ecb72'; }
+      logLine('   ✓ Publicado: https://donalab.com.br/p/'+result.slug, '#5ecb72');
+      setProgress(idx, total);
+      publicarProximo();
+    }).catch(function(err){
+      _loteResults.push({nome:nome, ok:false, erro:String(err)});
+      if(statusEl){ statusEl.textContent='✗ Erro'; statusEl.style.color='#e07070'; }
+      logLine('   ✗ Erro em ['+nome+']: '+err, '#e07070');
+      setProgress(idx, total);
+      publicarProximo();
+    });
+  }
+
+  publicarProximo();
+}
+
+function loteFinish(){
+  document.getElementById('lote-step3').style.display = 'none';
+  document.getElementById('lote-step4').style.display = '';
+  var ok = _loteResults.filter(function(r){ return r.ok; }).length;
+  document.getElementById('lote-ok-count').textContent = ok;
+
+  var tbody = document.getElementById('lote-result-tbody');
+  tbody.innerHTML = '';
+  _loteResults.forEach(function(r){
+    var tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid rgba(255,255,255,.05)';
+    if(r.ok){
+      tr.innerHTML =
+        '<td style="padding:10px 14px;font-weight:600">'+r.nome+'</td>'+
+        '<td style="padding:10px 14px"><a href="'+r.link+'" target="_blank" style="color:var(--gold);font-size:12px">'+r.link+'</a></td>'+
+        '<td style="padding:10px 14px;color:var(--text-muted);font-size:12px">'+(r.email||'—')+'</td>'+
+        '<td style="padding:10px 14px"><code style="background:var(--surface2);padding:3px 8px;border-radius:5px;font-size:12px;color:var(--gold)">'+r.senha+'</code></td>'+
+        '<td style="padding:10px 14px"><span style="color:#5ecb72;font-size:12px">✓ Publicado</span></td>';
+    } else {
+      tr.innerHTML =
+        '<td style="padding:10px 14px;font-weight:600">'+r.nome+'</td>'+
+        '<td colspan="3" style="padding:10px 14px;font-size:12px;color:#e07070">'+r.erro+'</td>'+
+        '<td style="padding:10px 14px"><span style="color:#e07070;font-size:12px">✗ Erro</span></td>';
+    }
+    tbody.appendChild(tr);
+  });
+
+  // Recarrega clientes e páginas
+  loadClients(); loadPages();
+}
+
+// Exporta resultado como CSV
+function loteExportarCSV(){
+  var rows = [['Nome','Link','Email','Senha','Status']];
+  _loteResults.forEach(function(r){
+    rows.push([r.nome||'', r.link||'', r.email||'', r.senha||'', r.ok?'Publicado':'Erro: '+r.erro]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'donalab-lote-resultado.csv';
+  a.click();
+}
+
+// Modelo CSV para download
+function loteBaixarModelo(){
+  var linhas = [
+    'Nome,Email,WhatsApp,Copy',
+    '"Maria Silva","maria@email.com","5511999990001","C1: Maria Silva\nC2: Meu Produto\nC3: Resultado incrivel em 30 dias\nC5: Quero comecar agora"',
+    '"Ana Souza","ana@email.com","5511999990002","C1: Ana Souza\nC2: Meu Curso\nC3: Transforme sua vida\nC5: Inscreva-se"'
+  ];
+  var csv = linhas.join('\n');
+  var blob = new Blob(['\xef\xbb\xbf'+csv], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'modelo-lote-donalab.csv';
+  a.click();
+}
+function loteVoltar(){
+  document.getElementById('lote-step2').style.display = 'none';
+  document.getElementById('lote-step1').style.display = '';
+  _loteRows = [];
+}
+
+function loteNovo(){
+  _loteRows = []; _loteResults = [];
+  document.getElementById('lote-step4').style.display = 'none';
+  document.getElementById('lote-step3').style.display = 'none';
+  document.getElementById('lote-step2').style.display = 'none';
+  document.getElementById('lote-step1').style.display = '';
+  document.getElementById('lote-file-input').value = '';
+}
+
+// Clique na área de upload
+document.getElementById('lote-drop-area').onclick = function(){
+  document.getElementById('lote-file-input').click();
+};
+
+
 // PAINEL PRINCIPAL
 // ══════════════════════════════════════════
 var _ppExemplos = [];
