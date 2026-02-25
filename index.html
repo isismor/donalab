@@ -701,25 +701,47 @@ C45: (e-mail de suporte — opcional)"></textarea>
           </div>
 
           <div class="table-wrap" style="padding:32px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
               <div>
-                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Página gerada</div>
-                <div style="font-size:13px;color:var(--text-muted)">Revise e publique quando estiver pronta.</div>
+                <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:4px">Página gerada — Modelos A e B</div>
+                <div style="font-size:13px;color:var(--text-muted)">Revise os dois modelos. Ambos serão publicados com links separados.</div>
               </div>
             </div>
-            <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-bottom:24px">
-              <iframe id="pagina-preview" style="width:100%;height:640px;border:none;background:#fff"></iframe>
+
+            <!-- Previews lado a lado -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+              <!-- Modelo A: Dark -->
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                  <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--gold)">A — DARK</div>
+                  <span style="font-size:11px;color:var(--text-dim)" id="slug-preview-dark"></span>
+                </div>
+                <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden">
+                  <iframe id="pagina-preview" style="width:100%;height:580px;border:none;background:#fff"></iframe>
+                </div>
+              </div>
+              <!-- Modelo B: Clean -->
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                  <div style="background:#f5f2eb;border:1px solid #ddd;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.1em;color:#555">B — CLEAN</div>
+                  <span style="font-size:11px;color:var(--text-dim)" id="slug-preview-clean"></span>
+                </div>
+                <div style="background:var(--surface2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden">
+                  <iframe id="pagina-preview-clean" style="width:100%;height:580px;border:none;background:#fff"></iframe>
+                </div>
+              </div>
             </div>
+
             <div style="display:flex;justify-content:space-between;align-items:center">
               <button class="btn-outline" id="btn-volta-2">Voltar</button>
               <div style="display:flex;gap:10px">
                 <button class="btn-outline" id="btn-baixar">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Baixar HTML
+                  Baixar Dark
                 </button>
                 <button class="btn-gold" id="btn-salvar-pagina">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                  Publicar Página
+                  Publicar A + B
                 </button>
               </div>
             </div>
@@ -772,71 +794,128 @@ C45: (e-mail de suporte — opcional)"></textarea>
 
 <!-- MODAL: Editar Página -->
 <div class="modal-overlay" id="edit-page-modal">
-  <div class="modal" style="max-width:520px">
-    <div class="modal-header">
-      <div class="modal-title">Editar Página</div>
+  <div class="modal" style="max-width:680px;max-height:88vh;overflow-y:auto">
+    <div class="modal-header" style="position:sticky;top:0;background:var(--surface);z-index:10;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:0">
+      <div>
+        <div class="modal-title">Editar Página</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:3px">Salvar atualiza <strong style="color:var(--gold)">Dark + Clean</strong> ao mesmo tempo</div>
+      </div>
       <div class="modal-close" onclick="closeModal('edit-page-modal')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </div>
     </div>
     <input type="hidden" id="edit-page-id">
-    <div class="form-group">
-      <label class="form-label">Título da página (nome)</label>
-      <input class="form-input" id="edit-page-titulo" placeholder="Nome do cliente / título">
-    </div>
-    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:20px 0 12px;font-weight:600">Seção 6 — Oferta</div>
-    <div class="form-group">
-      <label class="form-label">Título da oferta (C31)</label>
-      <input class="form-input" id="edit-c31" placeholder="Ex: Método Transformação Total">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Texto do botão (C37)</label>
-      <input class="form-input" id="edit-c37" placeholder="Ex: Quero começar agora">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Link do botão — checkout (C37B)</label>
-      <input class="form-input" id="edit-c37b" placeholder="https://pay.hotmart.com/...">
-    </div>
-    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:20px 0 12px;font-weight:600">Imagens</div>
+    <input type="hidden" id="edit-page-slug-dark">
+    <input type="hidden" id="edit-page-slug-clean">
 
-    <!-- C4: Foto Hero -->
-    <div class="form-group">
-      <label class="form-label">Foto hero — seção 1 (C4)</label>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="flex:1;background:var(--surface2);border:1px dashed rgba(255,255,255,0.12);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;text-align:center;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold-border)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload
-          <input type="file" accept="image/*" style="display:none" onchange="uploadImgPagina(this,'edit-c4','prev-c4')">
-        </label>
-        <span style="font-size:11px;color:var(--text-dim)">ou</span>
-        <input class="form-input" id="edit-c4" placeholder="https://..." style="flex:2" oninput="atualizarPrevImg('edit-c4','prev-c4')">
+    <div style="padding:20px 0">
+
+      <!-- SEÇÃO 1 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 14px;padding:12px 0 0">Seção 1 — Hero</div>
+      <div class="form-group"><label class="form-label">C1 — Nome da marca / pessoa</label><input class="form-input" id="ef-c1"></div>
+      <div class="form-group"><label class="form-label">C2 — Nome do produto</label><input class="form-input" id="ef-c2"></div>
+      <div class="form-group"><label class="form-label">C3 — Promessa / subtítulo</label><textarea class="form-input" id="ef-c3" rows="2"></textarea></div>
+      <div class="form-group"><label class="form-label">C4 — Foto hero (URL ou upload)</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <label style="flex:1;background:var(--surface2);border:1px dashed rgba(255,255,255,0.12);border-radius:9px;padding:9px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;text-align:center">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImgPagina(this,'ef-c4','prev-ef-c4')">
+          </label>
+          <span style="font-size:11px;color:var(--text-dim)">ou</span>
+          <input class="form-input" id="ef-c4" placeholder="https://..." style="flex:2" oninput="atualizarPrevImg('ef-c4','prev-ef-c4')">
+        </div>
+        <div id="prev-ef-c4" style="display:none;margin-top:4px"><img style="max-height:70px;border-radius:8px"><button onclick="limparImgPagina('ef-c4','prev-ef-c4')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;margin-left:8px">✕</button></div>
       </div>
-      <div id="prev-c4" style="display:none;margin-top:6px">
-        <img style="max-height:80px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
-        <button onclick="limparImgPagina('edit-c4','prev-c4')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;margin-left:8px;vertical-align:middle">✕ remover</button>
+      <div class="form-group"><label class="form-label">C5 — Texto do botão CTA</label><input class="form-input" id="ef-c5"></div>
+      <div class="form-group"><label class="form-label">C5B — Link checkout</label><input class="form-input" id="ef-c5b" placeholder="https://..."></div>
+
+      <!-- SEÇÃO 2 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 2 — Dor</div>
+      <div class="form-group"><label class="form-label">C6 — Pergunta de dor</label><input class="form-input" id="ef-c6"></div>
+      <div class="form-group"><label class="form-label">C7 — Sintoma 1</label><input class="form-input" id="ef-c7"></div>
+      <div class="form-group"><label class="form-label">C8 — Sintoma 2</label><input class="form-input" id="ef-c8"></div>
+      <div class="form-group"><label class="form-label">C9 — Sintoma 3</label><input class="form-input" id="ef-c9"></div>
+      <div class="form-group"><label class="form-label">C10 — Solução</label><input class="form-input" id="ef-c10"></div>
+
+      <!-- SEÇÃO 3 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 3 — Para quem é</div>
+      <div class="form-group"><label class="form-label">C11 — Título "Para quem é"</label><input class="form-input" id="ef-c11"></div>
+      <div class="form-group"><label class="form-label">C12 — Item 1</label><input class="form-input" id="ef-c12"></div>
+      <div class="form-group"><label class="form-label">C13 — Item 2</label><input class="form-input" id="ef-c13"></div>
+      <div class="form-group"><label class="form-label">C14 — Item 3</label><input class="form-input" id="ef-c14"></div>
+      <div class="form-group"><label class="form-label">C15 — Item 4</label><input class="form-input" id="ef-c15"></div>
+      <div class="form-group"><label class="form-label">C16 — Item 5</label><input class="form-input" id="ef-c16"></div>
+      <div class="form-group"><label class="form-label">C17 — Botão CTA 2</label><input class="form-input" id="ef-c17"></div>
+      <div class="form-group"><label class="form-label">C17B — Link checkout</label><input class="form-input" id="ef-c17b" placeholder="https://..."></div>
+
+      <!-- SEÇÃO 4 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 4 — Benefícios</div>
+      <div class="form-group"><label class="form-label">C18 — Título</label><input class="form-input" id="ef-c18"></div>
+      <div class="form-group"><label class="form-label">C19 — Benefício 1 título</label><input class="form-input" id="ef-c19"></div>
+      <div class="form-group"><label class="form-label">C20 — Benefício 1 descrição</label><textarea class="form-input" id="ef-c20" rows="2"></textarea></div>
+      <div class="form-group"><label class="form-label">C21 — Benefício 2 título</label><input class="form-input" id="ef-c21"></div>
+      <div class="form-group"><label class="form-label">C22 — Benefício 2 descrição</label><textarea class="form-input" id="ef-c22" rows="2"></textarea></div>
+      <div class="form-group"><label class="form-label">C23 — Benefício 3 título</label><input class="form-input" id="ef-c23"></div>
+      <div class="form-group"><label class="form-label">C24 — Benefício 3 descrição</label><textarea class="form-input" id="ef-c24" rows="2"></textarea></div>
+
+      <!-- SEÇÃO 5 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 5 — Antes e Depois</div>
+      <div class="form-group"><label class="form-label">C25 — Título da seção</label><input class="form-input" id="ef-c25"></div>
+      <div class="form-group"><label class="form-label">C26 — Antes 1</label><input class="form-input" id="ef-c26"></div>
+      <div class="form-group"><label class="form-label">C27 — Depois 1</label><input class="form-input" id="ef-c27"></div>
+      <div class="form-group"><label class="form-label">C28 — Antes 2</label><input class="form-input" id="ef-c28"></div>
+      <div class="form-group"><label class="form-label">C29 — Depois 2</label><input class="form-input" id="ef-c29"></div>
+      <div class="form-group"><label class="form-label">C30 — Antes 3</label><input class="form-input" id="ef-c30"></div>
+      <div class="form-group"><label class="form-label">C31 — Depois 3</label><input class="form-input" id="ef-c31"></div>
+
+      <!-- SEÇÃO 6 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 6 — Oferta</div>
+      <div class="form-group"><label class="form-label">C32 — Título do card</label><input class="form-input" id="ef-c32"></div>
+      <div class="form-group"><label class="form-label">C33 — Forma de entrega</label><input class="form-input" id="ef-c33"></div>
+      <div class="form-group"><label class="form-label">C34 — Garantia</label><input class="form-input" id="ef-c34"></div>
+      <div class="form-group"><label class="form-label">C35 — Tempo de acesso</label><input class="form-input" id="ef-c35"></div>
+      <div class="form-group"><label class="form-label">C36 — Bônus</label><input class="form-input" id="ef-c36"></div>
+      <div class="form-group"><label class="form-label">C37 — Preço</label><input class="form-input" id="ef-c37"></div>
+      <div class="form-group"><label class="form-label">C38 — CTA de compra (texto + link)</label><input class="form-input" id="ef-c38"></div>
+      <div class="form-group"><label class="form-label">C38B — Link checkout separado (opcional)</label><input class="form-input" id="ef-c38b" placeholder="https://..."></div>
+
+      <!-- SEÇÃO 7 -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 7 — Quem sou eu</div>
+      <div class="form-group"><label class="form-label">C39 — Nome (Quem eu sou?)</label><input class="form-input" id="ef-c39"></div>
+      <div class="form-group"><label class="form-label">C40 — Bio / Credenciais</label><textarea class="form-input" id="ef-c40" rows="3"></textarea></div>
+      <div class="form-group"><label class="form-label">C41 — Foto autor (URL ou upload)</label>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <label style="flex:1;background:var(--surface2);border:1px dashed rgba(255,255,255,0.12);border-radius:9px;padding:9px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;text-align:center">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImgPagina(this,'ef-c41','prev-ef-c41')">
+          </label>
+          <span style="font-size:11px;color:var(--text-dim)">ou</span>
+          <input class="form-input" id="ef-c41" placeholder="https://..." style="flex:2" oninput="atualizarPrevImg('ef-c41','prev-ef-c41')">
+        </div>
+        <div id="prev-ef-c41" style="display:none;margin-top:4px"><img style="max-height:70px;border-radius:8px"><button onclick="limparImgPagina('ef-c41','prev-ef-c41')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;margin-left:8px">✕</button></div>
       </div>
+
+      <!-- SEÇÃO 8 FAQ -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Seção 8 — FAQ</div>
+      <div class="form-group"><label class="form-label">C42 — Título do FAQ</label><input class="form-input" id="ef-c42" placeholder="Perguntas frequentes"></div>
+      <div class="form-group"><label class="form-label">C43 — Perguntas e respostas</label>
+        <textarea class="form-input" id="ef-c43" rows="4" placeholder="Pergunta 1? Resposta 1.,Pergunta 2? Resposta 2."></textarea>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Formato: Pergunta? Resposta.,Pergunta? Resposta.</div>
+      </div>
+
+      <!-- RODAPÉ -->
+      <div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:20px 0 14px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06)">Rodapé</div>
+      <div class="form-group"><label class="form-label">C44 — Direitos reservados</label><input class="form-input" id="ef-c44"></div>
+      <div class="form-group"><label class="form-label">C45 — E-mail de suporte (opcional)</label><input class="form-input" id="ef-c45" placeholder="contato@..."></div>
+
     </div>
 
-    <!-- C40: Foto Autor -->
-    <div class="form-group">
-      <label class="form-label">Foto do autor — seção 7 (C40)</label>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <label style="flex:1;background:var(--surface2);border:1px dashed rgba(255,255,255,0.12);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;text-align:center;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold-border)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload
-          <input type="file" accept="image/*" style="display:none" onchange="uploadImgPagina(this,'edit-c40','prev-c40')">
-        </label>
-        <span style="font-size:11px;color:var(--text-dim)">ou</span>
-        <input class="form-input" id="edit-c40" placeholder="https://..." style="flex:2" oninput="atualizarPrevImg('edit-c40','prev-c40')">
-      </div>
-      <div id="prev-c40" style="display:none;margin-top:6px">
-        <img style="max-height:80px;border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
-        <button onclick="limparImgPagina('edit-c40','prev-c40')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;margin-left:8px;vertical-align:middle">✕ remover</button>
-      </div>
-    </div>
-    <div class="form-actions">
+    <div class="form-actions" style="position:sticky;bottom:0;background:var(--surface);padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);margin-top:0">
       <button class="btn-outline" onclick="closeModal('edit-page-modal')">Cancelar</button>
-      <button class="btn-gold" id="btn-salvar-edicao" onclick="salvarEdicaoPagina()">Salvar</button>
+      <button class="btn-gold" id="btn-salvar-edicao" onclick="salvarEdicaoPagina()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Salvar Dark + Clean
+      </button>
     </div>
   </div>
 </div>
@@ -1057,7 +1136,7 @@ function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 // PAGES
-var pages=[], _html=null, _slug='', _nome='', _produto='';
+var pages=[], _html=null, _htmlClean=null, _slugDark='', _slugClean='', _slug='', _nome='', _produto='';
 
 function renderPages(){
   var tbody=document.getElementById('paginas-tbody'), empty=document.getElementById('paginas-empty');
@@ -1099,40 +1178,43 @@ function editarPagina(id){
   var p = pages.find(function(x){ return x.id===id; });
   if(!p){ alert('Página não encontrada. Recarregue a lista.'); return; }
 
-  // Extrai dados do HTML que já está em memória (carregado com loadPages)
-  var c4='', c40='', c37b='', c37='', c31='';
+  document.getElementById('edit-page-id').value = id;
+
+  // Extrai campos salvos no meta tag
+  var v = {};
   if(p.html){
     try{
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(p.html, 'text/html');
-      var heroImg  = doc.querySelector('.hero-img-wrap img');
-      var autorImg = doc.querySelector('.autor-inner img');
-      var btnSec6  = doc.querySelector('#sec6 a.btn-cta');
-      var h3Sec6   = doc.querySelector('#sec6 h3');
-      if(heroImg)  c4   = heroImg.getAttribute('src') || '';
-      if(autorImg) c40  = autorImg.getAttribute('src') || '';
-      if(btnSec6)  c37b = btnSec6.getAttribute('href') || '';
-      if(btnSec6)  c37  = btnSec6.textContent.trim();
-      if(h3Sec6)   c31  = h3Sec6.textContent.trim();
+      var metaMatch = p.html.match(/<meta name="page-fields" content='([^']+)'>/);
+      if(metaMatch) v = JSON.parse(decodeURIComponent(metaMatch[1]));
     }catch(e){}
   }
 
-  document.getElementById('edit-page-id').value    = id;
-  document.getElementById('edit-page-titulo').value = p.nome || '';
-  document.getElementById('edit-c4').value          = c4;
-  document.getElementById('edit-c40').value         = c40;
-  document.getElementById('edit-c37b').value        = c37b;
-  document.getElementById('edit-c37').value         = c37;
-  document.getElementById('edit-c31').value         = c31;
-  var lm = document.getElementById('edit-loading-msg');
-  if(lm) lm.style.display='none';
-  // Mostra preview das imagens se tiver URL
-  ['c4','c40'].forEach(function(k){
-    var url = k==='c4' ? c4 : c40;
-    var prev = document.getElementById('prev-'+k);
-    if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
-    else { prev.style.display='none'; }
+  // Slugs dark/clean
+  var slugBase = (p.slug||'').replace(/-dark$/,'').replace(/-clean$/,'');
+  document.getElementById('edit-page-slug-dark').value  = slugBase+'-dark';
+  document.getElementById('edit-page-slug-clean').value = slugBase+'-clean';
+
+  // Preenche todos os campos
+  var fields = ['c1','c2','c3','c4','c5','c5b','c6','c7','c8','c9','c10',
+    'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
+    'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
+    'c32','c33','c34','c35','c36','c37','c38','c38b',
+    'c39','c40','c41','c42','c43','c44','c45'];
+  fields.forEach(function(f){
+    var el = document.getElementById('ef-'+f);
+    if(el) el.value = v[f.toUpperCase()] || v[f] || '';
   });
+
+  // Preview imagens
+  ['c4','c41'].forEach(function(k){
+    var url = v[k.toUpperCase()] || v[k] || '';
+    var prev = document.getElementById('prev-ef-'+k);
+    if(prev){
+      if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
+      else { prev.style.display='none'; }
+    }
+  });
+
   openModal('edit-page-modal');
 }
 
@@ -1170,63 +1252,61 @@ function limparImgPagina(fieldId, prevId) {
 }
 
 function salvarEdicaoPagina(){
-  var id    = document.getElementById('edit-page-id').value;
-  var titulo = document.getElementById('edit-page-titulo').value.trim();
-  var c4    = document.getElementById('edit-c4').value.trim();
-  var c40   = document.getElementById('edit-c40').value.trim();
-  var c37b  = document.getElementById('edit-c37b').value.trim();
-  var c37   = document.getElementById('edit-c37').value.trim();
-  var c31   = document.getElementById('edit-c31').value.trim();
-  var btn   = document.getElementById('btn-salvar-edicao');
+  var id        = document.getElementById('edit-page-id').value;
+  var slugDark  = document.getElementById('edit-page-slug-dark').value;
+  var slugClean = document.getElementById('edit-page-slug-clean').value;
+  var btn = document.getElementById('btn-salvar-edicao');
   btn.disabled=true; btn.textContent='Salvando...';
 
-  // Busca HTML atual
-  sbFetch('paginas?id=eq.'+id+'&select=html').then(function(res){
-    if(!res || !res[0]){ btn.disabled=false; btn.textContent='Salvar'; return; }
-    var html = res[0].html;
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(html, 'text/html');
+  // Coleta todos os campos
+  var fields = ['C1','C2','C3','C4','C5','C5B','C6','C7','C8','C9','C10',
+    'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
+    'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
+    'C32','C33','C34','C35','C36','C37','C38','C38B',
+    'C39','C40','C41','C42','C43','C44','C45'];
+  var v = {};
+  fields.forEach(function(f){
+    var el = document.getElementById('ef-'+f.toLowerCase());
+    if(el && el.value.trim()) v[f] = el.value.trim();
+  });
 
-    // Atualiza C4 (hero img)
-    if(c4){
-      var heroImg = doc.querySelector('.hero-img-wrap img');
-      if(heroImg){ heroImg.setAttribute('src', c4); }
-      else {
-        var heroWrap = doc.querySelector('.hero-img-wrap');
-        if(heroWrap){ heroWrap.innerHTML = '<img src="'+c4+'" style="width:100%;height:100%;object-fit:cover">'; }
-      }
-    }
-    // Atualiza C40 (autor img)
-    if(c40){
-      var autorImg = doc.querySelector('.autor-inner img');
-      if(autorImg){ autorImg.setAttribute('src', c40); }
-      else {
-        var autorWrap = doc.querySelector('.autor-inner > div:first-child');
-        if(autorWrap){ autorWrap.innerHTML = '<img src="'+c40+'" style="width:100%;height:100%;object-fit:cover">'; }
-      }
-    }
-    // Atualiza C37B (link botão sec6) e C37 (texto)
-    var btnSec6 = doc.querySelector('#sec6 a.btn-cta');
-    if(btnSec6){
-      if(c37b) btnSec6.setAttribute('href', c37b);
-      if(c37)  btnSec6.textContent = c37;
-    }
-    // Atualiza C31 (título oferta)
-    var titulo31el = doc.querySelector('#sec6 h3');
-    if(titulo31el && c31) titulo31el.textContent = c31;
+  // Reconstrói os dois HTMLs do zero
+  var newDark  = buildPage(v);
+  var newClean = buildPageClean(v);
 
-    var newHtml = '<!DOCTYPE html>' + doc.documentElement.outerHTML;
-    var patch = { html: newHtml };
-    if(titulo) patch.nome = titulo;
+  // Injeta campos como meta tag para recuperar na próxima edição
+  var metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(v))+"'>";
+  newDark  = newDark.replace('</head>', metaTag+'</head>');
+  newClean = newClean.replace('</head>', metaTag+'</head>');
 
-    sbFetch('paginas?id=eq.'+id, {method:'PATCH', body:JSON.stringify(patch)}).then(function(){
-      btn.disabled=false; btn.textContent='Salvar';
-      closeModal('edit-page-modal');
-      loadPages();
-      alert('Página atualizada!');
-    });
+  var nomeCliente = v['C1'] || '';
+
+  // Busca IDs das páginas dark e clean pelo slug
+  Promise.all([
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugDark)+'&select=id'),
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugClean)+'&select=id')
+  ]).then(function(results){
+    var idDark  = results[0]&&results[0][0] ? results[0][0].id : null;
+    var idClean = results[1]&&results[1][0] ? results[1][0].id : null;
+
+    var patches = [];
+    if(idDark)  patches.push(sbFetch('paginas?id=eq.'+idDark,  {method:'PATCH',body:JSON.stringify({html:newDark,  nome:nomeCliente+' — Dark'})}));
+    if(idClean) patches.push(sbFetch('paginas?id=eq.'+idClean, {method:'PATCH',body:JSON.stringify({html:newClean, nome:nomeCliente+' — Clean'})}));
+    if(!idDark&&!idClean) patches.push(sbFetch('paginas?id=eq.'+id,{method:'PATCH',body:JSON.stringify({html:newDark,nome:nomeCliente})}));
+
+    return Promise.all(patches);
+  }).then(function(){
+    btn.disabled=false;
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar Dark + Clean';
+    closeModal('edit-page-modal');
+    loadPages();
+    alert('Páginas Dark e Clean atualizadas!');
+  }).catch(function(e){
+    btn.disabled=false; btn.textContent='Salvar Dark + Clean';
+    alert('Erro: '+e.message);
   });
 }
+
 
 function showPaginasTab(tab){
   var isL=tab==='lista';
@@ -1622,6 +1702,200 @@ ${faqHtml}
 </body></html>`;
 }
 
+// ══════════════════════════════════════════
+// MODELO B — CLEAN (fundo branco/creme)
+// ══════════════════════════════════════════
+function buildPageClean(v) {
+  function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function r(k){ return v[k]||''; }
+
+  // FAQ igual ao dark
+  var faqItens = [];
+  var c43raw = r('C43');
+  if(c43raw){
+    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
+    c43raw.split(/\.,\s*/).forEach(function(item){
+      item = item.replace(/^"|"$|^'|'$/g,'').trim();
+      if(!item) return;
+      var qIdx = item.indexOf('?');
+      if(qIdx !== -1) faqItens.push([item.substring(0,qIdx+1).trim(), item.substring(qIdx+1).trim().replace(/\.$/, '')]);
+    });
+  }
+  if(!faqItens.length){
+    for(var i=1;i<=6;i++){
+      var fp=r('C43_'+i+'P')||r('C43'+i+'P')||'';
+      var fr=r('C43_'+i+'R')||r('C43'+i+'R')||'';
+      if(fp) faqItens.push([fp,fr]);
+    }
+  }
+  var faqHtml = !faqItens.length ? '' :
+    '<section style="padding:60px 0;border-top:1px solid #e8e0d0">'
+    +'<div class="wrap">'
+    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'
+    +faqItens.map(function(item){
+      return '<details style="background:#faf7f0;border:1px solid #e0d8c8;border-radius:12px;overflow:hidden">'
+        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#2a2018;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+item[0]+'</span><span style="color:#9a7a2a;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
+        +'<div style="padding:16px 24px 20px;font-size:14px;color:#6a6050;line-height:1.75;border-top:1px solid #e0d8c8">'+item[1]+'</div>'
+        +'</details>';
+    }).join('')
+    +'</div></div></section>';
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${s('C2')} — ${s('C1')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fdfaf4;color:#2a2018;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:780px;margin:0 auto;padding:0 28px}
+.btn-cta{display:inline-block;background:#9a7a2a;color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+.btn-cta:hover{background:#b08e38}
+.section{padding:60px 0}
+.card{background:#faf7f0;border:1px solid #e0d8c8;border-radius:14px}
+@media(max-width:640px){
+  #sec1{flex-direction:column!important}
+  .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
+  .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
+  .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .ben-cols{flex-direction:column!important}
+  .ben-col{border-right:none!important;border-bottom:1px solid #e0d8c8!important;text-align:center!important}
+  .ben-col:last-child{border-bottom:none!important}
+  .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
+  .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
+  .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div id="sec1" style="background:#fdfaf4;border:1px solid #e0d8c8;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;display:flex;align-items:stretch;min-height:340px">
+  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#9a7a2a;margin-bottom:18px;font-weight:600">${s('C1')}</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#2a2018;letter-spacing:.04em;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
+    <p style="font-size:15px;color:#6a6050;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
+    <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
+  </div>
+  <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
+    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#f0ead8"></div>'}
+  </div>
+</div>
+
+<!-- DOR -->
+<section class="section">
+  <div class="wrap" style="text-align:center">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;margin-bottom:28px">${s('C6')}</h2>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+      ${['C7','C8','C9'].map(function(k){
+        return '<div style="background:#f5f0e4;border:1px solid #e0d8c8;border-radius:100px;padding:12px 24px;font-size:13px;color:#6a6050;font-weight:500">'+s(k)+'</div>';
+      }).join('')}
+    </div>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018">${s('C10')}</h2>
+  </div>
+</section>
+
+<!-- PARA QUEM -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
+      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #e0d8c8;flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#9a7a2a;text-align:center;line-height:1.3">${s('C11')}</div>
+      </div>
+      <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        ${['C12','C13','C14','C15','C16'].map(function(k,i){
+          return '<div style="font-size:14px;color:#4a4030;display:flex;align-items:baseline;gap:8px">'
+            +'<span style="color:#b0a080;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
+            +'<span>'+s(k)+'</span></div>';
+        }).join('')}
+      </div>
+    </div>
+    <div style="text-align:center"><a href="#sec6" class="btn-cta">${s('C17')}</a></div>
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section class="section" style="background:#f5f0e4">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:32px">${s('C18')}</h2>
+    <div class="ben-cols" style="display:flex;gap:0;background:#fff;border:1px solid #e0d8c8;border-radius:14px;overflow:hidden">
+      ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
+        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #e0d8c8':'')+'">'
+          +'<div style="font-size:11px;font-weight:700;color:#9a7a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
+          +'<p style="font-size:13px;color:#6a6050;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</section>
+
+<!-- ANTES E DEPOIS -->
+<section class="section">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">${s('C25')}</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
+        return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
+          +'<div style="flex:1;background:#fff0f0;border:1px solid #e8c8c8;border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#c05050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
+          +'<p style="font-size:14px;color:#704040;line-height:1.65">'+s(pair[0])+'</p></div>'
+          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#9a7a2a;font-size:22px;margin:0 4px">→</div>'
+          +'<div style="flex:1;background:#f0fff8;border:1px solid #b8e8c8;border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#208050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
+          +'<p style="font-size:14px;color:#306040;line-height:1.65">'+s(pair[1])+'</p></div>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section id="sec6" class="section" style="background:#f5f0e4">
+  <div class="wrap" style="display:flex;justify-content:center">
+    <div style="background:#fff;border:2px solid #c8a840;border-radius:20px;padding:40px 36px;width:100%;max-width:480px;box-shadow:0 4px 40px rgba(154,122,42,.1)">
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#2a2018;text-align:center;margin-bottom:28px">${s('C32')}</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+        ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
+          return '<div style="background:#faf5e4;border:1px solid #e0d0a0;border-radius:100px;padding:11px 22px;font-size:13px;color:#6a5020;text-align:center;font-weight:500">'+s(k)+'</div>';
+        }).join('')}
+      </div>
+      <a href="${r('C38B')||((r('C38').match(/https?:\/\/\S+/)||['#'])[0])}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
+    </div>
+  </div>
+</section>
+
+<!-- QUEM SOU EU -->
+<section class="section" style="border-top:1px solid #e0d8c8">
+  <div class="wrap">
+    <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
+      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid #c8a840">
+        ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
+          : '<div style="width:100%;height:100%;background:#f0ead8;display:flex;align-items:center;justify-content:center;color:#b0a080;font-size:11px">Foto</div>'}
+      </div>
+      <div style="flex:1;min-width:200px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#9a7a2a;margin-bottom:14px">${s('C39')}</h2>
+        <p style="font-size:14px;color:#6a6050;line-height:1.75">${s('C40')}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+${faqHtml}
+
+<!-- RODAPÉ -->
+<footer style="border-top:1px solid #e0d8c8;padding:32px 28px;text-align:center;background:#f5f0e4">
+  <div style="font-size:13px;color:#a09070;margin-bottom:4px">${s('C44')}</div>
+  ${r('C45') ? '<div style="font-size:12px;color:#a09070;margin-top:4px">'+s('C45')+'</div>' : ''}
+</footer>
+
+</body></html>`;
+}
+
 
 document.getElementById('btn-gerar-pagina').onclick = function() {
   var nome  = document.getElementById('p-nome').value.trim();
@@ -1649,19 +1923,24 @@ document.getElementById('btn-gerar-pagina').onclick = function() {
   });
 
   goToStep(2);
-  document.getElementById('gerando-status').textContent = 'Montando a página...';
+  document.getElementById('gerando-status').textContent = 'Montando os modelos A e B...';
 
   setTimeout(function() {
-    var TEMPLATE = buildPage(v);
-    _html    = TEMPLATE;
-    _nome    = nome || v['NOME'] || 'Cliente';
-    _produto = v['PRODUTO_NOME'] || 'Produto';
-    _slug    = (_nome + '-' + _produto).toLowerCase()
-                 .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-                 .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
-               + '-' + Date.now();
+    _nome    = nome || v['C1'] || 'Cliente';
+    _produto = v['C2'] || 'Produto';
 
-    document.getElementById('pagina-preview').srcdoc = _html;
+    // Gera os dois modelos
+    _html      = buildPage(v);
+    _htmlClean = buildPageClean(v);
+
+    // Slugs base (serão finalizados na publicação)
+    _slug = _nome.split(' ')[0].toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+              .replace(/[^a-z0-9]/g,'');
+
+    // Mostra nos previews
+    document.getElementById('pagina-preview').srcdoc      = _html;
+    document.getElementById('pagina-preview-clean').srcdoc = _htmlClean;
 
     var deteccao = detectarImagensPendentes(_html);
     _html = deteccao.htmlModificado;
@@ -1674,60 +1953,92 @@ document.getElementById('btn-gerar-pagina').onclick = function() {
 
 document.getElementById('btn-baixar').onclick=function(){
   if(!_html){alert('Gere a pagina primeiro.');return;}
-  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([_html],{type:'text/html'})); a.download=(_slug||'pagina')+'.html'; a.click();
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([_html],{type:'text/html'})); a.download=(_slug||'pagina')+'-dark.html'; a.click();
 };
+
+function gerarSenha(){
+  var chars='abcdefghjkmnpqrstuvwxyz23456789'; // sem chars ambíguos (0,o,i,l,1)
+  var s='';
+  for(var i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
 
 document.getElementById('btn-salvar-pagina').onclick=function(){
   if(!_html){alert('Gere a página primeiro.');return;}
-  var nomeCliente = document.getElementById('p-nome').value.trim() || _nome;
+  var nomeCliente  = document.getElementById('p-nome').value.trim() || _nome;
   var emailCliente = document.getElementById('p-email').value.trim();
   var btn = document.getElementById('btn-salvar-pagina');
-  btn.disabled=true; btn.textContent='Publicando...';
+  btn.disabled=true; btn.textContent='Publicando A + B...';
 
-  // Gera slug: primeiro-nome-[numero-de-paginas-do-cliente + 1]
+  // Slug base: primeiranome-[num]
   var primeiroNome = nomeCliente.split(' ')[0].toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]/g,'');
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
 
   sbFetch('paginas?select=id&cliente=eq.'+encodeURIComponent(nomeCliente)).then(function(existentes){
-    var numPaginas = (Array.isArray(existentes) ? existentes.length : 0) + 1;
-    var slugFinal = primeiroNome + '-' + numPaginas;
-    var linkPagina = 'donalab.com.br/p/' + slugFinal;
+    var num = (Array.isArray(existentes) ? existentes.length : 0) + 1;
+    _slugDark  = primeiroNome + '-' + num + '-dark';
+    _slugClean = primeiroNome + '-' + num + '-clean';
+    var linkDark  = 'https://donalab.com.br/p/' + _slugDark;
+    var linkClean = 'https://donalab.com.br/p/' + _slugClean;
 
-    // Salvar página
-    var payload = { slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:_html };
-    sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
-      if(!res || !res[0] || !res[0].id){
-        btn.disabled=false; btn.innerHTML='Publicar Página';
-        alert('Erro ao salvar: '+(res&&res.message||JSON.stringify(res))); return;
-      }
+    var sd = document.getElementById('slug-preview-dark');
+    var sc = document.getElementById('slug-preview-clean');
+    if(sd) sd.textContent = _slugDark;
+    if(sc) sc.textContent = _slugClean;
 
-      // Auto-cadastrar cliente
-      var clientePayload = { nome:nomeCliente, email:emailCliente, dados:'Página: https://'+linkPagina };
-      if(emailCliente){
-        sbFetch('clientes?select=id&email=eq.'+encodeURIComponent(emailCliente)).then(function(existe){
-          if(existe && existe.length>0){
-            sbFetch('clientes?id=eq.'+existe[0].id,{method:'PATCH',body:JSON.stringify({dados:'Página: https://'+linkPagina})});
-          } else {
-            sbFetch('clientes',{method:'POST',body:JSON.stringify(clientePayload)});
-          }
-        });
-      } else {
-        // sem email, cadastra pelo nome se não existir
-        sbFetch('clientes?select=id&nome=eq.'+encodeURIComponent(nomeCliente)).then(function(existe){
-          if(!existe || !existe.length){
-            sbFetch('clientes',{method:'POST',body:JSON.stringify({nome:nomeCliente,dados:'Página: https://'+linkPagina})});
-          }
-        });
-      }
+    var payloadDark  = {slug:_slugDark,  nome:nomeCliente+' — Dark',  cliente:nomeCliente, produto:_produto, html:_html};
+    var payloadClean = {slug:_slugClean, nome:nomeCliente+' — Clean', cliente:nomeCliente, produto:_produto, html:_htmlClean};
 
-      btn.disabled=false;
-      btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Publicar Página';
-      loadPages();
-      loadClients();
-      showPaginasTab('lista');
-      alert('Página publicada!\nSlug: '+slugFinal+'\nLink: https://'+linkPagina);
-    }).catch(function(e){ btn.disabled=false; alert('Erro: '+e.message); });
+    Promise.all([
+      sbFetch('paginas',{method:'POST',body:JSON.stringify(payloadDark)}),
+      sbFetch('paginas',{method:'POST',body:JSON.stringify(payloadClean)})
+    ]).then(function(results){
+      var errA = !results[0]||!results[0][0]||!results[0][0].id;
+      var errB = !results[1]||!results[1][0]||!results[1][0].id;
+      if(errA||errB){ btn.disabled=false; btn.textContent='Publicar A + B'; alert('Erro ao publicar: verifique o console.'); return; }
+
+      var dados = 'A: '+linkDark+'\nB: '+linkClean;
+
+      // Verifica se cliente já existe pelo e-mail (ou nome se sem email)
+      var buscaExistente = emailCliente
+        ? sbFetch('clientes?select=id,senha&email=eq.'+encodeURIComponent(emailCliente))
+        : sbFetch('clientes?select=id,senha&nome=eq.'+encodeURIComponent(nomeCliente));
+
+      buscaExistente.then(function(existe){
+        var clienteExistente = existe && existe.length > 0;
+        var senhaFinal;
+
+        if(clienteExistente){
+          // Já existe — só atualiza os dados com os novos links, mantém senha
+          senhaFinal = existe[0].senha || '(já cadastrado)';
+          sbFetch('clientes?id=eq.'+existe[0].id, {method:'PATCH', body:JSON.stringify({dados:dados})});
+        } else {
+          // Novo cliente — gera senha e cadastra
+          senhaFinal = gerarSenha();
+          var clientePayload = {nome:nomeCliente, email:emailCliente||null, senha:senhaFinal, dados:dados};
+          sbFetch('clientes',{method:'POST',body:JSON.stringify(clientePayload)});
+        }
+
+        btn.disabled=false;
+        btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Publicar A + B';
+        loadPages(); loadClients(); showPaginasTab('lista');
+
+        var msgCliente = clienteExistente
+          ? '👤 Cliente já existia — página adicionada ao cadastro\n🔑 Senha atual: '+senhaFinal
+          : '👤 Novo cliente cadastrado\n🔑 Senha gerada: '+senhaFinal;
+
+        alert(
+          '✅ Publicado!\n\n'
+          +'🌑 Dark:\n'+linkDark+'\n\n'
+          +'☀️ Clean:\n'+linkClean+'\n\n'
+          +'────────────────\n'
+          +msgCliente+'\n'
+          +(emailCliente ? '📧 E-mail: '+emailCliente : '⚠️ Sem e-mail cadastrado')
+          +'\n\n🔗 Área do cliente:\nhttps://donalab.com.br/cliente'
+        );
+      });
+
+    }).catch(function(e){ btn.disabled=false; btn.textContent='Publicar A + B'; alert('Erro: '+e.message); });
   });
 };
 
