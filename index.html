@@ -1421,39 +1421,27 @@ function buildPage(v) {
   function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function r(k){ return v[k]||''; }
 
-  // FAQ: C42 = título, C43 = array JSON ["Pergunta? Resposta.", ...]
+  // FAQ: C42 = título, C43 = "Pergunta? Resposta.,Pergunta? Resposta." (separado por .,)
   var faqItens = [];
   var c43raw = r('C43');
   if(c43raw){
-    try{
-      // Tenta parsear como JSON array
-      var arr = JSON.parse(c43raw);
-      if(Array.isArray(arr)){
-        arr.forEach(function(item){
-          // Separa na primeira '?' para extrair pergunta e resposta
-          var qIdx = item.indexOf('?');
-          if(qIdx !== -1){
-            var pergunta = item.substring(0, qIdx+1).trim();
-            var resposta = item.substring(qIdx+1).trim();
-            if(pergunta) faqItens.push([pergunta, resposta]);
-          } else {
-            // Sem '?', usa o item inteiro como pergunta
-            faqItens.push([item.trim(), '']);
-          }
-        });
+    // Remove JSON array brackets se existirem
+    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
+    // Separa itens por ".,", "." seguido de "," ou por JSON ","
+    var itens = c43raw.split(/\.,\s*/);
+    // Remove aspas residuais de cada item
+    itens.forEach(function(item){
+      item = item.replace(/^"|"$|^'|'$/g,'').trim();
+      if(!item) return;
+      var qIdx = item.indexOf('?');
+      if(qIdx !== -1){
+        var pergunta = item.substring(0, qIdx+1).trim();
+        var resposta = item.substring(qIdx+1).trim().replace(/\.$/, '');
+        if(pergunta) faqItens.push([pergunta, resposta]);
       }
-    } catch(e){
-      // Fallback: tenta separar por vírgula se não for JSON válido
-      c43raw.replace(/^\[|\]$/g,'').split(/",\s*"/).forEach(function(item){
-        item = item.replace(/^"|"$/g,'').trim();
-        var qIdx = item.indexOf('?');
-        if(qIdx !== -1){
-          faqItens.push([item.substring(0,qIdx+1).trim(), item.substring(qIdx+1).trim()]);
-        }
-      });
-    }
+    });
   }
-  // Fallback: campos individuais C43_1P/C43_1R etc
+  // Fallback campos individuais C43_1P/C43_1R
   if(!faqItens.length){
     for(var i=1;i<=6;i++){
       var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
