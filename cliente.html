@@ -4,32 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dona Lab — Área do Cliente</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gold:#C9A84C; --gold2:#e2c06e; --gold-dim:rgba(201,168,76,0.1); --gold-border:rgba(201,168,76,0.25);
-  --bg:#0D0D0D; --surface:#141414; --surface2:#1A1A1A; --surface3:#222;
-  --text:#F0EDE8; --muted:#888880; --dim:#444; --border:rgba(255,255,255,0.06);
-  --danger:#e05555; --success:#5db870;
-  --r:12px; --rl:18px;
+:root{
+  --gold:#C9A84C;--gold2:#e2c06e;--gold-dim:rgba(201,168,76,0.08);--gold-border:rgba(201,168,76,0.25);
+  --bg:#0D0D0D;--surface:#141414;--surface2:#1A1A1A;--surface3:#222;
+  --text:#F0EDE8;--muted:#888880;--dim:#444;--border:rgba(255,255,255,0.06);
+  --danger:#e05555;--success:#5db870;--r:12px;--rl:18px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #screen-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:48px 40px;width:100%;max-width:400px;}
-.login-logo{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.login-logo{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--gold);margin-bottom:4px;letter-spacing:.04em;}
 .login-sub{font-size:13px;color:var(--muted);margin-bottom:36px;}
-.login-label{font-size:12px;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;display:block;}
+.login-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block;}
 .login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:16px;}
 .login-input:focus{border-color:var(--gold-border);}
-.login-btn{width:100%;background:var(--gold);color:#080808;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;padding:14px;border-radius:100px;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+.login-btn{width:100%;background:var(--gold);color:#080808;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;padding:14px;border-radius:100px;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
 .login-btn:hover{background:var(--gold2);}
 .login-err{font-size:13px;color:var(--danger);margin-top:12px;display:none;text-align:center;}
 
-/* ── DASHBOARD ── */
+/* DASHBOARD */
 #screen-dashboard{display:none;}
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .header-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);}
@@ -38,77 +38,88 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .btn-logout{background:transparent;border:1px solid var(--border);border-radius:100px;padding:7px 16px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .btn-logout:hover{border-color:var(--danger);color:var(--danger);}
 .main{max-width:1100px;margin:0 auto;padding:40px 28px;}
-.section-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:24px;color:var(--text);}
-.tabs{display:flex;gap:8px;margin-bottom:32px;border-bottom:1px solid var(--border);padding-bottom:0;}
-.tab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--border);}
+.tab{padding:12px 22px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
 .tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 .tab-content{display:none;}.tab-content.active{display:block;}
 
-/* ── CARDS PÁGINAS ── */
-.pages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+/* CARDS */
+.pages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
 .page-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;transition:border-color .2s;}
 .page-card:hover{border-color:var(--gold-border);}
-.page-thumb{width:100%;height:160px;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase;overflow:hidden;}
+.page-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.badge-dark{background:#1a1a1a;border:1px solid #333;color:var(--gold);}
+.badge-clean{background:#f5f0e4;border:1px solid #ddd;color:#555;}
+.page-thumb{width:100%;height:160px;background:var(--surface2);overflow:hidden;position:relative;}
 .page-thumb iframe{width:200%;height:200%;transform:scale(0.5);transform-origin:top left;pointer-events:none;border:none;}
 .page-info{padding:20px;}
 .page-name{font-size:15px;font-weight:600;margin-bottom:4px;}
 .page-meta{font-size:12px;color:var(--muted);margin-bottom:16px;}
-.page-actions{display:flex;gap:8px;}
-.btn-sm{padding:8px 16px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
-.btn-gold{background:var(--gold);color:#080808;}
-.btn-gold:hover{background:var(--gold2);}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
-.btn-outline:hover{border-color:var(--gold-border);color:var(--gold);}
+.page-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-sm{padding:8px 16px;border-radius:100px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.btn-gold-sm{background:var(--gold);color:#080808;}
+.btn-gold-sm:hover{background:var(--gold2);}
+.btn-outline-sm{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.btn-outline-sm:hover{border-color:var(--gold-border);color:var(--gold);}
 
-/* ── MATERIAIS ── */
+/* MATERIAIS */
 .materiais-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
 .material-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
 .material-icon{width:40px;height:40px;border-radius:10px;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
 .material-nome{font-size:14px;font-weight:600;margin-bottom:4px;}
 .material-tipo{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
-.material-link{font-size:12px;color:var(--gold);text-decoration:none;}
+.material-link{font-size:12px;color:var(--gold);}
 .material-link:hover{text-decoration:underline;}
 
-/* ── EDITOR MODAL ── */
-#editor-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;overflow-y:auto;}
-#editor-modal.open{display:flex;flex-direction:column;}
-.editor-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:10;}
-.editor-title{font-size:15px;font-weight:600;}
-.editor-actions{display:flex;gap:8px;align-items:center;}
-.editor-tabs{background:var(--surface2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:0;flex-shrink:0;}
-.editor-tab{padding:12px 18px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;letter-spacing:.03em;}
-.editor-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
-.editor-body{display:flex;flex:1;min-height:0;max-height:calc(100vh - 120px);}
-.editor-sidebar{width:320px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px;}
-.editor-preview{flex:1;background:#111;overflow-y:auto;}
-.editor-preview iframe{width:100%;height:100%;min-height:calc(100vh - 120px);border:none;}
-.editor-panel{display:none;}.editor-panel.active{display:block;}
-
-/* ── EDITOR FORM ── */
-.field-group{margin-bottom:20px;}
-.field-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block;}
-.field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;resize:vertical;}
-.field-input:focus{border-color:var(--gold-border);}
-.field-section{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:24px 0 12px;font-weight:600;display:flex;align-items:center;gap:8px;}
-.field-section::after{content:'';flex:1;height:1px;background:var(--gold-border);}
-.img-upload-area{border:1px dashed var(--gold-border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gold-dim);}
-.img-upload-area:hover{background:rgba(201,168,76,0.15);}
-.img-upload-label{font-size:12px;color:var(--muted);margin-top:6px;}
-.img-preview{width:100%;height:100px;object-fit:cover;border-radius:8px;display:none;margin-bottom:8px;}
-.save-indicator{font-size:12px;color:var(--success);display:none;margin-left:8px;}
-
-/* ── CONFIGURAÇÕES ── */
+/* CONFIG */
 .config-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:28px;margin-bottom:20px;}
 .config-title{font-size:15px;font-weight:600;margin-bottom:6px;}
-.config-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
-.config-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;margin-bottom:12px;}
+.config-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.65;}
+.config-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;margin-bottom:12px;resize:vertical;}
 .config-input:focus{border-color:var(--gold-border);}
 .config-btn{background:var(--gold);color:#080808;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;padding:11px 24px;border-radius:100px;border:none;cursor:pointer;transition:all .2s;}
 .config-btn:hover{background:var(--gold2);}
 .config-msg{font-size:12px;color:var(--success);margin-top:10px;display:none;}
 .tag-info{display:inline-flex;align-items:center;gap:6px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--gold);margin-bottom:12px;}
 
-/* ── LOADING ── */
+/* EDITOR MODAL */
+#editor-modal{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;}
+#editor-modal.open{display:flex;}
+.editor-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.editor-title-wrap{display:flex;align-items:center;gap:12px;}
+.editor-title{font-size:15px;font-weight:600;}
+.editor-subtitle{font-size:12px;color:var(--muted);}
+.editor-actions{display:flex;gap:8px;align-items:center;}
+.save-ok{font-size:12px;color:var(--success);display:none;}
+.editor-body{display:flex;flex:1;min-height:0;}
+
+/* SIDEBAR */
+.editor-sidebar{width:340px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.stab{flex:1;padding:13px 8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer;text-align:center;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.stab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.sidebar-body{flex:1;overflow-y:auto;padding:20px;}
+.spanel{display:none;}.spanel.active{display:block;}
+
+/* FORM FIELDS */
+.fgroup{margin-bottom:16px;}
+.flabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block;}
+.finput{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;resize:vertical;}
+.finput:focus{border-color:var(--gold-border);}
+.fsection{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:24px 0 12px;padding:20px 0 0;border-top:1px solid rgba(255,255,255,0.06);}
+.fsection:first-child{margin-top:0;padding-top:0;border-top:none;}
+.img-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+.img-upload-btn{flex:1;background:var(--surface2);border:1px dashed rgba(255,255,255,0.12);border-radius:9px;padding:9px 14px;font-size:12px;color:var(--muted);cursor:pointer;text-align:center;transition:border-color .2s;}
+.img-upload-btn:hover{border-color:var(--gold-border);}
+.img-preview-wrap{display:none;margin-top:6px;}
+.img-preview-wrap img{max-height:70px;border-radius:8px;border:1px solid var(--border);}
+.img-preview-wrap button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;margin-left:8px;vertical-align:middle;}
+
+/* PREVIEW */
+.editor-preview{flex:1;background:#111;overflow:hidden;}
+.editor-preview iframe{width:100%;height:100%;border:none;}
+
+/* LOADING / EMPTY */
 .loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--muted);font-size:14px;gap:12px;}
 .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -117,7 +128,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 </head>
 <body>
 
-<!-- ══ LOGIN ══ -->
+<!-- LOGIN -->
 <div id="screen-login">
   <div class="login-box">
     <div class="login-logo">Dona Lab</div>
@@ -131,7 +142,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
 </div>
 
-<!-- ══ DASHBOARD ══ -->
+<!-- DASHBOARD -->
 <div id="screen-dashboard">
   <div class="header">
     <div class="header-logo">Dona Lab</div>
@@ -151,18 +162,18 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <!-- PÁGINAS -->
     <div class="tab-content active" id="tab-paginas">
       <div id="paginas-loading" class="loading"><div class="spinner"></div> Carregando páginas...</div>
-      <div class="pages-grid" id="pages-grid" style="display:none;"></div>
-      <div class="empty" id="paginas-empty" style="display:none;">Nenhuma página disponível ainda.</div>
+      <div class="pages-grid" id="pages-grid" style="display:none"></div>
+      <div class="empty" id="paginas-empty" style="display:none">Nenhuma página disponível ainda.</div>
     </div>
 
     <!-- MATERIAIS -->
     <div class="tab-content" id="tab-materiais">
       <div id="materiais-loading" class="loading"><div class="spinner"></div> Carregando materiais...</div>
-      <div class="materiais-grid" id="materiais-grid" style="display:none;"></div>
-      <div class="empty" id="materiais-empty" style="display:none;">Nenhum material disponível ainda.</div>
+      <div class="materiais-grid" id="materiais-grid" style="display:none"></div>
+      <div class="empty" id="materiais-empty" style="display:none">Nenhum material disponível ainda.</div>
     </div>
 
-    <!-- CONFIGURAÇÕES -->
+    <!-- CONFIG -->
     <div class="tab-content" id="tab-config">
       <div class="config-card">
         <div class="config-title">Domínio personalizado</div>
@@ -171,19 +182,14 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <button class="config-btn" id="btn-salvar-dominio">Salvar domínio</button>
         <div class="config-msg" id="msg-dominio">✓ Domínio salvo!</div>
       </div>
-
       <div class="config-card">
         <div class="config-title">Pixel do Facebook / Meta</div>
-        <div class="config-desc">Cole aqui o código completo do seu Pixel do Facebook. Ele será inserido automaticamente em todas as suas páginas publicadas.</div>
-        <div class="tag-info">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Cole o código exatamente como fornecido pelo Gerenciador de Eventos da Meta
-        </div>
-        <textarea class="config-input" id="config-pixel" rows="6" placeholder="<!-- Meta Pixel Code -->&#10;<script>&#10;!function(f,b,e,v,n,t,s)...&#10;</script>&#10;<!-- End Meta Pixel Code -->"></textarea>
+        <div class="config-desc">Cole aqui o código completo do seu Pixel. Será inserido automaticamente em todas as páginas ao salvar.</div>
+        <div class="tag-info"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Cole o código exatamente como fornecido pelo Gerenciador de Eventos da Meta</div>
+        <textarea class="config-input" id="config-pixel" rows="5" placeholder="<!-- Meta Pixel Code -->"></textarea>
         <button class="config-btn" id="btn-salvar-pixel">Salvar Pixel</button>
-        <div class="config-msg" id="msg-pixel">✓ Pixel salvo! Será aplicado nas próximas publicações.</div>
+        <div class="config-msg" id="msg-pixel">✓ Pixel salvo!</div>
       </div>
-
       <div class="config-card">
         <div class="config-title">Alterar senha</div>
         <div class="config-desc">Defina uma nova senha para sua conta.</div>
@@ -196,54 +202,141 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
 </div>
 
-<!-- ══ EDITOR MODAL ══ -->
+<!-- EDITOR MODAL -->
 <div id="editor-modal">
   <div class="editor-header">
-    <div class="editor-title" id="editor-page-nome">Editando página</div>
-    <div class="editor-actions">
-      <span class="save-indicator" id="save-indicator">✓ Salvo</span>
-      <button class="btn-sm btn-gold" id="btn-publicar">Salvar alterações</button>
-      <button class="btn-sm btn-outline" id="btn-fechar-editor">✕ Fechar</button>
+    <div class="editor-title-wrap">
+      <div>
+        <div class="editor-title" id="editor-page-nome">Editando página</div>
+        <div class="editor-subtitle">As alterações atualizam Dark + Clean ao mesmo tempo</div>
+      </div>
     </div>
-  </div>
-
-  <div class="editor-tabs">
-    <div class="editor-tab active" data-etab="textos">Textos</div>
-    <div class="editor-tab" data-etab="imagens">Imagens</div>
-    <div class="editor-tab" data-etab="links">Links & CTA</div>
+    <div class="editor-actions">
+      <span class="save-ok" id="save-ok">✓ Salvo!</span>
+      <button class="btn-sm btn-outline-sm" id="btn-fechar-editor">✕ Fechar</button>
+      <button class="btn-sm btn-gold-sm" id="btn-publicar">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+        Salvar alterações
+      </button>
+    </div>
   </div>
 
   <div class="editor-body">
+    <!-- SIDEBAR -->
     <div class="editor-sidebar">
-
-      <!-- TEXTOS -->
-      <div class="editor-panel active" id="epanel-textos">
-        <div id="textos-fields"></div>
+      <div class="sidebar-tabs">
+        <div class="stab active" data-stab="s1">Hero</div>
+        <div class="stab" data-stab="s2">Conteúdo</div>
+        <div class="stab" data-stab="s3">Oferta</div>
+        <div class="stab" data-stab="s4">Sobre + FAQ</div>
       </div>
+      <div class="sidebar-body">
 
-      <!-- IMAGENS -->
-      <div class="editor-panel" id="epanel-imagens">
-        <div id="imagens-fields"></div>
-      </div>
+        <!-- ABA 1: HERO -->
+        <div class="spanel active" id="spanel-s1">
+          <div class="fsection">Seção 1 — Hero</div>
+          <div class="fgroup"><label class="flabel">Nome da marca / pessoa (C1)</label><input class="finput" id="ce-c1"></div>
+          <div class="fgroup"><label class="flabel">Nome do produto (C2)</label><input class="finput" id="ce-c2"></div>
+          <div class="fgroup"><label class="flabel">Promessa / subtítulo (C3)</label><textarea class="finput" id="ce-c3" rows="2"></textarea></div>
+          <div class="fgroup"><label class="flabel">Foto hero — C4</label>
+            <div class="img-row">
+              <label class="img-upload-btn">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload
+                <input type="file" accept="image/*" style="display:none" onchange="ceUploadImg(this,'ce-c4','prev-ce-c4')">
+              </label>
+              <span style="font-size:11px;color:var(--muted)">ou</span>
+              <input class="finput" id="ce-c4" placeholder="https://..." style="flex:2" oninput="cePrevImg('ce-c4','prev-ce-c4')">
+            </div>
+            <div class="img-preview-wrap" id="prev-ce-c4"><img><button onclick="ceClearImg('ce-c4','prev-ce-c4')">✕ remover</button></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Texto botão CTA (C5)</label><input class="finput" id="ce-c5"></div>
+          <div class="fgroup"><label class="flabel">Link checkout (C5B)</label><input class="finput" id="ce-c5b" placeholder="https://..."></div>
 
-      <!-- LINKS -->
-      <div class="editor-panel" id="epanel-links">
-        <div class="field-group">
-          <label class="field-label">Link de checkout (CTA principal)</label>
-          <input class="field-input" id="edit-link-venda" placeholder="https://pay.hotmart.com/...">
+          <div class="fsection">Seção 2 — Dor</div>
+          <div class="fgroup"><label class="flabel">Pergunta de dor (C6)</label><input class="finput" id="ce-c6"></div>
+          <div class="fgroup"><label class="flabel">Sintoma 1 (C7)</label><input class="finput" id="ce-c7"></div>
+          <div class="fgroup"><label class="flabel">Sintoma 2 (C8)</label><input class="finput" id="ce-c8"></div>
+          <div class="fgroup"><label class="flabel">Sintoma 3 (C9)</label><input class="finput" id="ce-c9"></div>
+          <div class="fgroup"><label class="flabel">Solução (C10)</label><input class="finput" id="ce-c10"></div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Texto do botão principal</label>
-          <input class="field-input" id="edit-cta-principal" placeholder="Quero me inscrever">
-        </div>
-        <div class="field-group">
-          <label class="field-label">E-mail de suporte</label>
-          <input class="field-input" id="edit-email-suporte" placeholder="contato@email.com">
-        </div>
-        <button class="btn-sm btn-gold" style="width:100%;justify-content:center;margin-top:8px;" id="btn-aplicar-links">Aplicar links</button>
-      </div>
 
-    </div>
+        <!-- ABA 2: CONTEÚDO -->
+        <div class="spanel" id="spanel-s2">
+          <div class="fsection">Seção 3 — Para quem</div>
+          <div class="fgroup"><label class="flabel">Título para quem (C11)</label><input class="finput" id="ce-c11"></div>
+          <div class="fgroup"><label class="flabel">Item 1 (C12)</label><input class="finput" id="ce-c12"></div>
+          <div class="fgroup"><label class="flabel">Item 2 (C13)</label><input class="finput" id="ce-c13"></div>
+          <div class="fgroup"><label class="flabel">Item 3 (C14)</label><input class="finput" id="ce-c14"></div>
+          <div class="fgroup"><label class="flabel">Item 4 (C15)</label><input class="finput" id="ce-c15"></div>
+          <div class="fgroup"><label class="flabel">Item 5 (C16)</label><input class="finput" id="ce-c16"></div>
+          <div class="fgroup"><label class="flabel">Botão CTA 2 (C17)</label><input class="finput" id="ce-c17"></div>
+          <div class="fgroup"><label class="flabel">Link checkout (C17B)</label><input class="finput" id="ce-c17b" placeholder="https://..."></div>
+
+          <div class="fsection">Seção 4 — Benefícios</div>
+          <div class="fgroup"><label class="flabel">Título (C18)</label><input class="finput" id="ce-c18"></div>
+          <div class="fgroup"><label class="flabel">Benefício 1 título (C19)</label><input class="finput" id="ce-c19"></div>
+          <div class="fgroup"><label class="flabel">Benefício 1 descrição (C20)</label><textarea class="finput" id="ce-c20" rows="2"></textarea></div>
+          <div class="fgroup"><label class="flabel">Benefício 2 título (C21)</label><input class="finput" id="ce-c21"></div>
+          <div class="fgroup"><label class="flabel">Benefício 2 descrição (C22)</label><textarea class="finput" id="ce-c22" rows="2"></textarea></div>
+          <div class="fgroup"><label class="flabel">Benefício 3 título (C23)</label><input class="finput" id="ce-c23"></div>
+          <div class="fgroup"><label class="flabel">Benefício 3 descrição (C24)</label><textarea class="finput" id="ce-c24" rows="2"></textarea></div>
+
+          <div class="fsection">Seção 5 — Antes e Depois</div>
+          <div class="fgroup"><label class="flabel">Título da seção (C25)</label><input class="finput" id="ce-c25"></div>
+          <div class="fgroup"><label class="flabel">Antes 1 (C26)</label><input class="finput" id="ce-c26"></div>
+          <div class="fgroup"><label class="flabel">Depois 1 (C27)</label><input class="finput" id="ce-c27"></div>
+          <div class="fgroup"><label class="flabel">Antes 2 (C28)</label><input class="finput" id="ce-c28"></div>
+          <div class="fgroup"><label class="flabel">Depois 2 (C29)</label><input class="finput" id="ce-c29"></div>
+          <div class="fgroup"><label class="flabel">Antes 3 (C30)</label><input class="finput" id="ce-c30"></div>
+          <div class="fgroup"><label class="flabel">Depois 3 (C31)</label><input class="finput" id="ce-c31"></div>
+        </div>
+
+        <!-- ABA 3: OFERTA -->
+        <div class="spanel" id="spanel-s3">
+          <div class="fsection">Seção 6 — Oferta</div>
+          <div class="fgroup"><label class="flabel">Título do card (C32)</label><input class="finput" id="ce-c32"></div>
+          <div class="fgroup"><label class="flabel">Forma de entrega (C33)</label><input class="finput" id="ce-c33"></div>
+          <div class="fgroup"><label class="flabel">Garantia (C34)</label><input class="finput" id="ce-c34"></div>
+          <div class="fgroup"><label class="flabel">Tempo de acesso (C35)</label><input class="finput" id="ce-c35"></div>
+          <div class="fgroup"><label class="flabel">Bônus (C36)</label><input class="finput" id="ce-c36"></div>
+          <div class="fgroup"><label class="flabel">Preço (C37)</label><input class="finput" id="ce-c37"></div>
+          <div class="fgroup"><label class="flabel">CTA de compra + link (C38)</label><input class="finput" id="ce-c38"></div>
+          <div class="fgroup"><label class="flabel">Link checkout separado (C38B)</label><input class="finput" id="ce-c38b" placeholder="https://..."></div>
+
+          <div class="fsection">Rodapé</div>
+          <div class="fgroup"><label class="flabel">Direitos reservados (C44)</label><input class="finput" id="ce-c44"></div>
+          <div class="fgroup"><label class="flabel">E-mail de suporte (C45)</label><input class="finput" id="ce-c45" placeholder="contato@..."></div>
+        </div>
+
+        <!-- ABA 4: SOBRE + FAQ -->
+        <div class="spanel" id="spanel-s4">
+          <div class="fsection">Seção 7 — Quem sou eu</div>
+          <div class="fgroup"><label class="flabel">Nome (C39)</label><input class="finput" id="ce-c39"></div>
+          <div class="fgroup"><label class="flabel">Bio / credenciais (C40)</label><textarea class="finput" id="ce-c40" rows="4"></textarea></div>
+          <div class="fgroup"><label class="flabel">Foto autor — C41</label>
+            <div class="img-row">
+              <label class="img-upload-btn">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload
+                <input type="file" accept="image/*" style="display:none" onchange="ceUploadImg(this,'ce-c41','prev-ce-c41')">
+              </label>
+              <span style="font-size:11px;color:var(--muted)">ou</span>
+              <input class="finput" id="ce-c41" placeholder="https://..." style="flex:2" oninput="cePrevImg('ce-c41','prev-ce-c41')">
+            </div>
+            <div class="img-preview-wrap" id="prev-ce-c41"><img><button onclick="ceClearImg('ce-c41','prev-ce-c41')">✕ remover</button></div>
+          </div>
+
+          <div class="fsection">Seção 8 — FAQ</div>
+          <div class="fgroup"><label class="flabel">Título do FAQ (C42)</label><input class="finput" id="ce-c42" placeholder="Perguntas frequentes"></div>
+          <div class="fgroup"><label class="flabel">Perguntas e respostas (C43)</label>
+            <textarea class="finput" id="ce-c43" rows="5" placeholder="Pergunta 1? Resposta 1.,Pergunta 2? Resposta 2."></textarea>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Formato: Pergunta? Resposta.,Pergunta? Resposta.</div>
+          </div>
+        </div>
+
+      </div><!-- /sidebar-body -->
+    </div><!-- /sidebar -->
+
+    <!-- PREVIEW -->
     <div class="editor-preview">
       <iframe id="preview-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
     </div>
@@ -253,47 +346,44 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 <script>
 var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
 var SB_KEY = 'sb_publishable_Yi2a2lXgQYH96PYP8ceZOw_dcMFQh9v';
-
 var _cliente = null;
 var _editingPage = null;
-var _editingHTML = '';
-var _editingData = {};
+var _editingV = {};
+var _previewDebounce = null;
+var _pagesData = [];
 
-function sbFetch(path, opts) {
-  return fetch(SB_URL + '/rest/v1/' + path, Object.assign({
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    }
-  }, opts || {})).then(function(r){ return r.json(); });
+function sbFetch(path, opts){
+  return fetch(SB_URL+'/rest/v1/'+path, Object.assign({
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
+  }, opts||{})).then(function(r){ return r.json(); });
 }
 
+// ── AUTOLOGIN ──
+(function(){
+  var saved = sessionStorage.getItem('donalab_cliente');
+  if(saved){ try{ _cliente=JSON.parse(saved); initDashboard(); }catch(e){ sessionStorage.removeItem('donalab_cliente'); } }
+})();
+
 // ── LOGIN ──
-document.getElementById('btn-login').onclick = function() {
+document.getElementById('btn-login').onclick = function(){
   var email = document.getElementById('login-email').value.trim().toLowerCase();
   var senha = document.getElementById('login-senha').value.trim();
-  var err = document.getElementById('login-err');
+  var err   = document.getElementById('login-err');
   err.style.display = 'none';
-  if (!email || !senha) { err.textContent = 'Preencha e-mail e senha.'; err.style.display = 'block'; return; }
-
-  sbFetch('clientes?email=eq.' + encodeURIComponent(email) + '&senha=eq.' + encodeURIComponent(senha) + '&select=*')
-    .then(function(data) {
-      if (!data || data.length === 0) {
-        err.textContent = 'E-mail ou senha incorretos.'; err.style.display = 'block'; return;
-      }
+  if(!email||!senha){ err.textContent='Preencha e-mail e senha.'; err.style.display='block'; return; }
+  sbFetch('clientes?email=eq.'+encodeURIComponent(email)+'&senha=eq.'+encodeURIComponent(senha)+'&select=*')
+    .then(function(data){
+      if(!data||!data.length){ err.textContent='E-mail ou senha incorretos.'; err.style.display='block'; return; }
       _cliente = data[0];
       sessionStorage.setItem('donalab_cliente', JSON.stringify(_cliente));
       initDashboard();
     });
 };
-
 document.getElementById('login-email').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
 document.getElementById('login-senha').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
 
 // ── LOGOUT ──
-document.getElementById('btn-logout').onclick = function() {
+document.getElementById('btn-logout').onclick = function(){
   sessionStorage.removeItem('donalab_cliente');
   _cliente = null;
   document.getElementById('screen-dashboard').style.display = 'none';
@@ -301,28 +391,28 @@ document.getElementById('btn-logout').onclick = function() {
 };
 
 // ── TABS ──
-document.querySelectorAll('.tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
     document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
     document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
     tab.classList.add('active');
-    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
   });
 });
 
-document.querySelectorAll('.editor-tab').forEach(function(tab) {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.editor-tab').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('.editor-panel').forEach(function(p){ p.classList.remove('active'); });
+document.querySelectorAll('.stab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
     tab.classList.add('active');
-    document.getElementById('epanel-' + tab.dataset.etab).classList.add('active');
+    document.getElementById('spanel-'+tab.dataset.stab).classList.add('active');
   });
 });
 
 // ── INIT DASHBOARD ──
-function initDashboard() {
-  document.getElementById('screen-login').style.display = 'none';
-  document.getElementById('screen-dashboard').style.display = 'block';
+function initDashboard(){
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('screen-dashboard').style.display='block';
   document.getElementById('header-name').textContent = _cliente.nome;
   loadPaginas();
   loadMateriais();
@@ -330,346 +420,684 @@ function initDashboard() {
 }
 
 // ── PÁGINAS ──
-function loadPaginas() {
-  document.getElementById('paginas-loading').style.display = 'flex';
-  document.getElementById('pages-grid').style.display = 'none';
-  document.getElementById('paginas-empty').style.display = 'none';
+function loadPaginas(){
+  document.getElementById('paginas-loading').style.display='flex';
+  document.getElementById('pages-grid').style.display='none';
+  document.getElementById('paginas-empty').style.display='none';
 
-  sbFetch('paginas?cliente=eq.' + encodeURIComponent(_cliente.nome) + '&select=id,slug,nome,produto,created_at,html')
-    .then(function(data) {
-      document.getElementById('paginas-loading').style.display = 'none';
-      if (!data || data.length === 0) {
-        document.getElementById('paginas-empty').style.display = 'block'; return;
-      }
+  sbFetch('paginas?cliente=eq.'+encodeURIComponent(_cliente.nome)+'&select=*&order=created_at.asc')
+    .then(function(data){
+      document.getElementById('paginas-loading').style.display='none';
+      if(!data||!data.length){ document.getElementById('paginas-empty').style.display='block'; return; }
+
+      _pagesData = data;
+
+      // Agrupa por par dark/clean (mesmo base slug)
+      var grupos = {};
+      data.forEach(function(p){
+        var base = (p.slug||'').replace(/-dark$/,'').replace(/-clean$/,'');
+        if(!grupos[base]) grupos[base] = {};
+        if((p.slug||'').endsWith('-dark'))  grupos[base].dark = p;
+        else if((p.slug||'').endsWith('-clean')) grupos[base].clean = p;
+        else grupos[base].solo = p;
+      });
+
       var grid = document.getElementById('pages-grid');
       grid.innerHTML = '';
-      data.forEach(function(p) {
+      Object.keys(grupos).forEach(function(base){
+        var g = grupos[base];
+        var pRef = g.dark || g.solo || g.clean;
+        var dt = new Date(pRef.created_at).toLocaleDateString('pt-BR');
+        var nome = (pRef.nome||'').replace(/ — Dark| — Clean/,'') || pRef.produto || 'Página';
+
         var card = document.createElement('div');
         card.className = 'page-card';
-        var dt = new Date(p.created_at).toLocaleDateString('pt-BR');
-        card.innerHTML = '<div class="page-thumb"><span>Prévia indisponível</span></div>'
-          + '<div class="page-info">'
-          + '<div class="page-name">' + (p.nome||p.produto||'Página') + '</div>'
-          + '<div class="page-meta">Criada em ' + dt + ' · donalab.com.br/p/' + p.slug + '</div>'
-          + '<div class="page-actions">'
-          + '<button class="btn-sm btn-gold btn-editar" data-id="'+p.id+'">✏️ Editar</button>'
-          + '<a class="btn-sm btn-outline" href="https://donalab.com.br/p/'+p.slug+'" target="_blank">🔗 Ver</a>'
-          + '</div></div>';
+        card.innerHTML =
+          '<div class="page-thumb">'+(pRef.html ? '<iframe srcdoc="'+encodeHtml(pRef.html)+'"></iframe>' : '<span style="color:var(--dim);font-size:12px;letter-spacing:.1em;text-transform:uppercase">Prévia</span>')+'</div>'
+          +'<div class="page-info">'
+          +'<div style="margin-bottom:8px">'
+          +(g.dark  ? '<span class="page-badge badge-dark">A — Dark</span> ' : '')
+          +(g.clean ? '<span class="page-badge badge-clean">B — Clean</span>' : '')
+          +'</div>'
+          +'<div class="page-name">'+escHtml(nome)+'</div>'
+          +'<div class="page-meta">Criada em '+dt+'</div>'
+          +'<div class="page-actions">'
+          +'<button class="btn-sm btn-gold-sm btn-editar" data-base="'+base+'">✏️ Editar</button>'
+          +(g.dark  ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.dark.slug+'" target="_blank">🌑 Dark</a>' : '')
+          +(g.clean ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.clean.slug+'" target="_blank">☀️ Clean</a>' : '')
+          +'</div>'
+          +'</div>';
         grid.appendChild(card);
 
-        card.querySelector('.btn-editar').addEventListener('click', function() {
-          abrirEditor(p);
+        card.querySelector('.btn-editar').addEventListener('click', function(){
+          abrirEditor(base, g);
         });
       });
-      grid.style.display = 'grid';
+      grid.style.display='grid';
     });
 }
 
+function encodeHtml(h){ return h.replace(/"/g,'&quot;'); }
+function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 // ── MATERIAIS ──
-function loadMateriais() {
-  document.getElementById('materiais-loading').style.display = 'flex';
-  sbFetch('materiais?cliente_id=eq.' + _cliente.id + '&select=*')
-    .then(function(data) {
-      document.getElementById('materiais-loading').style.display = 'none';
-      if (!data || !Array.isArray(data) || data.length === 0) {
-        document.getElementById('materiais-empty').style.display = 'block'; return;
-      }
+function loadMateriais(){
+  document.getElementById('materiais-loading').style.display='flex';
+  sbFetch('materiais?cliente_id=eq.'+_cliente.id+'&select=*')
+    .then(function(data){
+      document.getElementById('materiais-loading').style.display='none';
+      if(!data||!Array.isArray(data)||!data.length){ document.getElementById('materiais-empty').style.display='block'; return; }
       var grid = document.getElementById('materiais-grid');
-      grid.innerHTML = '';
-      data.forEach(function(m) {
-        grid.innerHTML += '<div class="material-card">'
-          + '<div class="material-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>'
-          + '<div class="material-nome">' + m.nome + '</div>'
-          + '<div class="material-tipo">' + (m.tipo||'Material') + '</div>'
-          + (m.url ? '<a class="material-link" href="'+m.url+'" target="_blank">Acessar →</a>' : '')
-          + '</div>';
+      grid.innerHTML='';
+      data.forEach(function(m){
+        grid.innerHTML+='<div class="material-card"><div class="material-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>'
+          +'<div class="material-nome">'+escHtml(m.nome||'')+'</div>'
+          +'<div class="material-tipo">'+escHtml(m.tipo||'Material')+'</div>'
+          +(m.url ? '<a class="material-link" href="'+m.url+'" target="_blank">Acessar →</a>' : '')
+          +'</div>';
       });
-      grid.style.display = 'grid';
+      grid.style.display='grid';
     });
 }
 
 // ── CONFIG ──
-function loadConfig() {
-  if (_cliente.dominio) document.getElementById('config-dominio').value = _cliente.dominio;
-  if (_cliente.pixel) document.getElementById('config-pixel').value = _cliente.pixel;
+function loadConfig(){
+  if(_cliente.dominio) document.getElementById('config-dominio').value = _cliente.dominio;
+  if(_cliente.pixel)   document.getElementById('config-pixel').value   = _cliente.pixel;
 }
-
-document.getElementById('btn-salvar-dominio').onclick = function() {
+document.getElementById('btn-salvar-dominio').onclick = function(){
   var val = document.getElementById('config-dominio').value.trim();
-  sbFetch('clientes?id=eq.' + _cliente.id, { method:'PATCH', body: JSON.stringify({dominio: val}) })
-    .then(function() { _cliente.dominio = val; showMsg('msg-dominio'); });
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({dominio:val})})
+    .then(function(){ _cliente.dominio=val; showMsg('msg-dominio'); });
 };
-
-document.getElementById('btn-salvar-pixel').onclick = function() {
+document.getElementById('btn-salvar-pixel').onclick = function(){
   var val = document.getElementById('config-pixel').value.trim();
-  sbFetch('clientes?id=eq.' + _cliente.id, { method:'PATCH', body: JSON.stringify({pixel: val}) })
-    .then(function() { _cliente.pixel = val; showMsg('msg-pixel'); });
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({pixel:val})})
+    .then(function(){ _cliente.pixel=val; showMsg('msg-pixel'); });
 };
-
-document.getElementById('btn-salvar-senha').onclick = function() {
-  var nova = document.getElementById('config-senha-nova').value.trim();
-  var conf = document.getElementById('config-senha-conf').value.trim();
-  if (nova.length < 6) { alert('Senha deve ter ao menos 6 caracteres.'); return; }
-  if (nova !== conf) { alert('As senhas não coincidem.'); return; }
-  sbFetch('clientes?id=eq.' + _cliente.id, { method:'PATCH', body: JSON.stringify({senha: nova}) })
-    .then(function() { showMsg('msg-senha'); document.getElementById('config-senha-nova').value=''; document.getElementById('config-senha-conf').value=''; });
+document.getElementById('btn-salvar-senha').onclick = function(){
+  var nova  = document.getElementById('config-senha-nova').value.trim();
+  var conf  = document.getElementById('config-senha-conf').value.trim();
+  if(nova.length<6){ alert('Mínimo 6 caracteres.'); return; }
+  if(nova!==conf){ alert('As senhas não coincidem.'); return; }
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({senha:nova})})
+    .then(function(){ showMsg('msg-senha'); document.getElementById('config-senha-nova').value=''; document.getElementById('config-senha-conf').value=''; });
 };
+function showMsg(id){ var el=document.getElementById(id); el.style.display='block'; setTimeout(function(){ el.style.display='none'; },3000); }
 
-function showMsg(id) {
-  var el = document.getElementById(id);
-  el.style.display = 'block';
-  setTimeout(function(){ el.style.display = 'none'; }, 3000);
-}
+// ─────────────────────────────────────────
+// EDITOR
+// ─────────────────────────────────────────
+var _editingBase  = '';
+var _editingGroup = {};
 
-// ── EDITOR ──
-function abrirEditor(pagina) {
-  _editingPage = pagina;
-  _editingHTML = pagina.html || '';
-  _editingData = {};
+function abrirEditor(base, grupo){
+  _editingBase  = base;
+  _editingGroup = grupo;
 
-  document.getElementById('editor-page-nome').textContent = pagina.nome || pagina.produto || 'Página';
+  // Extrai campos do meta tag da página dark (ou clean como fallback)
+  var pRef = grupo.dark || grupo.solo || grupo.clean;
+  _editingV = {};
+  if(pRef && pRef.html){
+    try{
+      var m = pRef.html.match(/<meta name="page-fields" content='([^']+)'>/);
+      if(m) _editingV = JSON.parse(decodeURIComponent(m[1]));
+    }catch(e){}
+  }
+
+  // Preenche os campos
+  var fields = ['c1','c2','c3','c4','c5','c5b','c6','c7','c8','c9','c10',
+    'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
+    'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
+    'c32','c33','c34','c35','c36','c37','c38','c38b',
+    'c39','c40','c41','c42','c43','c44','c45'];
+  fields.forEach(function(f){
+    var el = document.getElementById('ce-'+f);
+    if(el) el.value = _editingV[f.toUpperCase()] || _editingV[f] || '';
+  });
+
+  // Preview imagens
+  ['c4','c41'].forEach(function(k){
+    var url = _editingV[k.toUpperCase()] || '';
+    var prev = document.getElementById('prev-ce-'+k);
+    if(prev){
+      if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
+      else { prev.style.display='none'; }
+    }
+  });
+
+  // Título do editor
+  var nome = (_editingV['C1']||pRef.nome||'Página').replace(/ — Dark| — Clean/,'');
+  document.getElementById('editor-page-nome').textContent = nome;
+
+  // Vai para aba Hero
+  document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelector('.stab[data-stab="s1"]').classList.add('active');
+  document.getElementById('spanel-s1').classList.add('active');
+
+  // Mostra preview do dark
+  if(pRef && pRef.html) document.getElementById('preview-iframe').srcdoc = pRef.html;
+
   document.getElementById('editor-modal').classList.add('open');
-
-  // Preenche preview
-  atualizarPreview();
-
-  // Extrai campos editáveis do HTML
-  gerarCamposTexto();
-  gerarCamposImagem();
-
-  // Preenche links
-  var linkMatch = _editingHTML.match(/href="([^"]*)"[^>]*class="btn/);
-  if (linkMatch) document.getElementById('edit-link-venda').value = linkMatch[1];
 }
 
-document.getElementById('btn-fechar-editor').onclick = function() {
+// Live preview ao digitar (debounced 800ms)
+document.querySelectorAll('.finput').forEach(function(el){
+  el.addEventListener('input', function(){
+    clearTimeout(_previewDebounce);
+    _previewDebounce = setTimeout(function(){ atualizarPreviewAoVivo(); }, 800);
+  });
+});
+
+function atualizarPreviewAoVivo(){
+  var v = coletarCampos();
+  document.getElementById('preview-iframe').srcdoc = buildPage(v);
+}
+
+function coletarCampos(){
+  var fields = ['C1','C2','C3','C4','C5','C5B','C6','C7','C8','C9','C10',
+    'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
+    'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
+    'C32','C33','C34','C35','C36','C37','C38','C38B',
+    'C39','C40','C41','C42','C43','C44','C45'];
+  var v = {};
+  fields.forEach(function(f){
+    var el = document.getElementById('ce-'+f.toLowerCase());
+    if(el && el.value.trim()) v[f] = el.value.trim();
+  });
+  return v;
+}
+
+// ── HELPERS IMAGEM ──
+function ceUploadImg(input, fieldId, prevId){
+  var file = input.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    document.getElementById(fieldId).value = e.target.result;
+    var prev = document.getElementById(prevId);
+    prev.querySelector('img').src = e.target.result;
+    prev.style.display = 'block';
+    atualizarPreviewAoVivo();
+  };
+  reader.readAsDataURL(file);
+}
+function cePrevImg(fieldId, prevId){
+  var url = document.getElementById(fieldId).value.trim();
+  var prev = document.getElementById(prevId);
+  if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
+  else { prev.style.display='none'; }
+}
+function ceClearImg(fieldId, prevId){
+  document.getElementById(fieldId).value='';
+  var prev = document.getElementById(prevId);
+  prev.querySelector('img').src=''; prev.style.display='none';
+}
+
+// ── FECHAR EDITOR ──
+document.getElementById('btn-fechar-editor').onclick = function(){
   document.getElementById('editor-modal').classList.remove('open');
 };
 
-// Gera campos de texto automaticamente varrendo elementos de texto do HTML
-function gerarCamposTexto() {
-  var container = document.getElementById('textos-fields');
-  container.innerHTML = '';
-
-  // Mapa de seletores → labels amigáveis
-  var campos = [
-    { sel: 'h1', label: 'Título principal' },
-    { sel: '.hero-promessa', label: 'Subtítulo / Promessa' },
-    { sel: '.dor-titulo', label: 'Título da Dor', multi: true },
-    { sel: '.sint', label: 'Sintoma', multi: true },
-    { sel: '.pq-left h2', label: 'Para quem - título' },
-    { sel: '.pq-item span:last-child', label: 'Para quem - item', multi: true },
-    { sel: '.ben-col-titulo', label: 'Benefício - título', multi: true },
-    { sel: '.ben-col-desc', label: 'Benefício - descrição', multi: true },
-    { sel: '.res-t', label: 'Resultado - título', multi: true },
-    { sel: '.res-d', label: 'Resultado - descrição', multi: true },
-    { sel: '.aut-nome', label: 'Autor - nome' },
-    { sel: '.aut-bio', label: 'Autor - bio' },
-    { sel: '.ofr-titulo', label: 'Oferta - título' },
-    { sel: '.ofr-item:not(.destaque)', label: 'Oferta - item', multi: true },
-    { sel: '.pval', label: 'Preço' },
-    { sel: '.faq-q', label: 'FAQ - pergunta', multi: true },
-    { sel: '.faq-a', label: 'FAQ - resposta', multi: true },
-  ];
-
-  // Parse HTML para extrair valores atuais
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(_editingHTML, 'text/html');
-
-  campos.forEach(function(campo) {
-    var els = doc.querySelectorAll(campo.sel);
-    if (!els.length) return;
-
-    var section = document.createElement('div');
-    section.className = 'field-section';
-    section.textContent = campo.label;
-    container.appendChild(section);
-
-    els.forEach(function(el, i) {
-      var key = campo.sel + '_' + i;
-      var texto = el.innerText || el.textContent || '';
-      if (!texto.trim()) return;
-
-      _editingData[key] = { sel: campo.sel, idx: i, val: texto.trim() };
-
-      var group = document.createElement('div');
-      group.className = 'field-group';
-      var isLong = texto.length > 80;
-      var inputEl = document.createElement(isLong ? 'textarea' : 'input');
-      inputEl.className = 'field-input';
-      inputEl.value = texto.trim();
-      if (isLong) { inputEl.rows = 3; }
-      inputEl.dataset.key = key;
-
-      inputEl.addEventListener('input', function() {
-        _editingData[key].val = this.value;
-        aplicarTextoNoHTML(key, this.value);
-      });
-
-      group.appendChild(inputEl);
-      container.appendChild(group);
-    });
-  });
-}
-
-function gerarCamposImagem() {
-  var container = document.getElementById('imagens-fields');
-  container.innerHTML = '';
-
-  var imgCampos = [
-    { sel: '.hero-right .img-ph', label: 'Imagem do Hero', parentSel: '.hero-right' },
-    { sel: '.aut-foto', label: 'Foto do Autor' },
-    { sel: '.res-img', label: 'Imagem de Resultado', multi: true },
-  ];
-
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(_editingHTML, 'text/html');
-
-  imgCampos.forEach(function(campo) {
-    var els = doc.querySelectorAll(campo.sel);
-    els.forEach(function(el, i) {
-      var key = 'img_' + campo.sel + '_' + i;
-      var label = campo.label + (els.length > 1 ? ' ' + (i+1) : '');
-
-      var section = document.createElement('div');
-      section.className = 'field-section';
-      section.textContent = label;
-      container.appendChild(section);
-
-      // Preview da imagem atual
-      var imgActual = el.querySelector('img');
-      var preview = document.createElement('img');
-      preview.className = 'img-preview';
-      if (imgActual) { preview.src = imgActual.src; preview.style.display = 'block'; }
-
-      // Upload area
-      var uploadArea = document.createElement('div');
-      uploadArea.className = 'img-upload-area';
-      uploadArea.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><div class="img-upload-label">Clique para escolher imagem</div>';
-
-      var fileInput = document.createElement('input');
-      fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.style.display = 'none';
-
-      uploadArea.onclick = function() { fileInput.click(); };
-      fileInput.onchange = function(e) {
-        var file = e.target.files[0]; if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-          var base64 = ev.target.result;
-          preview.src = base64; preview.style.display = 'block';
-          aplicarImagemNoHTML(campo.sel, i, base64);
-        };
-        reader.readAsDataURL(file);
-      };
-
-      container.appendChild(preview);
-      container.appendChild(uploadArea);
-      container.appendChild(fileInput);
-    });
-  });
-}
-
-function aplicarTextoNoHTML(key, valor) {
-  var data = _editingData[key];
-  if (!data) return;
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(_editingHTML, 'text/html');
-  var els = doc.querySelectorAll(data.sel);
-  if (els[data.idx]) {
-    els[data.idx].textContent = valor;
-  }
-  _editingHTML = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
-  atualizarPreview();
-}
-
-function aplicarImagemNoHTML(sel, idx, base64) {
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(_editingHTML, 'text/html');
-  var els = doc.querySelectorAll(sel);
-  if (els[idx]) {
-    var img = els[idx].querySelector('img');
-    if (!img) {
-      img = document.createElement('img');
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-      els[idx].innerHTML = '';
-      els[idx].appendChild(img);
-    }
-    img.src = base64;
-  }
-  _editingHTML = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
-  atualizarPreview();
-}
-
-document.getElementById('btn-aplicar-links').onclick = function() {
-  var link = document.getElementById('edit-link-venda').value.trim();
-  var cta = document.getElementById('edit-cta-principal').value.trim();
-  var email = document.getElementById('edit-email-suporte').value.trim();
-
-  var parser = new DOMParser();
-  var doc = parser.parseFromString(_editingHTML, 'text/html');
-
-  if (link) {
-    doc.querySelectorAll('a.btn, a[href]').forEach(function(a) {
-      if (a.href && !a.href.startsWith('mailto')) a.href = link;
-    });
-  }
-  if (cta) {
-    doc.querySelectorAll('.btn-full, a.btn').forEach(function(el) { el.textContent = cta; });
-  }
-  if (email) {
-    doc.querySelectorAll('a[href^="mailto"]').forEach(function(a) {
-      a.href = 'mailto:' + email; a.textContent = email;
-    });
-  }
-
-  _editingHTML = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
-  atualizarPreview();
-  showMsg('save-indicator');
-};
-
-function atualizarPreview() {
-  var iframe = document.getElementById('preview-iframe');
-  iframe.srcdoc = _editingHTML;
-}
-
-// ── PUBLICAR ──
-document.getElementById('btn-publicar').onclick = function() {
+// ── SALVAR ──
+document.getElementById('btn-publicar').onclick = function(){
   var btn = this;
-  btn.textContent = 'Salvando...'; btn.disabled = true;
+  btn.disabled=true; btn.textContent='Salvando...';
 
-  // Injeta pixel do Facebook se existir
-  var htmlFinal = _editingHTML;
-  if (_cliente.pixel && _cliente.pixel.trim()) {
-    if (htmlFinal.includes('</head>')) {
-      htmlFinal = htmlFinal.replace('</head>', _cliente.pixel + '\n</head>');
-    }
+  var v = coletarCampos();
+
+  // Reconstrói dark + clean
+  var newDark  = buildPage(v);
+  var newClean = buildPageClean(v);
+
+  // Injeta meta tag com campos
+  var metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(v))+"'>";
+  newDark  = newDark.replace('</head>',  metaTag+'</head>');
+  newClean = newClean.replace('</head>', metaTag+'</head>');
+
+  // Injeta pixel se existir
+  if(_cliente.pixel && _cliente.pixel.trim()){
+    newDark  = newDark.replace('</head>',  _cliente.pixel+'\n</head>');
+    newClean = newClean.replace('</head>', _cliente.pixel+'\n</head>');
   }
 
-  sbFetch('paginas?id=eq.' + _editingPage.id, {
-    method: 'PATCH',
-    body: JSON.stringify({ html: htmlFinal })
-  }).then(function() {
-    btn.textContent = '✓ Salvo!';
-    setTimeout(function(){ btn.textContent = 'Salvar alterações'; btn.disabled = false; }, 2500);
-    _editingPage.html = htmlFinal;
-    var ind = document.getElementById('save-indicator');
-    ind.style.display = 'inline';
-    setTimeout(function(){ ind.style.display = 'none'; }, 3000);
-  }).catch(function() {
-    btn.textContent = 'Erro — tente novamente'; btn.disabled = false;
+  var nomeCliente = v['C1'] || '';
+  var slugDark  = _editingBase+'-dark';
+  var slugClean = _editingBase+'-clean';
+
+  Promise.all([
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugDark)+'&select=id'),
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugClean)+'&select=id')
+  ]).then(function(results){
+    var idDark  = results[0]&&results[0][0] ? results[0][0].id : null;
+    var idClean = results[1]&&results[1][0] ? results[1][0].id : null;
+    var patches = [];
+    if(idDark)  patches.push(sbFetch('paginas?id=eq.'+idDark,  {method:'PATCH',body:JSON.stringify({html:newDark,  nome:nomeCliente+' — Dark'})}));
+    if(idClean) patches.push(sbFetch('paginas?id=eq.'+idClean, {method:'PATCH',body:JSON.stringify({html:newClean, nome:nomeCliente+' — Clean'})}));
+    // Fallback: solo page
+    if(!idDark&&!idClean&&_editingGroup.solo){
+      patches.push(sbFetch('paginas?id=eq.'+_editingGroup.solo.id,{method:'PATCH',body:JSON.stringify({html:newDark,nome:nomeCliente})}));
+    }
+    return Promise.all(patches);
+  }).then(function(){
+    btn.disabled=false;
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar alterações';
+    var ok = document.getElementById('save-ok');
+    ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },3000);
+    // Atualiza preview com a versão salva
+    document.getElementById('preview-iframe').srcdoc = newDark;
+  }).catch(function(e){
+    btn.disabled=false; btn.textContent='Salvar alterações';
+    alert('Erro ao salvar: '+e.message);
   });
 };
 
-// ── AUTO LOGIN por sessão ──
-(function() {
-  var saved = sessionStorage.getItem('donalab_cliente');
-  if (saved) {
-    try {
-      _cliente = JSON.parse(saved);
-      initDashboard();
-    } catch(e) { sessionStorage.removeItem('donalab_cliente'); }
-  }
-})();
 </script>
+
+<!-- buildPage e buildPageClean injetados do dashboard -->
+<script>
+
+function buildPage(v) {
+  function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function r(k){ return v[k]||''; }
+
+  // FAQ: C42 = título, C43 = "Pergunta? Resposta.,Pergunta? Resposta." (separado por .,)
+  var faqItens = [];
+  var c43raw = r('C43');
+  if(c43raw){
+    // Remove JSON array brackets se existirem
+    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
+    // Separa itens por ".,", "." seguido de "," ou por JSON ","
+    var itens = c43raw.split(/\.,\s*/);
+    // Remove aspas residuais de cada item
+    itens.forEach(function(item){
+      item = item.replace(/^"|"$|^'|'$/g,'').trim();
+      if(!item) return;
+      var qIdx = item.indexOf('?');
+      if(qIdx !== -1){
+        var pergunta = item.substring(0, qIdx+1).trim();
+        var resposta = item.substring(qIdx+1).trim().replace(/\.$/, '');
+        if(pergunta) faqItens.push([pergunta, resposta]);
+      }
+    });
+  }
+  // Fallback campos individuais C43_1P/C43_1R
+  if(!faqItens.length){
+    for(var i=1;i<=6;i++){
+      var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
+      var fr = r('C43_'+i+'R') || r('C43'+i+'R') || '';
+      if(fp) faqItens.push([fp, fr]);
+    }
+  }
+  var faqHtml = !faqItens.length ? '' :
+    '<div class="section" style="border-top:1px solid #1e1c10">'
+    +'<div class="wrap">'
+    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'
+    +faqItens.map(function(item){
+      return '<details style="background:#141210;border:1px solid #2a2618;border-radius:12px;overflow:hidden">'
+        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#e8e0cc;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+item[0]+'</span><span style="color:#C9A84C;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
+        +'<div style="padding:16px 24px 20px;font-size:14px;color:#8a8070;line-height:1.75;border-top:1px solid #2a2618">'+item[1]+'</div>'
+        +'</details>';
+    }).join('')
+    +'</div></div></div>';
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${s('C2')} — ${s('C1')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;color:#e8e0cc;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:780px;margin:0 auto;padding:0 28px}
+.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+.btn-cta:hover{background:#dbb95e}
+.section{padding:60px 0}
+.card{background:#181610;border:1px solid #2a2618;border-radius:14px}
+@media(max-width:640px){
+  #sec1{flex-direction:column!important}
+  .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
+  .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
+  .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .ben-cols{flex-direction:column!important}
+  .ben-col{border-right:none!important;border-bottom:1px solid #2a2618!important;text-align:center!important}
+  .ben-col:last-child{border-bottom:none!important}
+  .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
+  .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
+  .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SEÇÃO 1: HERO ══ C1-C5 -->
+<div id="sec1" style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;position:relative;display:flex;align-items:stretch;min-height:340px">
+  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:18px;font-weight:500">${s('C1')}</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
+    <p style="font-size:15px;color:#8a8070;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
+    <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
+  </div>
+  <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
+    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#1c1a10"></div>'}
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 2: DOR ══ C6-C10 -->
+<div class="section">
+  <div class="wrap" style="text-align:center">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;margin-bottom:28px">${s('C6')}</h2>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+      ${['C7','C8','C9'].map(function(k){
+        return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';
+      }).join('')}
+    </div>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc">${s('C10')}</h2>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 3: PARA QUEM ══ C11-C17 -->
+<div class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
+      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618;flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.3">${s('C11')}</div>
+      </div>
+      <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        ${['C12','C13','C14','C15','C16'].map(function(k,i){
+          return '<div style="font-size:14px;color:#c0b090;display:flex;align-items:baseline;gap:8px">'
+            +'<span style="color:#8a8070;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
+            +'<span>'+s(k)+'</span></div>';
+        }).join('')}
+      </div>
+    </div>
+    <div style="text-align:center">
+      <a href="#sec6" class="btn-cta">${s('C17')}</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 4: BENEFÍCIOS ══ C18-C24 -->
+<div class="section">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:32px">${s('C18')}</h2>
+    <div class="ben-cols" style="display:flex;gap:0;background:#181610;border:1px solid #2a2618;border-radius:14px;overflow:hidden">
+      ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
+        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #2a2618':'')+'">'
+          +'<div style="font-size:11px;font-weight:700;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
+          +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 5: ANTES E DEPOIS ══ C25-C31 -->
+<div class="section" style="padding-top:0">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">${s('C25')}</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
+        return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
+          +'<div style="flex:1;background:rgba(180,30,30,.12);border:1px solid rgba(200,60,60,.25);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#e05555;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
+          +'<p style="font-size:14px;color:#c0a8a8;line-height:1.65">'+s(pair[0])+'</p>'
+          +'</div>'
+          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#C9A84C;font-size:22px;margin:0 4px">→</div>'
+          +'<div style="flex:1;background:rgba(20,140,90,.1);border:1px solid rgba(40,160,100,.2);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#3dbf8a;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
+          +'<p style="font-size:14px;color:#a0c0b0;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 6: OFERTA ══ C32-C38 -->
+<div id="sec6" class="section">
+  <div class="wrap" style="display:flex;justify-content:center">
+    <div style="background:linear-gradient(160deg,#1c1a08,#221e0a);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:40px 36px;width:100%;max-width:480px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C32')}</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+        ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
+          return '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:100px;padding:11px 22px;font-size:13px;color:#b0a070;text-align:center;font-weight:500">'+s(k)+'</div>';
+        }).join('')}
+      </div>
+      <a href="${r('C38B')||r('C38').match(/https?:\/\/\S+/)?r('C38').match(/https?:\/\/\S+/)[0]:'#'}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 7: QUEM SOU EU ══ C39-C41 -->
+<div class="section" style="border-top:1px solid #1e1c10">
+  <div class="wrap">
+    <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
+      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.2)">
+        ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
+          : '<div style="width:100%;height:100%;background:#1c1a10;display:flex;align-items:center;justify-content:center;color:#3a3428;font-size:11px">Foto</div>'}
+      </div>
+      <div style="flex:1;min-width:200px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C39')}</h2>
+        <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C40')}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SEÇÃO 8: FAQ ══ C42-C43 -->
+${faqHtml}
+
+<!-- ══ RODAPÉ ══ C44-C45 -->
+<footer style="border-top:1px solid #1e1c10;padding:32px 28px;text-align:center">
+  <div style="font-size:13px;color:#4a4638;margin-bottom:4px">${s('C44')}</div>
+  ${r('C45') ? '<div style="font-size:12px;color:#4a4638;margin-top:4px">'+s('C45')+'</div>' : ''}
+</footer>
+
+</body></html>`;
+}
+
+// ══════════════════════════════════════════
+// MODELO B — CLEAN (fundo branco/creme)
+// ══════════════════════════════════════════
+function buildPageClean(v) {
+  function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function r(k){ return v[k]||''; }
+
+  // FAQ igual ao dark
+  var faqItens = [];
+  var c43raw = r('C43');
+  if(c43raw){
+    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
+    c43raw.split(/\.,\s*/).forEach(function(item){
+      item = item.replace(/^"|"$|^'|'$/g,'').trim();
+      if(!item) return;
+      var qIdx = item.indexOf('?');
+      if(qIdx !== -1) faqItens.push([item.substring(0,qIdx+1).trim(), item.substring(qIdx+1).trim().replace(/\.$/, '')]);
+    });
+  }
+  if(!faqItens.length){
+    for(var i=1;i<=6;i++){
+      var fp=r('C43_'+i+'P')||r('C43'+i+'P')||'';
+      var fr=r('C43_'+i+'R')||r('C43'+i+'R')||'';
+      if(fp) faqItens.push([fp,fr]);
+    }
+  }
+  var faqHtml = !faqItens.length ? '' :
+    '<section style="padding:60px 0;border-top:1px solid #e8e0d0">'
+    +'<div class="wrap">'
+    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'
+    +faqItens.map(function(item){
+      return '<details style="background:#faf7f0;border:1px solid #e0d8c8;border-radius:12px;overflow:hidden">'
+        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#2a2018;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+item[0]+'</span><span style="color:#9a7a2a;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
+        +'<div style="padding:16px 24px 20px;font-size:14px;color:#6a6050;line-height:1.75;border-top:1px solid #e0d8c8">'+item[1]+'</div>'
+        +'</details>';
+    }).join('')
+    +'</div></div></section>';
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${s('C2')} — ${s('C1')}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fdfaf4;color:#2a2018;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:780px;margin:0 auto;padding:0 28px}
+.btn-cta{display:inline-block;background:#9a7a2a;color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
+.btn-cta:hover{background:#b08e38}
+.section{padding:60px 0}
+.card{background:#faf7f0;border:1px solid #e0d8c8;border-radius:14px}
+@media(max-width:640px){
+  #sec1{flex-direction:column!important}
+  .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
+  .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
+  .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .ben-cols{flex-direction:column!important}
+  .ben-col{border-right:none!important;border-bottom:1px solid #e0d8c8!important;text-align:center!important}
+  .ben-col:last-child{border-bottom:none!important}
+  .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
+  .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
+  .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div id="sec1" style="background:#fdfaf4;border:1px solid #e0d8c8;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;display:flex;align-items:stretch;min-height:340px">
+  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#9a7a2a;margin-bottom:18px;font-weight:600">${s('C1')}</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#2a2018;letter-spacing:.04em;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
+    <p style="font-size:15px;color:#6a6050;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
+    <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
+  </div>
+  <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
+    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#f0ead8"></div>'}
+  </div>
+</div>
+
+<!-- DOR -->
+<section class="section">
+  <div class="wrap" style="text-align:center">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;margin-bottom:28px">${s('C6')}</h2>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+      ${['C7','C8','C9'].map(function(k){
+        return '<div style="background:#f5f0e4;border:1px solid #e0d8c8;border-radius:100px;padding:12px 24px;font-size:13px;color:#6a6050;font-weight:500">'+s(k)+'</div>';
+      }).join('')}
+    </div>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018">${s('C10')}</h2>
+  </div>
+</section>
+
+<!-- PARA QUEM -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
+      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #e0d8c8;flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#9a7a2a;text-align:center;line-height:1.3">${s('C11')}</div>
+      </div>
+      <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+        ${['C12','C13','C14','C15','C16'].map(function(k,i){
+          return '<div style="font-size:14px;color:#4a4030;display:flex;align-items:baseline;gap:8px">'
+            +'<span style="color:#b0a080;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
+            +'<span>'+s(k)+'</span></div>';
+        }).join('')}
+      </div>
+    </div>
+    <div style="text-align:center"><a href="#sec6" class="btn-cta">${s('C17')}</a></div>
+  </div>
+</section>
+
+<!-- BENEFÍCIOS -->
+<section class="section" style="background:#f5f0e4">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:32px">${s('C18')}</h2>
+    <div class="ben-cols" style="display:flex;gap:0;background:#fff;border:1px solid #e0d8c8;border-radius:14px;overflow:hidden">
+      ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
+        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #e0d8c8':'')+'">'
+          +'<div style="font-size:11px;font-weight:700;color:#9a7a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
+          +'<p style="font-size:13px;color:#6a6050;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</section>
+
+<!-- ANTES E DEPOIS -->
+<section class="section">
+  <div class="wrap">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">${s('C25')}</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
+        return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
+          +'<div style="flex:1;background:#fff0f0;border:1px solid #e8c8c8;border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#c05050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
+          +'<p style="font-size:14px;color:#704040;line-height:1.65">'+s(pair[0])+'</p></div>'
+          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#9a7a2a;font-size:22px;margin:0 4px">→</div>'
+          +'<div style="flex:1;background:#f0fff8;border:1px solid #b8e8c8;border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#208050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
+          +'<p style="font-size:14px;color:#306040;line-height:1.65">'+s(pair[1])+'</p></div>'
+          +'</div>';
+      }).join('')}
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section id="sec6" class="section" style="background:#f5f0e4">
+  <div class="wrap" style="display:flex;justify-content:center">
+    <div style="background:#fff;border:2px solid #c8a840;border-radius:20px;padding:40px 36px;width:100%;max-width:480px;box-shadow:0 4px 40px rgba(154,122,42,.1)">
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#2a2018;text-align:center;margin-bottom:28px">${s('C32')}</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+        ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
+          return '<div style="background:#faf5e4;border:1px solid #e0d0a0;border-radius:100px;padding:11px 22px;font-size:13px;color:#6a5020;text-align:center;font-weight:500">'+s(k)+'</div>';
+        }).join('')}
+      </div>
+      <a href="${r('C38B')||((r('C38').match(/https?:\/\/\S+/)||['#'])[0])}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
+    </div>
+  </div>
+</section>
+
+<!-- QUEM SOU EU -->
+<section class="section" style="border-top:1px solid #e0d8c8">
+  <div class="wrap">
+    <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
+      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid #c8a840">
+        ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
+          : '<div style="width:100%;height:100%;background:#f0ead8;display:flex;align-items:center;justify-content:center;color:#b0a080;font-size:11px">Foto</div>'}
+      </div>
+      <div style="flex:1;min-width:200px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#9a7a2a;margin-bottom:14px">${s('C39')}</h2>
+        <p style="font-size:14px;color:#6a6050;line-height:1.75">${s('C40')}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+${faqHtml}
+
+<!-- RODAPÉ -->
+<footer style="border-top:1px solid #e0d8c8;padding:32px 28px;text-align:center;background:#f5f0e4">
+  <div style="font-size:13px;color:#a09070;margin-bottom:4px">${s('C44')}</div>
+  ${r('C45') ? '<div style="font-size:12px;color:#a09070;margin-top:4px">'+s('C45')+'</div>' : ''}
+</footer>
+
+</body></html>`;
+}
+
+
+</script>
+
 </body>
 </html>
