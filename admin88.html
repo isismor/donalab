@@ -2448,18 +2448,31 @@ document.getElementById('btn-publicar-plano').onclick = function() {
     })}).then(function(res){
       if(!res||!res[0]){ throw new Error('Erro ao salvar no banco.'); }
 
-      // Salva também em materiais para listar na área do cliente
-      return sbFetch('materiais', {method:'POST', body:JSON.stringify({
-        nome: 'Plano de Ouro',
+      // Salva em materiais — tenta com cliente_id como int e como string
+      var matPayload = {
+        nome: 'Plano de Ouro — ' + clienteNome,
         tipo: 'Plano',
         url: 'https://donalab.com.br/p/'+slug,
         tipo_categoria: 'plano-ouro',
-        cliente_id: clienteId
-      })});
+        cliente_id: parseInt(clienteId) || clienteId
+      };
+      return fetch(SB_URL+'/rest/v1/materiais', {
+        method: 'POST',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer '+SB_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(matPayload)
+      }).then(function(r){
+        if(!r.ok) return r.text().then(function(t){ throw new Error('materiais: '+t); });
+        return r.json();
+      });
     }).then(function(){
       btn.disabled = false; btn.textContent = 'Publicar';
       fecharModalPlanoOuro();
-      loadMateriais('plano-ouro');
+      loadPlanosOuro();
       alert('Plano publicado!\nhttps://donalab.com.br/p/'+slug);
     }).catch(function(e){
       erroEl.textContent = 'Erro: ' + (e.message||'tente novamente');
