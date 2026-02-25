@@ -1375,7 +1375,7 @@ function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
 // PAGES
-var pages=[], _html=null, _slug='', _nome='', _produto='', _paleta='noir-dourado';
+var pages=[], _html=null, _v={}, _slug='', _nome='', _produto='', _paleta='noir-dourado';
 var _editingPageV = {};
 
 function renderPages(){
@@ -1424,7 +1424,7 @@ function editarPagina(id){
   var v = {};
   if(p.html){
     try{
-      var metaMatch = p.html.match(/<meta name="page-fields" content='([^']+)'>/);
+      var metaMatch = p.html.match(/<meta name=["']page-fields["'] content='([^']+)'>/);
       if(metaMatch) v = JSON.parse(decodeURIComponent(metaMatch[1]));
     }catch(e){}
   }
@@ -1439,7 +1439,9 @@ function editarPagina(id){
     'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
     'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
     'c32','c33','c34','c35','c36','c37','c38','c38b',
-    'c39','c40','c41','c42','c43','c44','c45'];
+    'c39','c40','c41','c42',
+    'c43','c44','c45','c46','c47','c48','c49','c50','c51','c52','c53','c54',
+    'c55','c56'];
   fields.forEach(function(f){
     var el = document.getElementById('ef-'+f);
     if(el) el.value = v[f.toUpperCase()] || v[f] || '';
@@ -1546,10 +1548,13 @@ function salvarEdicaoPagina(){
   var v = Object.assign({}, _editingPageV);
   fields.forEach(function(f){
     var el = document.getElementById('ef-'+f.toLowerCase());
-    if(!el) return;
+    if(!el) return; // sem input para este campo — mantém valor original
     var val = el.value.trim();
     if(val) v[f] = val;
-    else if(v[f] !== undefined && el.value === '') delete v[f];
+    else if(el.value === '' && document.activeElement !== el) {
+      // só apaga se o campo existir no editor e estiver explicitamente vazio
+      delete v[f];
+    }
   });
 
   // Paleta selecionada no modal
@@ -1564,7 +1569,7 @@ function salvarEdicaoPagina(){
 
   sbFetch('paginas?slug=eq.'+encodeURIComponent(slug)+'&select=id').then(function(res){
     var idPag = (res && res[0]) ? res[0].id : id;
-    return sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})});
+    return sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente, campos:v})});
   }).then(function(){
     _editingPageV = v;
     btn.disabled=false;
@@ -2064,8 +2069,15 @@ document.getElementById('btn-gerar-pagina').onclick = function() {
               .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
               .replace(/[^a-z0-9]/g,'');
 
+    // Salva campos para uso na publicação
+    _v = v;
+    _v['PALETA'] = _paleta;
+
     // Gera com paleta padrão
     _html = buildPage(v, _paleta);
+    // Injeta meta tag de campos
+    var _metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(_v))+"'>";
+    _html = _html.replace('</head>', _metaTag+'</head>');
 
     // Monta seletor de paletas
     renderPaletaSwatches(v);
@@ -2138,7 +2150,12 @@ function renderPaletaSwatches(v) {
         });
       }
       if(vAtual) {
+        _v['PALETA'] = _paleta;
         _html = buildPage(vAtual, _paleta);
+        // Atualiza meta tag
+        _html = _html.replace(/<meta name=\"page-fields\" content='[^']*'>/, '');
+        var _mt = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(_v))+"'>";
+        _html = _html.replace('</head>', _mt+'</head>');
         document.getElementById('pagina-preview').srcdoc = _html;
       }
     };
@@ -2222,7 +2239,12 @@ document.getElementById('btn-salvar-pagina').onclick=function(){
     var sl = document.getElementById('slug-preview-label');
     if(sl) sl.textContent = slugFinal;
 
-    var payload = {slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:_html};
+    // Remove meta tag antigo se existir (evita duplicação) e insere o atual
+    var htmlFinal = _html.replace(/<meta name=\"page-fields\" content='[^']*'>/, '');
+    _v['PALETA'] = _paleta;
+    var metaAtual = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(_v))+"'>";
+    htmlFinal = htmlFinal.replace('</head>', metaAtual+'</head>');
+    var payload = {slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:htmlFinal, campos:_v};
 
     sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
       if(!res||!res[0]||!res[0].id){ btn.disabled=false; btn.textContent='Publicar Página'; alert('Erro ao publicar.'); return; }
@@ -2745,7 +2767,7 @@ function lotePublicar(){
       var slug = slugBase + '-' + num;
 
       // Insere meta de campos no HTML
-      var meta = "<meta name='page-fields' content='"+encodeURIComponent(JSON.stringify(campos))+"'>";
+      var meta = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(campos))+"'>";
       html = html.replace('</head>', meta+'</head>');
 
       logLine('   Slug: '+slug);
@@ -2756,7 +2778,8 @@ function lotePublicar(){
         nome: nome,
         cliente: nome,
         produto: campos['C2']||'',
-        html: html
+        html: html,
+        campos: campos
       })}).then(function(){
         // Registra cliente
         var senha = gerarSenha();
