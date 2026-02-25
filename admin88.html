@@ -2252,8 +2252,8 @@ document.getElementById('btn-salvar-pagina').onclick=function(){
       var dados = linkPagina;
 
       var buscaExistente = emailCliente
-        ? sbFetch('clientes?select=id,senha&email=eq.'+encodeURIComponent(emailCliente))
-        : sbFetch('clientes?select=id,senha&nome=eq.'+encodeURIComponent(nomeCliente));
+        ? sbFetch('clientes?select=id,senha,dados&email=eq.'+encodeURIComponent(emailCliente))
+        : sbFetch('clientes?select=id,senha,dados&nome=eq.'+encodeURIComponent(nomeCliente));
 
       buscaExistente.then(function(existe){
         var clienteExistente = existe && existe.length > 0;
@@ -2261,7 +2261,12 @@ document.getElementById('btn-salvar-pagina').onclick=function(){
 
         if(clienteExistente){
           senhaFinal = existe[0].senha || '(já cadastrado)';
-          sbFetch('clientes?id=eq.'+existe[0].id, {method:'PATCH', body:JSON.stringify({dados:dados})});
+          // Concatena novo link ao dados existente (não sobrescreve)
+          var dadosAntigos = existe[0].dados || '';
+          var dadosNovos = dadosAntigos
+            ? (dadosAntigos.indexOf(linkPagina) === -1 ? dadosAntigos + '\n' + linkPagina : dadosAntigos)
+            : linkPagina;
+          sbFetch('clientes?id=eq.'+existe[0].id, {method:'PATCH', body:JSON.stringify({dados:dadosNovos})});
         } else {
           senhaFinal = gerarSenha();
           sbFetch('clientes',{method:'POST',body:JSON.stringify({nome:nomeCliente, email:emailCliente||null, whatsapp:wppCliente||null, senha:senhaFinal, dados:dados})});
@@ -2783,10 +2788,12 @@ function lotePublicar(){
         // Registra cliente
         var senha = gerarSenha();
         var dados = 'https://donalab.com.br/p/'+slug;
-        return sbFetch('clientes?email=eq.'+encodeURIComponent(email||'NOEMAIL'+i)+'&select=id').then(function(ex){
-          var clientePayload = {nome:nome, email:email||null, whatsapp:wpp||null, senha:senha, dados:dados};
+        return sbFetch('clientes?email=eq.'+encodeURIComponent(email||'NOEMAIL'+i)+'&select=id,dados').then(function(ex){
+          var _dadosEx = (ex&&ex[0]&&ex[0].dados)||'';
+          var _dadosFinal = _dadosEx ? (_dadosEx.indexOf(dados)===-1 ? _dadosEx+'\n'+dados : _dadosEx) : dados;
+          var clientePayload = {nome:nome, email:email||null, whatsapp:wpp||null, senha:senha, dados:_dadosFinal};
           var req = (ex&&ex[0])
-            ? sbFetch('clientes?id=eq.'+ex[0].id, {method:'PATCH', body:JSON.stringify(clientePayload)})
+            ? sbFetch('clientes?id=eq.'+ex[0].id, {method:'PATCH', body:JSON.stringify({dados:_dadosFinal})})
             : sbFetch('clientes', {method:'POST', body:JSON.stringify(clientePayload)});
           return req.then(function(){
             return {slug:slug, nome:nome, email:email, senha:senha, link:dados, wpp:wpp, ok:true};
