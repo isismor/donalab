@@ -2493,31 +2493,47 @@ function buildPlanoPage(nomeCliente, embedUrl, originalUrl) {
 }
 
 function loadPlanosOuro() {
-  sbFetch('materiais?tipo_categoria=eq.plano-ouro&select=*,clientes:cliente_id(nome)&order=created_at.desc').then(function(data){
-    var el = document.getElementById('lista-plano-ouro');
+  var el = document.getElementById('lista-plano-ouro');
+  el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-dim);font-size:13px">Carregando...</div>';
+
+  sbFetch('materiais?tipo_categoria=eq.plano-ouro&select=*&order=created_at.desc').then(function(data){
     if(!data||!data.length){
       el.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p style="font-size:14px">Nenhum Plano de Ouro publicado ainda.</p></div>';
       return;
     }
-    el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
-      +'<thead><tr style="border-bottom:1px solid rgba(255,255,255,.06)">'
-      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Cliente</th>'
-      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Link</th>'
-      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Data</th>'
-      +'<th style="padding:12px 20px"></th>'
-      +'</tr></thead><tbody>'
-      + data.map(function(m){
-          var dt = new Date(m.created_at).toLocaleDateString('pt-BR');
-          var nomeCl = (m.clientes&&m.clientes.nome) || '—';
-          return '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-            +'<td style="padding:14px 20px;font-size:14px;color:var(--text-primary)">'+escHtml(nomeCl)+'</td>'
-            +'<td style="padding:14px 20px"><a href="'+escHtml(m.url||'')+'" target="_blank" style="font-size:13px;color:var(--gold);text-decoration:none">'+escHtml(m.url||'')+'</a></td>'
-            +'<td style="padding:14px 20px;font-size:13px;color:var(--text-muted)">'+dt+'</td>'
-            +'<td style="padding:14px 20px;text-align:right">'
-            +'<button onclick="deletarPlano('+m.id+',\''+escHtml(m.url||'').replace(/'/g,'\\\'')+'\')" style="background:transparent;border:1px solid rgba(220,60,60,.3);border-radius:8px;padding:6px 12px;color:#f07070;cursor:pointer;font-size:12px;font-family:\'DM Sans\',sans-serif">Remover</button>'
-            +'</td></tr>';
-        }).join('')
-      +'</tbody></table>';
+
+    // Busca nomes dos clientes separado (sem depender de FK)
+    var clienteIds = data.map(function(m){ return m.cliente_id; }).filter(Boolean);
+    var clienteMap = {};
+    var fetchClientes = clienteIds.length
+      ? sbFetch('clientes?id=in.('+clienteIds.join(',')+')'+'&select=id,nome')
+      : Promise.resolve([]);
+
+    fetchClientes.then(function(clientes){
+      (clientes||[]).forEach(function(cl){ clienteMap[cl.id] = cl.nome; });
+
+      el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+        +'<thead><tr style="border-bottom:1px solid rgba(255,255,255,.06)">'
+        +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Cliente</th>'
+        +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Link</th>'
+        +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Data</th>'
+        +'<th style="padding:12px 20px"></th>'
+        +'</tr></thead><tbody>'
+        + data.map(function(m){
+            var dt = new Date(m.created_at).toLocaleDateString('pt-BR');
+            var nomeCl = clienteMap[m.cliente_id] || m.nome || '—';
+            return '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
+              +'<td style="padding:14px 20px;font-size:14px;color:var(--text-primary)">'+escHtml(nomeCl)+'</td>'
+              +'<td style="padding:14px 20px"><a href="'+escHtml(m.url||'')+'" target="_blank" style="font-size:13px;color:var(--gold);text-decoration:none">'+escHtml(m.url||'')+'</a></td>'
+              +'<td style="padding:14px 20px;font-size:13px;color:var(--text-muted)">'+dt+'</td>'
+              +'<td style="padding:14px 20px;text-align:right">'
+              +'<button onclick="deletarPlano('+m.id+',\''+escHtml(m.url||'').replace(/'/g,'\\\'')+'\')" style="background:transparent;border:1px solid rgba(220,60,60,.3);border-radius:8px;padding:6px 12px;color:#f07070;cursor:pointer;font-size:12px;font-family:\'DM Sans\',sans-serif">Remover</button>'
+              +'</td></tr>';
+          }).join('')
+        +'</tbody></table>';
+    });
+  }).catch(function(e){
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:#f07070;font-size:13px">Erro ao carregar: '+e.message+'</div>';
   });
 }
 
