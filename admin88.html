@@ -305,15 +305,47 @@
     <div id="section-plano-ouro" style="display:none">
       <div class="topbar">
         <div class="page-title">Plano de Ouro</div>
-        <button class="btn-gold" onclick="abrirModalMaterial('plano-ouro')">
+        <button class="btn-gold" onclick="abrirModalPlanoOuro()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Adicionar Material
+          Publicar Plano
         </button>
       </div>
       <div id="lista-plano-ouro" class="table-wrap" style="padding:0">
         <div style="padding:60px;text-align:center;color:var(--text-dim)">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <p style="font-size:14px">Nenhum material no Plano de Ouro ainda.</p>
+          <p style="font-size:14px">Nenhum Plano de Ouro publicado ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PLANO DE OURO -->
+    <div id="modal-plano-ouro" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;">
+      <div style="background:var(--surface);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:36px;width:100%;max-width:500px;margin:24px;">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;">Publicar Plano de Ouro</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:28px;">Cole o link do Google Docs e escolha o cliente. O plano será publicado em /p/plano-nome.</div>
+
+        <div class="form-group">
+          <label class="form-label">Cliente</label>
+          <select class="form-input" id="plano-cliente-select"><option value="">Selecione o cliente...</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link do Google Docs</label>
+          <input class="form-input" id="plano-gdocs-url" placeholder="https://docs.google.com/document/d/...">
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">O documento precisa estar com acesso público ("qualquer pessoa com o link pode ver").</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Slug (gerado automaticamente)</label>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:13px;color:var(--text-muted);white-space:nowrap">/p/plano-</span>
+            <input class="form-input" id="plano-slug-custom" placeholder="nome-da-cliente" style="flex:1">
+          </div>
+        </div>
+
+        <div id="plano-ouro-erro" style="display:none;background:rgba(220,60,60,.12);border:1px solid rgba(220,60,60,.25);border-radius:10px;padding:12px 16px;font-size:13px;color:#f07070;margin-bottom:16px"></div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button class="btn-gold" id="btn-publicar-plano" style="flex:1">Publicar</button>
+          <button onclick="fecharModalPlanoOuro()" style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:100px;padding:12px;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;">Cancelar</button>
         </div>
       </div>
     </div>
@@ -1211,7 +1243,11 @@ function showMateriais(categoria) {
   document.getElementById('nav-materiais').classList.add('active');
   var navEl = document.getElementById('nav-'+categoria);
   if (navEl) navEl.classList.add('active');
-  carregarMateriais(categoria);
+  if(categoria === 'plano-ouro'){
+    loadPlanosOuro();
+  } else {
+    carregarMateriais(categoria);
+  }
 }
 
 function toggleFluxos() {
@@ -2330,6 +2366,170 @@ function carregarMateriais(categoria) {
         + '<th style="padding:12px 20px"></th>'
         + '</tr></thead><tbody>' + rows + '</tbody></table>';
     });
+}
+
+// ── PLANO DE OURO ──
+function abrirModalPlanoOuro() {
+  // Preenche select de clientes
+  var sel = document.getElementById('plano-cliente-select');
+  sel.innerHTML = '<option value="">Selecione o cliente...</option>';
+  sbFetch('clientes?select=id,nome&order=nome.asc').then(function(clientes){
+    (clientes||[]).forEach(function(cl){
+      var opt = document.createElement('option');
+      opt.value = cl.id;
+      opt.textContent = cl.nome;
+      opt.setAttribute('data-nome', cl.nome);
+      sel.appendChild(opt);
+    });
+  });
+  // Auto-preenche slug ao escolher cliente
+  sel.onchange = function(){
+    var opt = sel.options[sel.selectedIndex];
+    var nome = opt.getAttribute('data-nome') || '';
+    var slug = nome.split(' ')[0].toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+    document.getElementById('plano-slug-custom').value = slug;
+  };
+  document.getElementById('plano-gdocs-url').value = '';
+  document.getElementById('plano-slug-custom').value = '';
+  document.getElementById('plano-ouro-erro').style.display = 'none';
+  var m = document.getElementById('modal-plano-ouro');
+  m.style.display = 'flex';
+}
+
+function fecharModalPlanoOuro() {
+  document.getElementById('modal-plano-ouro').style.display = 'none';
+}
+
+document.getElementById('btn-publicar-plano').onclick = function() {
+  var btn = this;
+  var clienteId  = document.getElementById('plano-cliente-select').value;
+  var gdocsUrl   = document.getElementById('plano-gdocs-url').value.trim();
+  var slugCustom = document.getElementById('plano-slug-custom').value.trim()
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9-]/g,'');
+  var erroEl = document.getElementById('plano-ouro-erro');
+
+  erroEl.style.display = 'none';
+
+  if(!clienteId){ erroEl.textContent='Selecione um cliente.'; erroEl.style.display='block'; return; }
+  if(!gdocsUrl){ erroEl.textContent='Cole o link do Google Docs.'; erroEl.style.display='block'; return; }
+  if(!slugCustom){ erroEl.textContent='Informe o slug (nome da cliente).'; erroEl.style.display='block'; return; }
+
+  // Transforma link de edição em link de visualização pública
+  var embedUrl = gdocsUrl
+    .replace('/edit', '/preview')
+    .replace('/pub', '/preview');
+  // Se for link /d/ID/edit → /d/ID/preview
+  if(!/preview/.test(embedUrl)) embedUrl = embedUrl.replace(/\/(edit|view).*$/, '/preview');
+
+  var slug = 'plano-' + slugCustom;
+  var clienteNome = document.getElementById('plano-cliente-select').options[document.getElementById('plano-cliente-select').selectedIndex].getAttribute('data-nome');
+
+  btn.disabled = true; btn.textContent = 'Publicando...';
+
+  // Verifica se slug já existe
+  sbFetch('paginas?slug=eq.'+slug+'&select=id').then(function(existe){
+    if(existe && existe.length > 0){
+      erroEl.textContent = 'Já existe uma página com o slug /p/'+slug+'. Mude o slug.';
+      erroEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Publicar';
+      return;
+    }
+
+    // Monta HTML da página — iframe do Google Docs + cabeçalho
+    var html = buildPlanoPage(clienteNome, embedUrl, gdocsUrl);
+
+    sbFetch('paginas', {method:'POST', body:JSON.stringify({
+      slug: slug,
+      nome: 'Plano de Ouro — ' + clienteNome,
+      cliente: clienteNome,
+      produto: 'Plano de Ouro',
+      html: html
+    })}).then(function(res){
+      if(!res||!res[0]){ throw new Error('Erro ao salvar no banco.'); }
+
+      // Salva também em materiais para listar na área do cliente
+      return sbFetch('materiais', {method:'POST', body:JSON.stringify({
+        nome: 'Plano de Ouro',
+        tipo: 'Plano',
+        url: 'https://donalab.com.br/p/'+slug,
+        tipo_categoria: 'plano-ouro',
+        cliente_id: clienteId
+      })});
+    }).then(function(){
+      btn.disabled = false; btn.textContent = 'Publicar';
+      fecharModalPlanoOuro();
+      loadMateriais('plano-ouro');
+      alert('Plano publicado!\nhttps://donalab.com.br/p/'+slug);
+    }).catch(function(e){
+      erroEl.textContent = 'Erro: ' + (e.message||'tente novamente');
+      erroEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Publicar';
+    });
+  });
+};
+
+function buildPlanoPage(nomeCliente, embedUrl, originalUrl) {
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plano de Ouro \u2014 '+nomeCliente+'</title>'
+    +'<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">'
+    +'<style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:\'DM Sans\',sans-serif;background:#fafafa;display:flex;flex-direction:column;height:100vh;overflow:hidden}'
+    +'.header{background:#fff;border-bottom:1px solid rgba(0,0,0,.08);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 12px rgba(0,0,0,.05)}'
+    +'.header-nome{font-family:\'Playfair Display\',serif;font-size:16px;font-weight:700;color:#0a0a0a}'
+    +'.header-sub{font-size:11px;color:#888;letter-spacing:.05em}'
+    +'.header-badge{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;background:#111;color:#fff;padding:5px 14px;border-radius:100px}'
+    +'.header-open{font-size:11px;color:#C9A84C;text-decoration:none;border:1px solid rgba(201,168,76,.4);padding:5px 14px;border-radius:100px;font-weight:600;white-space:nowrap}'
+    +'.doc-frame{flex:1;width:100%;border:none;display:block}'
+    +'</style></head><body>'
+    +'<div class="header">'
+    +'<div><div class="header-nome">'+nomeCliente+'</div><div class="header-sub">Plano estratégico personalizado \u00b7 Dona Lab</div></div>'
+    +'<div style="display:flex;align-items:center;gap:12px">'
+    +'<a class="header-open" href="'+originalUrl+'" target="_blank">Abrir no Google Docs</a>'
+    +'<div class="header-badge">Plano de Ouro</div>'
+    +'</div></div>'
+    +'<iframe class="doc-frame" src="'+embedUrl+'" allowfullscreen></iframe>'
+    +'</body></html>';
+}
+
+function loadPlanosOuro() {
+  sbFetch('materiais?tipo_categoria=eq.plano-ouro&select=*,clientes:cliente_id(nome)&order=created_at.desc').then(function(data){
+    var el = document.getElementById('lista-plano-ouro');
+    if(!data||!data.length){
+      el.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-dim)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;margin-bottom:16px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><p style="font-size:14px">Nenhum Plano de Ouro publicado ainda.</p></div>';
+      return;
+    }
+    el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+      +'<thead><tr style="border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Cliente</th>'
+      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Link</th>'
+      +'<th style="padding:12px 20px;text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600">Data</th>'
+      +'<th style="padding:12px 20px"></th>'
+      +'</tr></thead><tbody>'
+      + data.map(function(m){
+          var dt = new Date(m.created_at).toLocaleDateString('pt-BR');
+          var nomeCl = (m.clientes&&m.clientes.nome) || '—';
+          return '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
+            +'<td style="padding:14px 20px;font-size:14px;color:var(--text-primary)">'+escHtml(nomeCl)+'</td>'
+            +'<td style="padding:14px 20px"><a href="'+escHtml(m.url||'')+'" target="_blank" style="font-size:13px;color:var(--gold);text-decoration:none">'+escHtml(m.url||'')+'</a></td>'
+            +'<td style="padding:14px 20px;font-size:13px;color:var(--text-muted)">'+dt+'</td>'
+            +'<td style="padding:14px 20px;text-align:right">'
+            +'<button onclick="deletarPlano('+m.id+',\''+escHtml(m.url||'').replace(/'/g,'\\\'')+'\')" style="background:transparent;border:1px solid rgba(220,60,60,.3);border-radius:8px;padding:6px 12px;color:#f07070;cursor:pointer;font-size:12px;font-family:\'DM Sans\',sans-serif">Remover</button>'
+            +'</td></tr>';
+        }).join('')
+      +'</tbody></table>';
+  });
+}
+
+function deletarPlano(id, url) {
+  if(!confirm('Remover este plano da lista?')) return;
+  // Remove material
+  sbFetch('materiais?id=eq.'+id, {method:'DELETE'}).then(function(){
+    // Remove página do banco pelo URL
+    var slug = (url||'').replace('https://donalab.com.br/p/','');
+    if(slug) sbFetch('paginas?slug=eq.'+encodeURIComponent(slug), {method:'DELETE'});
+    loadPlanosOuro();
+  });
 }
 
 function abrirModalMaterial(categoria) {
