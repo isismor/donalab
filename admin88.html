@@ -1569,7 +1569,7 @@ function salvarEdicaoPagina(){
 
   sbFetch('paginas?slug=eq.'+encodeURIComponent(slug)+'&select=id').then(function(res){
     var idPag = (res && res[0]) ? res[0].id : id;
-    return sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente, campos:v})});
+    return sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})});
   }).then(function(){
     _editingPageV = v;
     btn.disabled=false;
@@ -2244,7 +2244,7 @@ document.getElementById('btn-salvar-pagina').onclick=function(){
     _v['PALETA'] = _paleta;
     var metaAtual = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(_v))+"'>";
     htmlFinal = htmlFinal.replace('</head>', metaAtual+'</head>');
-    var payload = {slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:htmlFinal, campos:_v};
+    var payload = {slug:slugFinal, nome:nomeCliente, cliente:nomeCliente, produto:_produto, html:htmlFinal};
 
     sbFetch('paginas',{method:'POST',body:JSON.stringify(payload)}).then(function(res){
       if(!res||!res[0]||!res[0].id){ btn.disabled=false; btn.textContent='Publicar Página'; alert('Erro ao publicar.'); return; }
@@ -2778,8 +2778,7 @@ function lotePublicar(){
         nome: nome,
         cliente: nome,
         produto: campos['C2']||'',
-        html: html,
-        campos: campos
+        html: html
       })}).then(function(){
         // Registra cliente
         var senha = gerarSenha();

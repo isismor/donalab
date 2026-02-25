@@ -444,7 +444,7 @@ function loadPaginas(){
   document.getElementById('paginas-empty').style.display='none';
 
   // Carrega metadados sem html (evita payload enorme)
-  sbFetch('paginas?cliente=eq.'+encodeURIComponent(_cliente.nome)+'&select=id,slug,nome,produto,created_at,cliente,campos&order=created_at.asc')
+  sbFetch('paginas?cliente=eq.'+encodeURIComponent(_cliente.nome)+'&select=id,slug,nome,produto,created_at,cliente&order=created_at.asc')
     .then(function(data){
       document.getElementById('paginas-loading').style.display='none';
       if(!data||!data.length){ document.getElementById('paginas-empty').style.display='block'; return; }
@@ -558,18 +558,40 @@ function abrirEditor(base, grupo){
   var pRef = grupo.dark || grupo.solo || grupo.clean;
   if(!pRef){ alert('Página não encontrada.'); return; }
 
-  // Se temos campos em memória (coluna campos), usa direto — sem fetch
-  if(pRef.campos){
-    try{ _editingV = typeof pRef.campos === 'string' ? JSON.parse(pRef.campos) : pRef.campos; }
-    catch(e){ _editingV = {}; }
-  } else {
-    _editingV = {};
+  // Tenta recuperar campos salvos no sessionStorage (cache local)
+  _editingV = {};
+  var cacheKey = 'campos_' + pRef.id;
+  var cached = sessionStorage.getItem(cacheKey);
+  if(cached){
+    try{ _editingV = JSON.parse(cached); }catch(e){}
   }
 
   _preencherEditor(pRef);
 }
 
 function _preencherEditor(pRef){
+  // Se não tem campos em cache, tenta buscar html do banco como fallback
+  if(!_editingV || Object.keys(_editingV).length === 0){
+    sbFetch('paginas?id=eq.'+pRef.id+'&select=html').then(function(res){
+      var html = res && res[0] && res[0].html ? res[0].html : '';
+      if(html){
+        try{
+          var m = html.match(/<meta name=["']page-fields["'] content='([^']+)'>/);
+          if(m){
+            _editingV = JSON.parse(decodeURIComponent(m[1]));
+            // Salva no cache
+            sessionStorage.setItem('campos_'+pRef.id, JSON.stringify(_editingV));
+          }
+        }catch(e){}
+      }
+      _renderEditorFields(pRef);
+    }).catch(function(){ _renderEditorFields(pRef); });
+    return;
+  }
+  _renderEditorFields(pRef);
+}
+
+function _renderEditorFields(pRef){
   var fields = ['c1','c2','c3','c4','c5','c5b','c6','c7','c8','c9','c10',
     'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
     'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
@@ -772,7 +794,7 @@ document.getElementById('btn-publicar').onclick = function(){
   var idPag = pSave ? pSave.id : null;
   if(!idPag){ btn.disabled=false; btn.textContent='Salvar alterações'; alert('Página não encontrada.'); return; }
 
-  sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente, campos:v})
+  sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})
   }).then(function(){
     btn.disabled=false;
     btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar alterações';
@@ -780,9 +802,11 @@ document.getElementById('btn-publicar').onclick = function(){
     ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },3000);
     // Atualiza _editingV para proximas edicoes partirem dos valores salvos
     _editingV = v;
-    // Atualiza campos em memória no _editingGroup
+    // Salva campos no sessionStorage para próxima abertura
     var pSaveRef = _editingGroup.dark || _editingGroup.solo || _editingGroup.clean;
-    if(pSaveRef) pSaveRef.campos = v;
+    if(pSaveRef){
+      sessionStorage.setItem('campos_' + pSaveRef.id, JSON.stringify(v));
+    }
     document.getElementById('preview-iframe').srcdoc = newHtml;
   }).catch(function(e){
     btn.disabled=false; btn.textContent='Salvar alterações';
