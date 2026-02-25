@@ -225,7 +225,7 @@ a{color:inherit;text-decoration:none;}
     <!-- SIDEBAR -->
     <div class="editor-sidebar">
       <div class="sidebar-tabs">
-        <div class="stab" data-stab="s0">🎨 Paleta</div>
+        <div class="stab" data-stab="s0">Paleta</div>
         <div class="stab active" data-stab="s1">Hero</div>
         <div class="stab" data-stab="s2">Conteúdo</div>
         <div class="stab" data-stab="s3">Oferta</div>
@@ -359,462 +359,6 @@ a{color:inherit;text-decoration:none;}
     </div>
   </div>
 </div>
-
-<script>
-var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
-var SB_KEY = 'sb_publishable_Yi2a2lXgQYH96PYP8ceZOw_dcMFQh9v';
-var _cliente = null;
-var _editingPage = null;
-var _editingV = {};
-var _previewDebounce = null;
-var _pagesData = [];
-var _grupos = {};
-
-function sbFetch(path, opts){
-  return fetch(SB_URL+'/rest/v1/'+path, Object.assign({
-    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
-  }, opts||{})).then(function(r){ return r.json(); });
-}
-
-// ── AUTOLOGIN ──
-(function(){
-  var saved = sessionStorage.getItem('donalab_cliente');
-  if(saved){ try{ _cliente=JSON.parse(saved); initDashboard(); }catch(e){ sessionStorage.removeItem('donalab_cliente'); } }
-})();
-
-// ── LOGIN ──
-document.getElementById('btn-login').onclick = function(){
-  var email = document.getElementById('login-email').value.trim().toLowerCase();
-  var senha = document.getElementById('login-senha').value.trim();
-  var err   = document.getElementById('login-err');
-  err.style.display = 'none';
-  if(!email||!senha){ err.textContent='Preencha e-mail e senha.'; err.style.display='block'; return; }
-  sbFetch('clientes?email=eq.'+encodeURIComponent(email)+'&senha=eq.'+encodeURIComponent(senha)+'&select=*')
-    .then(function(data){
-      if(!data||!data.length){ err.textContent='E-mail ou senha incorretos.'; err.style.display='block'; return; }
-      _cliente = data[0];
-      sessionStorage.setItem('donalab_cliente', JSON.stringify(_cliente));
-      initDashboard();
-    });
-};
-document.getElementById('login-email').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
-document.getElementById('login-senha').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
-
-// ── LOGOUT ──
-document.getElementById('btn-logout').onclick = function(){
-  sessionStorage.removeItem('donalab_cliente');
-  _cliente = null;
-  document.getElementById('screen-dashboard').style.display = 'none';
-  document.getElementById('screen-login').style.display = 'flex';
-};
-
-// ── TABS ──
-document.querySelectorAll('.tab').forEach(function(tab){
-  tab.addEventListener('click', function(){
-    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
-    tab.classList.add('active');
-    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
-  });
-});
-
-document.querySelectorAll('.stab').forEach(function(tab){
-  tab.addEventListener('click', function(){
-    document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
-    document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
-    tab.classList.add('active');
-    document.getElementById('spanel-'+tab.dataset.stab).classList.add('active');
-  });
-});
-
-// ── INIT DASHBOARD ──
-function initDashboard(){
-  document.getElementById('screen-login').style.display='none';
-  document.getElementById('screen-dashboard').style.display='block';
-  document.getElementById('header-name').textContent = _cliente.nome;
-  loadPaginas();
-  loadMateriais();
-  loadConfig();
-}
-
-// ── PÁGINAS ──
-function loadPaginas(){
-  document.getElementById('paginas-loading').style.display='flex';
-  document.getElementById('pages-grid').style.display='none';
-  document.getElementById('paginas-empty').style.display='none';
-
-  // Carrega metadados sem html (evita payload enorme)
-  sbFetch('paginas?cliente=eq.'+encodeURIComponent(_cliente.nome)+'&select=id,slug,nome,produto,created_at,cliente&order=created_at.asc')
-    .then(function(data){
-      document.getElementById('paginas-loading').style.display='none';
-      if(!data||!data.length){ document.getElementById('paginas-empty').style.display='block'; return; }
-
-      _pagesData = data;
-
-      // Agrupa por par dark/clean (mesmo base slug)
-      var grupos = {};
-      data.forEach(function(p){
-        var base = (p.slug||'').replace(/-dark$/,'').replace(/-clean$/,'');
-        if(!grupos[base]) grupos[base] = {};
-        if((p.slug||'').endsWith('-dark'))  grupos[base].dark = p;
-        else if((p.slug||'').endsWith('-clean')) grupos[base].clean = p;
-        else grupos[base].solo = p;
-      });
-      _grupos = grupos;
-
-      var grid = document.getElementById('pages-grid');
-      grid.innerHTML = '';
-      Object.keys(grupos).forEach(function(base){
-        var g = grupos[base];
-        var pRef = g.dark || g.solo || g.clean;
-        var dt = new Date(pRef.created_at).toLocaleDateString('pt-BR');
-        var nome = (pRef.nome||'').replace(/ — Dark| — Clean/,'') || pRef.produto || 'Página';
-
-        var card = document.createElement('div');
-        card.className = 'page-card';
-        card.innerHTML =
-          '<div class="page-thumb"><a href="https://donalab.com.br/p/'+(g.dark?g.dark.slug:g.solo?g.solo.slug:g.clean.slug)+'" target="_blank" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:var(--gold);font-size:11px;letter-spacing:.08em;text-transform:uppercase;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Ver página</a></div>'
-          +'<div class="page-info">'
-          +'<div style="margin-bottom:8px">'
-          +(g.dark  ? '<span class="page-badge badge-dark">A — Dark</span> ' : '')
-          +(g.clean ? '<span class="page-badge badge-clean">B — Clean</span>' : '')
-          +'</div>'
-          +'<div class="page-name">'+escHtml(nome)+'</div>'
-          +'<div class="page-meta">Criada em '+dt+'</div>'
-          +'<div class="page-actions">'
-          +'<button class="btn-sm btn-gold-sm btn-editar" data-base="'+base+'">✏️ Editar</button>'
-          +(g.dark  ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.dark.slug+'" target="_blank">🌑 Dark</a>' : '')
-          +(g.clean ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.clean.slug+'" target="_blank">☀️ Clean</a>' : '')
-          +'</div>'
-          +'</div>';
-        grid.appendChild(card);
-
-        card.querySelector('.btn-editar').addEventListener('click', function(){
-          abrirEditor(base, g);
-        });
-      });
-      grid.style.display='grid';
-    });
-}
-
-function encodeHtml(h){ return h.replace(/"/g,'&quot;'); }
-function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ── MATERIAIS ──
-function loadMateriais(){
-  document.getElementById('materiais-loading').style.display='flex';
-  sbFetch('materiais?cliente_id=eq.'+_cliente.id+'&select=*')
-    .then(function(data){
-      document.getElementById('materiais-loading').style.display='none';
-      if(!data||!Array.isArray(data)||!data.length){ document.getElementById('materiais-empty').style.display='block'; return; }
-      var grid = document.getElementById('materiais-grid');
-      grid.innerHTML='';
-      data.forEach(function(m){
-        grid.innerHTML+='<div class="material-card"><div class="material-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>'
-          +'<div class="material-nome">'+escHtml(m.nome||'')+'</div>'
-          +'<div class="material-tipo">'+escHtml(m.tipo||'Material')+'</div>'
-          +(m.url ? '<a class="material-link" href="'+m.url+'" target="_blank">Acessar →</a>' : '')
-          +'</div>';
-      });
-      grid.style.display='grid';
-    });
-}
-
-// ── CONFIG ──
-function loadConfig(){
-  if(_cliente.dominio) document.getElementById('config-dominio').value = _cliente.dominio;
-  if(_cliente.pixel)   document.getElementById('config-pixel').value   = _cliente.pixel;
-}
-document.getElementById('btn-salvar-dominio').onclick = function(){
-  var val = document.getElementById('config-dominio').value.trim();
-  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({dominio:val})})
-    .then(function(){ _cliente.dominio=val; showMsg('msg-dominio'); });
-};
-document.getElementById('btn-salvar-pixel').onclick = function(){
-  var val = document.getElementById('config-pixel').value.trim();
-  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({pixel:val})})
-    .then(function(){ _cliente.pixel=val; showMsg('msg-pixel'); });
-};
-document.getElementById('btn-salvar-senha').onclick = function(){
-  var nova  = document.getElementById('config-senha-nova').value.trim();
-  var conf  = document.getElementById('config-senha-conf').value.trim();
-  if(nova.length<6){ alert('Mínimo 6 caracteres.'); return; }
-  if(nova!==conf){ alert('As senhas não coincidem.'); return; }
-  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({senha:nova})})
-    .then(function(){ showMsg('msg-senha'); document.getElementById('config-senha-nova').value=''; document.getElementById('config-senha-conf').value=''; });
-};
-function showMsg(id){ var el=document.getElementById(id); el.style.display='block'; setTimeout(function(){ el.style.display='none'; },3000); }
-
-// ─────────────────────────────────────────
-// EDITOR
-// ─────────────────────────────────────────
-var _editingBase  = '';
-var _editingGroup = {};
-
-function abrirEditor(base, grupo){
-  _editingBase  = base;
-  _editingGroup = grupo;
-
-  var pRef = grupo.dark || grupo.solo || grupo.clean;
-  if(!pRef){ alert('Página não encontrada.'); return; }
-
-  // Tenta recuperar campos salvos no sessionStorage (cache local)
-  _editingV = {};
-  var cacheKey = 'campos_' + pRef.id;
-  var cached = sessionStorage.getItem(cacheKey);
-  if(cached){
-    try{ _editingV = JSON.parse(cached); }catch(e){}
-  }
-
-  _preencherEditor(pRef);
-}
-
-function _preencherEditor(pRef){
-  // Se não tem campos em cache, tenta buscar html do banco como fallback
-  if(!_editingV || Object.keys(_editingV).length === 0){
-    sbFetch('paginas?id=eq.'+pRef.id+'&select=html').then(function(res){
-      var html = res && res[0] && res[0].html ? res[0].html : '';
-      if(html){
-        try{
-          var m = html.match(/<meta name=["']page-fields["'] content='([^']+)'>/);
-          if(m){
-            _editingV = JSON.parse(decodeURIComponent(m[1]));
-            // Salva no cache
-            sessionStorage.setItem('campos_'+pRef.id, JSON.stringify(_editingV));
-          }
-        }catch(e){}
-      }
-      _renderEditorFields(pRef);
-    }).catch(function(){ _renderEditorFields(pRef); });
-    return;
-  }
-  _renderEditorFields(pRef);
-}
-
-function _renderEditorFields(pRef){
-  var fields = ['c1','c2','c3','c4','c5','c5b','c6','c7','c8','c9','c10',
-    'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
-    'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
-    'c32','c33','c34','c35','c36','c37','c38','c38b',
-    'c39','c40','c41','c42',
-    'c43','c44','c45','c46','c47','c48','c49','c50','c51','c52','c53','c54',
-    'c55','c56'];
-  fields.forEach(function(f){
-    var el = document.getElementById('ce-'+f);
-    if(el) el.value = _editingV[f.toUpperCase()] || _editingV[f] || '';
-  });
-
-  ['c4','c41'].forEach(function(k){
-    var url = _editingV[k.toUpperCase()] || _editingV[k] || '';
-    var prev = document.getElementById('prev-ce-'+k);
-    if(prev){
-      if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
-      else { prev.style.display='none'; }
-    }
-  });
-
-  var nomeReal = (_editingV['C1']||pRef.nome||'Página').replace(/ — Dark| — Clean/,'');
-  document.getElementById('editor-page-nome').textContent = nomeReal;
-
-  var paletaAtual = _editingV['PALETA'] || 'noir-dourado';
-  renderCeSwatches(paletaAtual);
-
-  // Preview: reconstrói com buildPage (não depende do html do banco)
-  var vPreview = Object.assign({}, _editingV);
-  vPreview['PALETA'] = paletaAtual;
-  document.getElementById('preview-iframe').srcdoc = buildPage(vPreview, paletaAtual);
-
-  // Vai para aba Paleta
-  document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
-  var s0 = document.querySelector('.stab[data-stab="s0"]'); if(s0) s0.classList.add('active');
-  var sp0 = document.getElementById('spanel-s0'); if(sp0) sp0.classList.add('active');
-
-  document.getElementById('editor-modal').classList.add('open');
-}
-
-function renderCeSwatches(paletaAtual){
-  paletaAtual = paletaAtual || 'noir-dourado';
-  document.getElementById('ce-paleta-sel').value = paletaAtual;
-  var container = document.getElementById('ce-paleta-swatches');
-  if(!container) return;
-  container.innerHTML = '';
-  PALETAS.forEach(function(pal){
-    var selecionada = pal.id === paletaAtual;
-
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0';
-    wrap.title = pal.nome;
-
-    var swatch = document.createElement('div');
-    swatch.setAttribute('data-pal', pal.id);
-    swatch.style.cssText = 'width:42px;height:42px;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;' +
-      'border:2px solid '+(selecionada?'var(--gold)':'transparent')+';transition:border-color .15s;flex-shrink:0';
-    pal.preview.forEach(function(cor){
-      var bar = document.createElement('div');
-      bar.style.cssText = 'flex:1;background:'+cor;
-      swatch.appendChild(bar);
-    });
-
-    var lbl = document.createElement('div');
-    lbl.setAttribute('data-pal', pal.id);
-    lbl.style.cssText = 'font-size:9px;text-align:center;letter-spacing:.03em;max-width:46px;line-height:1.2;' +
-      'color:'+(selecionada?'var(--gold)':'var(--muted)');
-    lbl.textContent = pal.nome;
-
-    wrap.onclick = function(){
-      // Reseta todos
-      container.querySelectorAll('[data-pal]').forEach(function(el){
-        if(el.tagName === 'DIV' && el.style.border !== undefined && el.children.length >= 3){
-          el.style.borderColor = 'transparent';
-        } else {
-          el.style.color = 'var(--muted)';
-        }
-      });
-      // Marca selecionado
-      swatch.style.borderColor = 'var(--gold)';
-      lbl.style.color = 'var(--gold)';
-      document.getElementById('ce-paleta-sel').value = pal.id;
-      _editingV['PALETA'] = pal.id;
-      // Atualiza preview
-      var v = coletarCampos();
-      v['PALETA'] = pal.id;
-      document.getElementById('preview-iframe').srcdoc = buildPage(v, pal.id);
-    };
-
-    wrap.appendChild(swatch);
-    wrap.appendChild(lbl);
-    container.appendChild(wrap);
-  });
-}
-
-
-document.querySelectorAll('.finput').forEach(function(el){
-  el.addEventListener('input', function(){
-    clearTimeout(_previewDebounce);
-    _previewDebounce = setTimeout(function(){ atualizarPreviewAoVivo(); }, 800);
-  });
-});
-
-function atualizarPreviewAoVivo(){
-  var v = coletarCampos();
-  if(Object.keys(v).length < 3) return;
-  var paletaSel = document.getElementById('ce-paleta-sel');
-  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
-  v['PALETA'] = paletaId;
-  document.getElementById('preview-iframe').srcdoc = buildPage(v, paletaId);
-}
-
-function coletarCampos(){
-  var fields = ['C1','C2','C3','C4','C5','C5B','C6','C7','C8','C9','C10',
-    'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
-    'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
-    'C32','C33','C34','C35','C36','C37','C38','C38B',
-    'C39','C40','C41','C42',
-    'C43','C44','C45','C46','C47','C48','C49','C50','C51','C52','C53','C54',
-    'C55','C56'];
-
-  // Base: campos carregados do meta tag (pagina existente)
-  var v = Object.assign({}, _editingV);
-
-  // Sobrescreve com o que esta no formulario
-  fields.forEach(function(f){
-    var el = document.getElementById('ce-'+f.toLowerCase());
-    if(!el) return; // sem input para este campo — mantém valor original
-    var val = el.value.trim();
-    if(val) v[f] = val;
-    else if(el.value === '' && document.activeElement !== el) {
-      // só apaga se o campo existir no editor e estiver explicitamente vazio
-      delete v[f];
-    }
-  });
-  return v;
-}
-
-// ── HELPERS IMAGEM ──
-function ceUploadImg(input, fieldId, prevId){
-  var file = input.files[0]; if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    document.getElementById(fieldId).value = e.target.result;
-    var prev = document.getElementById(prevId);
-    prev.querySelector('img').src = e.target.result;
-    prev.style.display = 'block';
-    atualizarPreviewAoVivo();
-  };
-  reader.readAsDataURL(file);
-}
-function cePrevImg(fieldId, prevId){
-  var url = document.getElementById(fieldId).value.trim();
-  var prev = document.getElementById(prevId);
-  if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
-  else { prev.style.display='none'; }
-}
-function ceClearImg(fieldId, prevId){
-  document.getElementById(fieldId).value='';
-  var prev = document.getElementById(prevId);
-  prev.querySelector('img').src=''; prev.style.display='none';
-}
-
-// ── FECHAR EDITOR ──
-document.getElementById('btn-fechar-editor').onclick = function(){
-  document.getElementById('editor-modal').classList.remove('open');
-};
-
-// ── SALVAR ──
-document.getElementById('btn-publicar').onclick = function(){
-  var btn = this;
-  btn.disabled=true; btn.textContent='Salvando...';
-
-  var v = coletarCampos();
-
-  // Paleta selecionada
-  var paletaSel = document.getElementById('ce-paleta-sel');
-  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
-  v['PALETA']   = paletaId;
-
-  // Reconstrói com a paleta escolhida
-  var newHtml = buildPage(v, paletaId);
-
-  // Injeta meta tag com campos
-  var metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(v))+"'>";
-  newHtml = newHtml.replace('</head>', metaTag+'</head>');
-
-  // Injeta pixel se existir
-  if(_cliente.pixel && _cliente.pixel.trim()){
-    newHtml = newHtml.replace('</head>', _cliente.pixel+'\n</head>');
-  }
-
-  var nomeCliente = v['C1'] || '';
-  // Slug: tenta sem sufixos -dark/-clean
-  var slugBase = _editingBase.replace(/-dark$/, '').replace(/-clean$/, '');
-
-  // Usa id direto do grupo (sem busca extra)
-  var pSave = _editingGroup.dark || _editingGroup.solo || _editingGroup.clean;
-  var idPag = pSave ? pSave.id : null;
-  if(!idPag){ btn.disabled=false; btn.textContent='Salvar alterações'; alert('Página não encontrada.'); return; }
-
-  sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})
-  }).then(function(){
-    btn.disabled=false;
-    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar alterações';
-    var ok = document.getElementById('save-ok');
-    ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },3000);
-    // Atualiza _editingV para proximas edicoes partirem dos valores salvos
-    _editingV = v;
-    // Salva campos no sessionStorage para próxima abertura
-    var pSaveRef = _editingGroup.dark || _editingGroup.solo || _editingGroup.clean;
-    if(pSaveRef){
-      sessionStorage.setItem('campos_' + pSaveRef.id, JSON.stringify(v));
-    }
-    document.getElementById('preview-iframe').srcdoc = newHtml;
-  }).catch(function(e){
-    btn.disabled=false; btn.textContent='Salvar alterações';
-    alert('Erro ao salvar: '+e.message);
-  });
-};
-
-</script>
 
 <!-- buildPage e buildPageClean injetados do dashboard -->
 <script>
@@ -1056,5 +600,465 @@ ${faqHtml}
 </body></html>`;
 }
 
+</script>
+
+<script>
+var SB_URL = 'https://qojhspjqaodododgcuud.supabase.co';
+var SB_KEY = 'sb_publishable_Yi2a2lXgQYH96PYP8ceZOw_dcMFQh9v';
+var _cliente = null;
+var _editingPage = null;
+var _editingV = {};
+var _previewDebounce = null;
+var _pagesData = [];
+var _grupos = {};
+
+function sbFetch(path, opts){
+  return fetch(SB_URL+'/rest/v1/'+path, Object.assign({
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=representation'}
+  }, opts||{})).then(function(r){ return r.json(); });
+}
+
+// ── AUTOLOGIN ──
+(function(){
+  var saved = sessionStorage.getItem('donalab_cliente');
+  if(saved){ try{ _cliente=JSON.parse(saved); initDashboard(); }catch(e){ sessionStorage.removeItem('donalab_cliente'); } }
+})();
+
+// ── LOGIN ──
+document.getElementById('btn-login').onclick = function(){
+  var email = document.getElementById('login-email').value.trim().toLowerCase();
+  var senha = document.getElementById('login-senha').value.trim();
+  var err   = document.getElementById('login-err');
+  err.style.display = 'none';
+  if(!email||!senha){ err.textContent='Preencha e-mail e senha.'; err.style.display='block'; return; }
+  sbFetch('clientes?email=eq.'+encodeURIComponent(email)+'&senha=eq.'+encodeURIComponent(senha)+'&select=*')
+    .then(function(data){
+      if(!data||!data.length){ err.textContent='E-mail ou senha incorretos.'; err.style.display='block'; return; }
+      _cliente = data[0];
+      sessionStorage.setItem('donalab_cliente', JSON.stringify(_cliente));
+      initDashboard();
+    });
+};
+document.getElementById('login-email').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
+document.getElementById('login-senha').onkeydown = function(e){ if(e.key==='Enter') document.getElementById('btn-login').click(); };
+
+// ── LOGOUT ──
+document.getElementById('btn-logout').onclick = function(){
+  sessionStorage.removeItem('donalab_cliente');
+  _cliente = null;
+  document.getElementById('screen-dashboard').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'flex';
+};
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.stab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('spanel-'+tab.dataset.stab).classList.add('active');
+  });
+});
+
+// ── INIT DASHBOARD ──
+function initDashboard(){
+  document.getElementById('screen-login').style.display='none';
+  document.getElementById('screen-dashboard').style.display='block';
+  document.getElementById('header-name').textContent = _cliente.nome;
+  loadPaginas();
+  loadMateriais();
+  loadConfig();
+}
+
+// ── PÁGINAS ──
+function loadPaginas(){
+  document.getElementById('paginas-loading').style.display='flex';
+  document.getElementById('pages-grid').style.display='none';
+  document.getElementById('paginas-empty').style.display='none';
+
+  // Carrega metadados sem html (evita payload enorme)
+  sbFetch('paginas?cliente=eq.'+encodeURIComponent(_cliente.nome)+'&select=id,slug,nome,produto,created_at,cliente&order=created_at.asc')
+    .then(function(data){
+      document.getElementById('paginas-loading').style.display='none';
+      if(!data||!data.length){ document.getElementById('paginas-empty').style.display='block'; return; }
+
+      _pagesData = data;
+
+      // Agrupa por par dark/clean (mesmo base slug)
+      var grupos = {};
+      data.forEach(function(p){
+        var base = (p.slug||'').replace(/-dark$/,'').replace(/-clean$/,'');
+        if(!grupos[base]) grupos[base] = {};
+        if((p.slug||'').endsWith('-dark'))  grupos[base].dark = p;
+        else if((p.slug||'').endsWith('-clean')) grupos[base].clean = p;
+        else grupos[base].solo = p;
+      });
+      _grupos = grupos;
+
+      var grid = document.getElementById('pages-grid');
+      grid.innerHTML = '';
+      Object.keys(grupos).forEach(function(base){
+        var g = grupos[base];
+        var pRef = g.dark || g.solo || g.clean;
+        var dt = new Date(pRef.created_at).toLocaleDateString('pt-BR');
+        var nome = (pRef.nome||'').replace(/ — Dark| — Clean/,'') || pRef.produto || 'Página';
+
+        var card = document.createElement('div');
+        card.className = 'page-card';
+        card.innerHTML =
+          '<div class="page-thumb"><a href="https://donalab.com.br/p/'+(g.dark?g.dark.slug:g.solo?g.solo.slug:g.clean.slug)+'" target="_blank" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;text-decoration:none;color:var(--gold);font-size:11px;letter-spacing:.08em;text-transform:uppercase;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Ver página</a></div>'
+          +'<div class="page-info">'
+          +'<div style="margin-bottom:8px">'
+          +(g.dark  ? '<span class="page-badge badge-dark">A — Dark</span> ' : '')
+          +(g.clean ? '<span class="page-badge badge-clean">B — Clean</span>' : '')
+          +'</div>'
+          +'<div class="page-name">'+escHtml(nome)+'</div>'
+          +'<div class="page-meta">Criada em '+dt+'</div>'
+          +'<div class="page-actions">'
+          +'<button class="btn-sm btn-gold-sm btn-editar" data-base="'+base+'">Editar</button>'
+          +(g.dark  ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.dark.slug+'" target="_blank">Dark</a>' : '')
+          +(g.clean ? '<a class="btn-sm btn-outline-sm" href="https://donalab.com.br/p/'+g.clean.slug+'" target="_blank">Clean</a>' : '')
+          +'</div>'
+          +'</div>';
+        grid.appendChild(card);
+
+        card.querySelector('.btn-editar').addEventListener('click', function(){
+          abrirEditor(base, g);
+        });
+      });
+      grid.style.display='grid';
+    });
+}
+
+function encodeHtml(h){ return h.replace(/"/g,'&quot;'); }
+function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── MATERIAIS ──
+function loadMateriais(){
+  document.getElementById('materiais-loading').style.display='flex';
+  sbFetch('materiais?cliente_id=eq.'+_cliente.id+'&select=*')
+    .then(function(data){
+      document.getElementById('materiais-loading').style.display='none';
+      if(!data||!Array.isArray(data)||!data.length){ document.getElementById('materiais-empty').style.display='block'; return; }
+      var grid = document.getElementById('materiais-grid');
+      grid.innerHTML='';
+      data.forEach(function(m){
+        grid.innerHTML+='<div class="material-card"><div class="material-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>'
+          +'<div class="material-nome">'+escHtml(m.nome||'')+'</div>'
+          +'<div class="material-tipo">'+escHtml(m.tipo||'Material')+'</div>'
+          +(m.url ? '<a class="material-link" href="'+m.url+'" target="_blank">Acessar →</a>' : '')
+          +'</div>';
+      });
+      grid.style.display='grid';
+    });
+}
+
+// ── CONFIG ──
+function loadConfig(){
+  if(_cliente.dominio) document.getElementById('config-dominio').value = _cliente.dominio;
+  if(_cliente.pixel)   document.getElementById('config-pixel').value   = _cliente.pixel;
+}
+document.getElementById('btn-salvar-dominio').onclick = function(){
+  var val = document.getElementById('config-dominio').value.trim();
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({dominio:val})})
+    .then(function(){ _cliente.dominio=val; showMsg('msg-dominio'); });
+};
+document.getElementById('btn-salvar-pixel').onclick = function(){
+  var val = document.getElementById('config-pixel').value.trim();
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({pixel:val})})
+    .then(function(){ _cliente.pixel=val; showMsg('msg-pixel'); });
+};
+document.getElementById('btn-salvar-senha').onclick = function(){
+  var nova  = document.getElementById('config-senha-nova').value.trim();
+  var conf  = document.getElementById('config-senha-conf').value.trim();
+  if(nova.length<6){ alert('Mínimo 6 caracteres.'); return; }
+  if(nova!==conf){ alert('As senhas não coincidem.'); return; }
+  sbFetch('clientes?id=eq.'+_cliente.id,{method:'PATCH',body:JSON.stringify({senha:nova})})
+    .then(function(){ showMsg('msg-senha'); document.getElementById('config-senha-nova').value=''; document.getElementById('config-senha-conf').value=''; });
+};
+function showMsg(id){ var el=document.getElementById(id); el.style.display='block'; setTimeout(function(){ el.style.display='none'; },3000); }
+
+// ─────────────────────────────────────────
+// EDITOR
+// ─────────────────────────────────────────
+var _editingBase  = '';
+var _editingGroup = {};
+
+function abrirEditor(base, grupo){
+  _editingBase  = base;
+  _editingGroup = grupo;
+
+  var pRef = grupo.dark || grupo.solo || grupo.clean;
+  if(!pRef){ alert('Página não encontrada.'); return; }
+
+  // Tenta recuperar campos salvos no sessionStorage (cache local)
+  _editingV = {};
+  var cacheKey = 'campos_' + pRef.id;
+  var cached = sessionStorage.getItem(cacheKey);
+  if(cached){
+    try{ _editingV = JSON.parse(cached); }catch(e){}
+  }
+
+  _preencherEditor(pRef);
+}
+
+function _preencherEditor(pRef){
+  // Se não tem campos em cache, tenta buscar html do banco como fallback
+  if(!_editingV || Object.keys(_editingV).length === 0){
+    sbFetch('paginas?id=eq.'+pRef.id+'&select=html').then(function(res){
+      var html = res && res[0] && res[0].html ? res[0].html : '';
+      if(html){
+        try{
+          var m = html.match(/<meta name=["']page-fields["'] content='([^']+)'>/);
+          if(m){
+            _editingV = JSON.parse(decodeURIComponent(m[1]));
+            // Salva no cache
+            sessionStorage.setItem('campos_'+pRef.id, JSON.stringify(_editingV));
+          }
+        }catch(e){}
+      }
+      _renderEditorFields(pRef);
+    }).catch(function(){ _renderEditorFields(pRef); });
+    return;
+  }
+  _renderEditorFields(pRef);
+}
+
+function _renderEditorFields(pRef){
+  var fields = ['c1','c2','c3','c4','c5','c5b','c6','c7','c8','c9','c10',
+    'c11','c12','c13','c14','c15','c16','c17','c17b','c18',
+    'c19','c20','c21','c22','c23','c24','c25','c26','c27','c28','c29','c30','c31',
+    'c32','c33','c34','c35','c36','c37','c38','c38b',
+    'c39','c40','c41','c42',
+    'c43','c44','c45','c46','c47','c48','c49','c50','c51','c52','c53','c54',
+    'c55','c56'];
+  fields.forEach(function(f){
+    var el = document.getElementById('ce-'+f);
+    if(el) el.value = _editingV[f.toUpperCase()] || _editingV[f] || '';
+  });
+
+  ['c4','c41'].forEach(function(k){
+    var url = _editingV[k.toUpperCase()] || _editingV[k] || '';
+    var prev = document.getElementById('prev-ce-'+k);
+    if(prev){
+      if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
+      else { prev.style.display='none'; }
+    }
+  });
+
+  var nomeReal = (_editingV['C1']||pRef.nome||'Página').replace(/ — Dark| — Clean/,'');
+  document.getElementById('editor-page-nome').textContent = nomeReal;
+
+  var paletaAtual = _editingV['PALETA'] || 'noir-dourado';
+  renderCeSwatches(paletaAtual);
+
+  // Vai para aba Paleta
+  document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
+  var s0 = document.querySelector('.stab[data-stab="s0"]'); if(s0) s0.classList.add('active');
+  var sp0 = document.getElementById('spanel-s0'); if(sp0) sp0.classList.add('active');
+
+  // Abre modal ANTES do preview (garante abertura mesmo se buildPage falhar)
+  document.getElementById('editor-modal').classList.add('open');
+
+  // Preview com proteção
+  try{
+    var vPreview = Object.assign({}, _editingV);
+    vPreview['PALETA'] = paletaAtual;
+    if(Object.keys(vPreview).length > 1){
+      document.getElementById('preview-iframe').srcdoc = buildPage(vPreview, paletaAtual);
+    }
+  }catch(e){ console.warn('preview error:', e); }
+}
+
+function renderCeSwatches(paletaAtual){
+  paletaAtual = paletaAtual || 'noir-dourado';
+  document.getElementById('ce-paleta-sel').value = paletaAtual;
+  var container = document.getElementById('ce-paleta-swatches');
+  if(!container) return;
+  container.innerHTML = '';
+  PALETAS.forEach(function(pal){
+    var selecionada = pal.id === paletaAtual;
+
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0';
+    wrap.title = pal.nome;
+
+    var swatch = document.createElement('div');
+    swatch.setAttribute('data-pal', pal.id);
+    swatch.style.cssText = 'width:42px;height:42px;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;' +
+      'border:2px solid '+(selecionada?'var(--gold)':'transparent')+';transition:border-color .15s;flex-shrink:0';
+    pal.preview.forEach(function(cor){
+      var bar = document.createElement('div');
+      bar.style.cssText = 'flex:1;background:'+cor;
+      swatch.appendChild(bar);
+    });
+
+    var lbl = document.createElement('div');
+    lbl.setAttribute('data-pal', pal.id);
+    lbl.style.cssText = 'font-size:9px;text-align:center;letter-spacing:.03em;max-width:46px;line-height:1.2;' +
+      'color:'+(selecionada?'var(--gold)':'var(--muted)');
+    lbl.textContent = pal.nome;
+
+    wrap.onclick = function(){
+      // Reseta todos
+      container.querySelectorAll('[data-pal]').forEach(function(el){
+        if(el.tagName === 'DIV' && el.style.border !== undefined && el.children.length >= 3){
+          el.style.borderColor = 'transparent';
+        } else {
+          el.style.color = 'var(--muted)';
+        }
+      });
+      // Marca selecionado
+      swatch.style.borderColor = 'var(--gold)';
+      lbl.style.color = 'var(--gold)';
+      document.getElementById('ce-paleta-sel').value = pal.id;
+      _editingV['PALETA'] = pal.id;
+      // Atualiza preview
+      var v = coletarCampos();
+      v['PALETA'] = pal.id;
+      document.getElementById('preview-iframe').srcdoc = buildPage(v, pal.id);
+    };
+
+    wrap.appendChild(swatch);
+    wrap.appendChild(lbl);
+    container.appendChild(wrap);
+  });
+}
 
 
+document.querySelectorAll('.finput').forEach(function(el){
+  el.addEventListener('input', function(){
+    clearTimeout(_previewDebounce);
+    _previewDebounce = setTimeout(function(){ atualizarPreviewAoVivo(); }, 800);
+  });
+});
+
+function atualizarPreviewAoVivo(){
+  var v = coletarCampos();
+  if(Object.keys(v).length < 3) return;
+  var paletaSel = document.getElementById('ce-paleta-sel');
+  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
+  v['PALETA'] = paletaId;
+  document.getElementById('preview-iframe').srcdoc = buildPage(v, paletaId);
+}
+
+function coletarCampos(){
+  var fields = ['C1','C2','C3','C4','C5','C5B','C6','C7','C8','C9','C10',
+    'C11','C12','C13','C14','C15','C16','C17','C17B','C18',
+    'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
+    'C32','C33','C34','C35','C36','C37','C38','C38B',
+    'C39','C40','C41','C42',
+    'C43','C44','C45','C46','C47','C48','C49','C50','C51','C52','C53','C54',
+    'C55','C56'];
+
+  // Base: campos carregados do meta tag (pagina existente)
+  var v = Object.assign({}, _editingV);
+
+  // Sobrescreve com o que esta no formulario
+  fields.forEach(function(f){
+    var el = document.getElementById('ce-'+f.toLowerCase());
+    if(!el) return; // sem input para este campo — mantém valor original
+    var val = el.value.trim();
+    if(val) v[f] = val;
+    else if(el.value === '' && document.activeElement !== el) {
+      // só apaga se o campo existir no editor e estiver explicitamente vazio
+      delete v[f];
+    }
+  });
+  return v;
+}
+
+// ── HELPERS IMAGEM ──
+function ceUploadImg(input, fieldId, prevId){
+  var file = input.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    document.getElementById(fieldId).value = e.target.result;
+    var prev = document.getElementById(prevId);
+    prev.querySelector('img').src = e.target.result;
+    prev.style.display = 'block';
+    atualizarPreviewAoVivo();
+  };
+  reader.readAsDataURL(file);
+}
+function cePrevImg(fieldId, prevId){
+  var url = document.getElementById(fieldId).value.trim();
+  var prev = document.getElementById(prevId);
+  if(url){ prev.querySelector('img').src=url; prev.style.display='block'; }
+  else { prev.style.display='none'; }
+}
+function ceClearImg(fieldId, prevId){
+  document.getElementById(fieldId).value='';
+  var prev = document.getElementById(prevId);
+  prev.querySelector('img').src=''; prev.style.display='none';
+}
+
+// ── FECHAR EDITOR ──
+document.getElementById('btn-fechar-editor').onclick = function(){
+  document.getElementById('editor-modal').classList.remove('open');
+};
+
+// ── SALVAR ──
+document.getElementById('btn-publicar').onclick = function(){
+  var btn = this;
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  var v = coletarCampos();
+
+  // Paleta selecionada
+  var paletaSel = document.getElementById('ce-paleta-sel');
+  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
+  v['PALETA']   = paletaId;
+
+  // Reconstrói com a paleta escolhida
+  var newHtml = buildPage(v, paletaId);
+
+  // Injeta meta tag com campos
+  var metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(v))+"'>";
+  newHtml = newHtml.replace('</head>', metaTag+'</head>');
+
+  // Injeta pixel se existir
+  if(_cliente.pixel && _cliente.pixel.trim()){
+    newHtml = newHtml.replace('</head>', _cliente.pixel+'\n</head>');
+  }
+
+  var nomeCliente = v['C1'] || '';
+  // Slug: tenta sem sufixos -dark/-clean
+  var slugBase = _editingBase.replace(/-dark$/, '').replace(/-clean$/, '');
+
+  // Usa id direto do grupo (sem busca extra)
+  var pSave = _editingGroup.dark || _editingGroup.solo || _editingGroup.clean;
+  var idPag = pSave ? pSave.id : null;
+  if(!idPag){ btn.disabled=false; btn.textContent='Salvar alterações'; alert('Página não encontrada.'); return; }
+
+  sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})
+  }).then(function(){
+    btn.disabled=false;
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar alterações';
+    var ok = document.getElementById('save-ok');
+    ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },3000);
+    // Atualiza _editingV para proximas edicoes partirem dos valores salvos
+    _editingV = v;
+    // Salva campos no sessionStorage para próxima abertura
+    var pSaveRef = _editingGroup.dark || _editingGroup.solo || _editingGroup.clean;
+    if(pSaveRef){
+      sessionStorage.setItem('campos_' + pSaveRef.id, JSON.stringify(v));
+    }
+    document.getElementById('preview-iframe').srcdoc = newHtml;
+  }).catch(function(e){
+    btn.disabled=false; btn.textContent='Salvar alterações';
+    alert('Erro ao salvar: '+e.message);
+  });
+};
+
+</script>
