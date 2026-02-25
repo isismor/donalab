@@ -610,54 +610,64 @@
             <div class="form-group">
               <label class="form-label">Cole aqui os 43 campos</label>
               <textarea class="form-input" id="respostas-43" rows="20" style="font-size:13px;line-height:1.8;font-family:monospace" placeholder="C1: (nome da marca/pessoa)
-C2: (título principal — produto)
-C3: (subtítulo / promessa)
+C2: (nome do produto — até 30 chars)
+C3: (promessa SMART — desejo final)
 C4: (URL foto hero)
-C5: (texto botão CTA)
+C5: (texto botão CTA — ex: quero me inscrever agora)
 C5B: (link checkout)
-C6: (pergunta de dor)
+C6: (pergunta que ataca maior dor — use você)
 C7: (sintoma 1)
 C8: (sintoma 2)
 C9: (sintoma 3)
-C10: (solução)
-C11: (título — para quem é)
-C12: (desejo 1)
-C13: (desejo 2)
-C14: (desejo 3)
-C15: (desejo 4)
-C16: (desejo 5)
-C17: (texto botão CTA 2)
+C10: (solução — mostrar que está no produto)
+C11: (Para quem é [tipo] [produto] — até 35)
+C12: (resultado desejado 1 — começar com: Para quem...)
+C13: (resultado desejado 2)
+C14: (resultado desejado 3)
+C15: (resultado desejado 4)
+C16: (resultado desejado 5)
+C17: (eu quero [maior benefício] — até 22)
 C17B: (link checkout)
-C18: (título benefícios)
+C18: (linha de benefícios — consequências após resultado)
 C19: (benefício 1 título)
 C20: (benefício 1 descrição)
 C21: (benefício 2 título)
 C22: (benefício 2 descrição)
 C23: (benefício 3 título)
 C24: (benefício 3 descrição)
-C25: (resultado 1 título)
-C26: (resultado 1 descrição)
-C27: (resultado 2 título)
-C28: (resultado 2 descrição)
-C29: (resultado 3 título)
-C30: (resultado 3 descrição)
-C30A: (URL imagem resultado 1)
-C30B: (URL imagem resultado 2)
-C30C: (URL imagem resultado 3)
-C31: (título card oferta)
-C32: (item oferta 1)
-C33: (item oferta 2)
-C34: (item oferta 3)
-C35: (item oferta 4)
-C36: (item oferta 5)
-C37: (texto botão compra)
-C37B: (link checkout)
-C38: (quem sou eu — nome)
-C39: (bio)
-C40: (URL foto autor)
-C41: (nome rodapé)
-C42: (copyright)
-C43: (e-mail suporte)"></textarea>
+C25: (Antes e depois do/a [produto])
+C26: (ANTES 1 — situação atual / dor)
+C27: (DEPOIS 1 — transformação)
+C28: (ANTES 2 — situação atual / dor)
+C29: (DEPOIS 2 — transformação)
+C30: (ANTES 3 — situação atual / dor)
+C31: (DEPOIS 3 — transformação)
+C32: (título card — Inscreva-se / Compre / Adquira agora)
+C33: (forma de entrega — até 25)
+C34: (garantia — X dias de garantia)
+C35: (tempo de acesso)
+C36: (bônus — Acesso ao bônus X)
+C37: (preço — Por X à vista ou em até 12x)
+C38: (CTA compra + link checkout)
+C38B: (link checkout separado — opcional)
+C39: (Quem eu sou? [Primeiro Nome] — até 25)
+C40: (credenciais e autoridade — até 350)
+C41: (URL foto autor)
+C42: (Perguntas mais frequentes — até 50)
+C43_1P: (pergunta 1)
+C43_1R: (resposta 1)
+C43_2P: (pergunta 2)
+C43_2R: (resposta 2)
+C43_3P: (pergunta 3)
+C43_3R: (resposta 3)
+C43_4P: (pergunta 4)
+C43_4R: (resposta 4)
+C43_5P: (pergunta 5)
+C43_5R: (resposta 5)
+C43_6P: (pergunta 6)
+C43_6R: (resposta 6)
+C44: (direitos reservados — até 20)
+C45: (e-mail de suporte — opcional)"></textarea>
             </div>
 
             <div style="display:flex;justify-content:flex-end;margin-top:8px">
@@ -1410,11 +1420,60 @@ function aplicarImagensNoHTML() {
 function buildPage(v) {
   function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function r(k){ return v[k]||''; }
-  function img(k,alt,style){
-    return r(k)
-      ? '<img src="'+r(k)+'" alt="'+s(alt)+'" style="'+style+'">'
-      : '';
+
+  // FAQ: C42 = título, C43 = array JSON ["Pergunta? Resposta.", ...]
+  var faqItens = [];
+  var c43raw = r('C43');
+  if(c43raw){
+    try{
+      // Tenta parsear como JSON array
+      var arr = JSON.parse(c43raw);
+      if(Array.isArray(arr)){
+        arr.forEach(function(item){
+          // Separa na primeira '?' para extrair pergunta e resposta
+          var qIdx = item.indexOf('?');
+          if(qIdx !== -1){
+            var pergunta = item.substring(0, qIdx+1).trim();
+            var resposta = item.substring(qIdx+1).trim();
+            if(pergunta) faqItens.push([pergunta, resposta]);
+          } else {
+            // Sem '?', usa o item inteiro como pergunta
+            faqItens.push([item.trim(), '']);
+          }
+        });
+      }
+    } catch(e){
+      // Fallback: tenta separar por vírgula se não for JSON válido
+      c43raw.replace(/^\[|\]$/g,'').split(/",\s*"/).forEach(function(item){
+        item = item.replace(/^"|"$/g,'').trim();
+        var qIdx = item.indexOf('?');
+        if(qIdx !== -1){
+          faqItens.push([item.substring(0,qIdx+1).trim(), item.substring(qIdx+1).trim()]);
+        }
+      });
+    }
   }
+  // Fallback: campos individuais C43_1P/C43_1R etc
+  if(!faqItens.length){
+    for(var i=1;i<=6;i++){
+      var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
+      var fr = r('C43_'+i+'R') || r('C43'+i+'R') || '';
+      if(fp) faqItens.push([fp, fr]);
+    }
+  }
+  var faqHtml = !faqItens.length ? '' :
+    '<div class="section" style="border-top:1px solid #1e1c10">'
+    +'<div class="wrap">'
+    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
+    +'<div style="display:flex;flex-direction:column;gap:8px">'
+    +faqItens.map(function(item){
+      return '<details style="background:#141210;border:1px solid #2a2618;border-radius:12px;overflow:hidden">'
+        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#e8e0cc;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+item[0]+'</span><span style="color:#C9A84C;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
+        +'<div style="padding:16px 24px 20px;font-size:14px;color:#8a8070;line-height:1.75;border-top:1px solid #2a2618">'+item[1]+'</div>'
+        +'</details>';
+    }).join('')
+    +'</div></div></div>';
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -1428,76 +1487,59 @@ function buildPage(v) {
 body{background:#0d0d0d;color:#e8e0cc;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:780px;margin:0 auto;padding:0 28px}
-.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center}
+.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
 .btn-cta:hover{background:#dbb95e}
 .section{padding:60px 0}
 .card{background:#181610;border:1px solid #2a2618;border-radius:14px}
-
-/* ── SEÇÃO 1 mobile ── */
 @media(max-width:640px){
   #sec1{flex-direction:column!important}
   .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
-  /* imagem: quadrado fixo 260×260, nunca muda de tamanho */
-  .hero-img-wrap{
-    width:260px!important;
-    height:260px!important;
-    flex-shrink:0!important;
-    align-self:center!important;
-    margin:0 auto 32px!important;
-    border-radius:14px!important;
-    overflow:hidden!important;
-  }
+  .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
   .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
-  /* Seção 4 mobile */
   .ben-cols{flex-direction:column!important}
   .ben-col{border-right:none!important;border-bottom:1px solid #2a2618!important;text-align:center!important}
   .ben-col:last-child{border-bottom:none!important}
-  /* Seção 5 mobile */
-  .res-cols{flex-direction:column!important}
-  /* Seção 7 mobile */
+  .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
+  .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
   .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
 }
 </style>
 </head>
 <body>
 
-<!-- ══ SEÇÃO 1: HERO ══ campos 1-5 -->
+<!-- ══ SEÇÃO 1: HERO ══ C1-C5 -->
 <div id="sec1" style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;position:relative;display:flex;align-items:stretch;min-height:340px">
-  <!-- Coluna texto -->
-  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center;gap:0">
+  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
     <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:18px;font-weight:500">${s('C1')}</div>
     <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
     <p style="font-size:15px;color:#8a8070;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
     <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
   </div>
-  <!-- C4: imagem quadrada, ocupa toda a altura, colada na direita -->
   <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
-    ${r('C4')
-      ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">'
-      : '<div style="width:100%;height:100%;background:#1c1a10"></div>'}
+    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#1c1a10"></div>'}
   </div>
 </div>
 
-<!-- ══ SEÇÃO 2: DOR ══ campos 6, 7, 8, 9, 10 -->
+<!-- ══ SEÇÃO 2: DOR ══ C6-C10 -->
 <div class="section">
   <div class="wrap" style="text-align:center">
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;margin-bottom:28px">${s('C6')}</h2>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
-      ${['C7','C8','C9'].map(function(k){return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';}).join('')}
+      ${['C7','C8','C9'].map(function(k){
+        return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';
+      }).join('')}
     </div>
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc">${s('C10')}</h2>
   </div>
 </div>
 
-<!-- ══ SEÇÃO 3: PARA QUEM ══ campos 11-17 -->
+<!-- ══ SEÇÃO 3: PARA QUEM ══ C11-C17 -->
 <div class="section" style="padding-top:0">
   <div class="wrap">
     <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
-      <!-- C11: 30% do container -->
       <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618;flex-shrink:0">
-        <div style="font-family:'Playfair Display',serif;font-size:clamp(16px,2.5vw,22px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.3">${s('C11')}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.3">${s('C11')}</div>
       </div>
-      <!-- C12-C16: 70% do container -->
       <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
         ${['C12','C13','C14','C15','C16'].map(function(k,i){
           return '<div style="font-size:14px;color:#c0b090;display:flex;align-items:baseline;gap:8px">'
@@ -1512,7 +1554,7 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- ══ SEÇÃO 4: BENEFÍCIOS ══ campos 18-24 -->
+<!-- ══ SEÇÃO 4: BENEFÍCIOS ══ C18-C24 -->
 <div class="section">
   <div class="wrap">
     <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:32px">${s('C18')}</h2>
@@ -1527,55 +1569,66 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- ══ SEÇÃO 5: RESULTADOS ══ campos 25-30 (sem imagens) -->
+<!-- ══ SEÇÃO 5: ANTES E DEPOIS ══ C25-C31 -->
 <div class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="res-cols" style="display:flex;gap:16px">
-      ${[['C25','C26'],['C27','C28'],['C29','C30']].map(function(t){
-        return '<div class="card" style="flex:1;padding:28px 22px">'
-          +'<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;font-style:italic;color:#C9A84C;margin-bottom:10px">'+s(t[0])+'</div>'
-          +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(t[1])+'</p>'
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">${s('C25')}</h2>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
+        return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
+          +'<div style="flex:1;background:rgba(180,30,30,.12);border:1px solid rgba(200,60,60,.25);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#e05555;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
+          +'<p style="font-size:14px;color:#c0a8a8;line-height:1.65">'+s(pair[0])+'</p>'
+          +'</div>'
+          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#C9A84C;font-size:22px;margin:0 4px">→</div>'
+          +'<div style="flex:1;background:rgba(20,140,90,.1);border:1px solid rgba(40,160,100,.2);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:#3dbf8a;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
+          +'<p style="font-size:14px;color:#a0c0b0;line-height:1.65">'+s(pair[1])+'</p>'
+          +'</div>'
           +'</div>';
       }).join('')}
     </div>
   </div>
 </div>
 
-<!-- ══ SEÇÃO 6: OFERTA / CARD ══ campos 31-37 -->
+<!-- ══ SEÇÃO 6: OFERTA ══ C32-C38 -->
 <div id="sec6" class="section">
   <div class="wrap" style="display:flex;justify-content:center">
     <div style="background:linear-gradient(160deg,#1c1a08,#221e0a);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:40px 36px;width:100%;max-width:480px">
-      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C31')}</h3>
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C32')}</h3>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
-        ${['C32','C33','C34','C35','C36'].filter(function(k){return r(k);}).map(function(k){
+        ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
           return '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:100px;padding:11px 22px;font-size:13px;color:#b0a070;text-align:center;font-weight:500">'+s(k)+'</div>';
         }).join('')}
       </div>
-      <a href="${r('C37B')}" class="btn-cta" style="display:block;width:100%">${s('C37')}</a>
+      <a href="${r('C38B')||r('C38').match(/https?:\/\/\S+/)?r('C38').match(/https?:\/\/\S+/)[0]:'#'}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
     </div>
   </div>
 </div>
 
-<!-- ══ SEÇÃO 7: QUEM SOU EU ══ campos 38-40 -->
+<!-- ══ SEÇÃO 7: QUEM SOU EU ══ C39-C41 -->
 <div class="section" style="border-top:1px solid #1e1c10">
   <div class="wrap">
     <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
       <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.2)">
-        ${r('C40') ? '<img src="'+r('C40')+'" alt="'+s('C38')+'" style="width:100%;height:100%;object-fit:cover">' : '<div style="width:100%;height:100%;background:#1c1a10;display:flex;align-items:center;justify-content:center;color:#3a3428;font-size:11px">Foto</div>'}
+        ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
+          : '<div style="width:100%;height:100%;background:#1c1a10;display:flex;align-items:center;justify-content:center;color:#3a3428;font-size:11px">Foto</div>'}
       </div>
       <div style="flex:1;min-width:200px">
-        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C38')}</h2>
-        <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C39')}</p>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C39')}</h2>
+        <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C40')}</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ RODAPÉ ══ campos 41-43 -->
+<!-- ══ SEÇÃO 8: FAQ ══ C42-C43 -->
+${faqHtml}
+
+<!-- ══ RODAPÉ ══ C44-C45 -->
 <footer style="border-top:1px solid #1e1c10;padding:32px 28px;text-align:center">
-  <div style="font-size:13px;color:#4a4638;margin-bottom:4px">${s('C41')}</div>
-  <div style="font-size:12px;color:#3a3428;margin-bottom:4px">${s('C42')}</div>
-  <div style="font-size:12px;color:#4a4638">${s('C43')}</div>
+  <div style="font-size:13px;color:#4a4638;margin-bottom:4px">${s('C44')}</div>
+  ${r('C45') ? '<div style="font-size:12px;color:#4a4638;margin-top:4px">'+s('C45')+'</div>' : ''}
 </footer>
 
 </body></html>`;
@@ -1587,21 +1640,22 @@ document.getElementById('btn-gerar-pagina').onclick = function() {
   var email = document.getElementById('p-email').value.trim();
   var raw   = document.getElementById('respostas-43').value.trim();
 
-  if (!raw) { alert('Cole os 43 campos antes de gerar.'); return; }
+  if (!raw) { alert('Cole os campos antes de gerar.'); return; }
 
-  // Parse campos — aceita: "C1: valor", "Campo 1: valor", "1: valor"
+  // Parse campos — aceita: "C1: valor", "C43_1P: valor", "Campo 1: valor", "1: valor"
   var v = {};
   raw.split('\n').forEach(function(line) {
     var idx = line.indexOf(':');
     if (idx === -1) return;
     var rawKey = line.substring(0, idx).trim();
-    var val    = line.substring(idx + 1).trim();
+    // Valor é tudo após o primeiro ':'
+    var val = line.substring(idx + 1).trim();
     if (!val) return;
-    // Normaliza chave para formato C1, C2, C5B, C17B, C30A, C30B, C30C, C37B, C43
-    var k = rawKey.toUpperCase()
-      .replace(/^CAMPO\s*/,'C')   // "Campo 1" → "C1"
-      .replace(/\s+/g,'');        // remove espaços restantes
-    // Se for só número, adiciona C: "1" → "C1"
+    // Normaliza chave: uppercase, remove espaços, mantém underscore e letras
+    var k = rawKey.toUpperCase().replace(/\s+/g,'');
+    // "CAMPO 1" → "C1", "Campo1" → "C1"
+    k = k.replace(/^CAMPO/,'C');
+    // Se começar com número, adiciona C
     if (/^\d/.test(k)) k = 'C' + k;
     v[k] = val;
   });
