@@ -225,12 +225,21 @@ a{color:inherit;text-decoration:none;}
     <!-- SIDEBAR -->
     <div class="editor-sidebar">
       <div class="sidebar-tabs">
+        <div class="stab" data-stab="s0">🎨 Paleta</div>
         <div class="stab active" data-stab="s1">Hero</div>
         <div class="stab" data-stab="s2">Conteúdo</div>
         <div class="stab" data-stab="s3">Oferta</div>
         <div class="stab" data-stab="s4">Sobre + FAQ</div>
       </div>
       <div class="sidebar-body">
+
+        <!-- ABA 0: PALETA -->
+        <div class="spanel" id="spanel-s0">
+          <div class="fsection">Escolha a paleta de cores</div>
+          <input type="hidden" id="ce-paleta-sel" value="noir-dourado">
+          <div id="ce-paleta-swatches" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px"></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6">Clique em uma paleta para ver o resultado no preview ao lado. Salve para publicar.</div>
+        </div>
 
         <!-- ABA 1: HERO -->
         <div class="spanel active" id="spanel-s1">
@@ -570,11 +579,44 @@ function abrirEditor(base, grupo){
   var nome = (_editingV['C1']||pRef.nome||'Página').replace(/ — Dark| — Clean/,'');
   document.getElementById('editor-page-nome').textContent = nome;
 
-  // Vai para aba Hero
+  // Inicializa swatches de paleta
+  var paletaAtual = _editingV['PALETA'] || 'noir-dourado';
+  document.getElementById('ce-paleta-sel').value = paletaAtual;
+  var pSwatches = document.getElementById('ce-paleta-swatches');
+  if(pSwatches){
+    pSwatches.innerHTML = '';
+    PALETAS.forEach(function(pal){
+      var wrap = document.createElement('div');
+      wrap.title = pal.nome;
+      wrap.style.cssText = 'cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px';
+      var swatch = document.createElement('div');
+      swatch.style.cssText = 'width:42px;height:42px;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;border:2px solid '+(pal.id===paletaAtual?'var(--gold)':'transparent')+';transition:border-color .15s';
+      pal.preview.forEach(function(cor){
+        var bar=document.createElement('div'); bar.style.cssText='flex:1;background:'+cor; swatch.appendChild(bar);
+      });
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:9px;text-align:center;letter-spacing:.03em;max-width:46px;line-height:1.2;color:'+(pal.id===paletaAtual?'var(--gold)':'var(--muted)');
+      lbl.textContent = pal.nome;
+      wrap.onclick = function(){
+        paletaAtual = pal.id;
+        document.getElementById('ce-paleta-sel').value = pal.id;
+        pSwatches.querySelectorAll('div>div:first-child').forEach(function(s){ s.style.borderColor='transparent'; });
+        pSwatches.querySelectorAll('div>div:last-child').forEach(function(l){ l.style.color='var(--muted)'; });
+        swatch.style.borderColor='var(--gold)'; lbl.style.color='var(--gold)';
+        // Atualiza preview imediatamente
+        var v = coletarCampos(); v['PALETA'] = pal.id;
+        if(Object.keys(v).length >= 3) document.getElementById('preview-iframe').srcdoc = buildPage(v, pal.id);
+      };
+      wrap.appendChild(swatch); wrap.appendChild(lbl);
+      pSwatches.appendChild(wrap);
+    });
+  }
+
+  // Vai para aba Paleta primeiro
   document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('active'); });
   document.querySelectorAll('.spanel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelector('.stab[data-stab="s1"]').classList.add('active');
-  document.getElementById('spanel-s1').classList.add('active');
+  document.querySelector('.stab[data-stab="s0"]').classList.add('active');
+  document.getElementById('spanel-s0').classList.add('active');
 
   // Mostra preview do dark
   if(pRef && pRef.html) document.getElementById('preview-iframe').srcdoc = pRef.html;
@@ -592,7 +634,11 @@ document.querySelectorAll('.finput').forEach(function(el){
 
 function atualizarPreviewAoVivo(){
   var v = coletarCampos();
-  document.getElementById('preview-iframe').srcdoc = buildPage(v);
+  if(Object.keys(v).length < 3) return;
+  var paletaSel = document.getElementById('ce-paleta-sel');
+  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
+  v['PALETA'] = paletaId;
+  document.getElementById('preview-iframe').srcdoc = buildPage(v, paletaId);
 }
 
 function coletarCampos(){
@@ -601,10 +647,17 @@ function coletarCampos(){
     'C19','C20','C21','C22','C23','C24','C25','C26','C27','C28','C29','C30','C31',
     'C32','C33','C34','C35','C36','C37','C38','C38B',
     'C39','C40','C41','C42','C43','C44','C45'];
-  var v = {};
+
+  // Base: campos carregados do meta tag (pagina existente)
+  var v = Object.assign({}, _editingV);
+
+  // Sobrescreve com o que esta no formulario
   fields.forEach(function(f){
     var el = document.getElementById('ce-'+f.toLowerCase());
-    if(el && el.value.trim()) v[f] = el.value.trim();
+    if(!el) return;
+    var val = el.value.trim();
+    if(val) v[f] = val;
+    else if(v[f] !== undefined && el.value === '') delete v[f];
   });
   return v;
 }
@@ -646,46 +699,46 @@ document.getElementById('btn-publicar').onclick = function(){
 
   var v = coletarCampos();
 
-  // Reconstrói dark + clean
-  var newDark  = buildPage(v);
-  var newClean = buildPageClean(v);
+  // Paleta selecionada
+  var paletaSel = document.getElementById('ce-paleta-sel');
+  var paletaId  = (paletaSel ? paletaSel.value : null) || v['PALETA'] || 'noir-dourado';
+  v['PALETA']   = paletaId;
+
+  // Reconstrói com a paleta escolhida
+  var newHtml = buildPage(v, paletaId);
 
   // Injeta meta tag com campos
   var metaTag = "<meta name=\"page-fields\" content='"+encodeURIComponent(JSON.stringify(v))+"'>";
-  newDark  = newDark.replace('</head>',  metaTag+'</head>');
-  newClean = newClean.replace('</head>', metaTag+'</head>');
+  newHtml = newHtml.replace('</head>', metaTag+'</head>');
 
   // Injeta pixel se existir
   if(_cliente.pixel && _cliente.pixel.trim()){
-    newDark  = newDark.replace('</head>',  _cliente.pixel+'\n</head>');
-    newClean = newClean.replace('</head>', _cliente.pixel+'\n</head>');
+    newHtml = newHtml.replace('</head>', _cliente.pixel+'\n</head>');
   }
 
   var nomeCliente = v['C1'] || '';
-  var slugDark  = _editingBase+'-dark';
-  var slugClean = _editingBase+'-clean';
+  // Slug: tenta sem sufixos -dark/-clean
+  var slugBase = _editingBase.replace(/-dark$/, '').replace(/-clean$/, '');
 
+  // Busca a página pelo slug base, ou pelos slugs antigos
   Promise.all([
-    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugDark)+'&select=id'),
-    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugClean)+'&select=id')
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugBase)+'&select=id'),
+    sbFetch('paginas?slug=eq.'+encodeURIComponent(slugBase+'-dark')+'&select=id')
   ]).then(function(results){
-    var idDark  = results[0]&&results[0][0] ? results[0][0].id : null;
-    var idClean = results[1]&&results[1][0] ? results[1][0].id : null;
-    var patches = [];
-    if(idDark)  patches.push(sbFetch('paginas?id=eq.'+idDark,  {method:'PATCH',body:JSON.stringify({html:newDark,  nome:nomeCliente+' — Dark'})}));
-    if(idClean) patches.push(sbFetch('paginas?id=eq.'+idClean, {method:'PATCH',body:JSON.stringify({html:newClean, nome:nomeCliente+' — Clean'})}));
-    // Fallback: solo page
-    if(!idDark&&!idClean&&_editingGroup.solo){
-      patches.push(sbFetch('paginas?id=eq.'+_editingGroup.solo.id,{method:'PATCH',body:JSON.stringify({html:newDark,nome:nomeCliente})}));
-    }
-    return Promise.all(patches);
+    var idPag = (results[0]&&results[0][0]) ? results[0][0].id
+              : (results[1]&&results[1][0]) ? results[1][0].id
+              : (_editingGroup.solo ? _editingGroup.solo.id : null);
+    if(!idPag){ throw new Error('Página não encontrada para salvar.'); }
+    return sbFetch('paginas?id=eq.'+idPag, {method:'PATCH', body:JSON.stringify({html:newHtml, nome:nomeCliente})});
   }).then(function(){
     btn.disabled=false;
     btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> Salvar alterações';
     var ok = document.getElementById('save-ok');
     ok.style.display='inline'; setTimeout(function(){ ok.style.display='none'; },3000);
+    // Atualiza _editingV para proximas edicoes partirem dos valores salvos
+    _editingV = v;
     // Atualiza preview com a versão salva
-    document.getElementById('preview-iframe').srcdoc = newDark;
+    document.getElementById('preview-iframe').srcdoc = newHtml;
   }).catch(function(e){
     btn.disabled=false; btn.textContent='Salvar alterações';
     alert('Erro ao salvar: '+e.message);
@@ -697,20 +750,67 @@ document.getElementById('btn-publicar').onclick = function(){
 <!-- buildPage e buildPageClean injetados do dashboard -->
 <script>
 
-function buildPage(v) {
+// PALETAS — 10 temas pré-definidos
+// ══════════════════════════════════════════
+var PALETAS = [
+  {
+    id:'noir-dourado', nome:'Noir Dourado', preview:['#0d0d0d','#C9A84C','#e8e0cc'],
+    vars:'--bg:#0d0d0d;--surface:#181610;--surface2:#1c1a10;--border:#2a2618;--acento:#C9A84C;--acento2:#dbb95e;--texto:#e8e0cc;--texto2:#a09070;--texto3:#8a8070;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(20,140,90,.1);--depois-border:rgba(40,160,100,.2);--depois-cor:#3dbf8a;--oferta-bg:linear-gradient(160deg,#1c1a08,#221e0a);--rodape:#4a4638'
+  },
+  {
+    id:'vinho-rose', nome:'Vinho & Rosé', preview:['#1a0a0f','#c4698a','#f0dde5'],
+    vars:'--bg:#1a0a0f;--surface:#221018;--surface2:#2a1520;--border:#3d1f2a;--acento:#c4698a;--acento2:#d4849e;--texto:#f0dde5;--texto2:#c0909a;--texto3:#9a7080;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(20,120,90,.1);--depois-border:rgba(40,150,100,.2);--depois-cor:#3dbf8a;--oferta-bg:linear-gradient(160deg,#1a0a0f,#2a1020);--rodape:#5a3040'
+  },
+  {
+    id:'floresta', nome:'Floresta', preview:['#0a130d','#6db87a','#d8edd8'],
+    vars:'--bg:#0a130d;--surface:#111a13;--surface2:#172218;--border:#1e3020;--acento:#6db87a;--acento2:#85c890;--texto:#d8edd8;--texto2:#90b890;--texto3:#708870;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(30,140,60,.12);--depois-border:rgba(50,170,80,.25);--depois-cor:#5dd87a;--oferta-bg:linear-gradient(160deg,#0e1a10,#162216);--rodape:#304830'
+  },
+  {
+    id:'oceano', nome:'Oceano', preview:['#080f1a','#4a9fd4','#d0e8f5'],
+    vars:'--bg:#080f1a;--surface:#0e1825;--surface2:#142030;--border:#1a2d40;--acento:#4a9fd4;--acento2:#6ab5e5;--texto:#d0e8f5;--texto2:#80b0d0;--texto3:#608098;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(20,100,160,.12);--depois-border:rgba(40,130,190,.25);--depois-cor:#4ab8e8;--oferta-bg:linear-gradient(160deg,#0a1525,#101e30);--rodape:#203040'
+  },
+  {
+    id:'areia', nome:'Areia & Terracota', preview:['#faf5ef','#c46a3a','#3a2010'],
+    vars:'--bg:#faf5ef;--surface:#f2ebe0;--surface2:#ede4d5;--border:#ddd0bc;--acento:#c46a3a;--acento2:#d4804f;--texto:#3a2010;--texto2:#704030;--texto3:#907060;--antes-bg:rgba(180,30,30,.06);--antes-border:rgba(200,60,60,.2);--antes-cor:#c04040;--depois-bg:rgba(20,120,60,.06);--depois-border:rgba(40,150,80,.2);--depois-cor:#208050;--oferta-bg:linear-gradient(160deg,#f2e8d8,#eeddc8);--rodape:#b09070'
+  },
+  {
+    id:'creme-violeta', nome:'Creme & Violeta', preview:['#fdfbf8','#8b5cf6','#1a0a2e'],
+    vars:'--bg:#fdfbf8;--surface:#f5f0f8;--surface2:#ede5f5;--border:#d8c8ee;--acento:#8b5cf6;--acento2:#a07df8;--texto:#1a0a2e;--texto2:#5a3a7a;--texto3:#8a6aaa;--antes-bg:rgba(180,30,30,.06);--antes-border:rgba(200,60,60,.2);--antes-cor:#c04040;--depois-bg:rgba(60,120,30,.06);--depois-border:rgba(80,160,50,.2);--depois-cor:#308050;--oferta-bg:linear-gradient(160deg,#ede5f5,#e5d8f8);--rodape:#c0a8e0'
+  },
+  {
+    id:'solar', nome:'Solar', preview:['#fffdf5','#d4920a','#2a1800'],
+    vars:'--bg:#fffdf5;--surface:#fff8e0;--surface2:#fef2c0;--border:#f0d880;--acento:#d4920a;--acento2:#e8a820;--texto:#2a1800;--texto2:#6a4010;--texto3:#9a7030;--antes-bg:rgba(180,30,30,.06);--antes-border:rgba(200,60,60,.2);--antes-cor:#c04040;--depois-bg:rgba(20,120,60,.06);--depois-border:rgba(40,150,80,.2);--depois-cor:#208050;--oferta-bg:linear-gradient(160deg,#fff8d0,#fef0a8);--rodape:#c0a040'
+  },
+  {
+    id:'ardosia', nome:'Ardósia', preview:['#1a1f2e','#7eb8d4','#e8eef5'],
+    vars:'--bg:#1a1f2e;--surface:#222838;--surface2:#2a3045;--border:#384060;--acento:#7eb8d4;--acento2:#9ecce8;--texto:#e8eef5;--texto2:#a0b8d0;--texto3:#7898b0;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(20,120,80,.1);--depois-border:rgba(40,160,110,.2);--depois-cor:#50d0a0;--oferta-bg:linear-gradient(160deg,#1e2438,#252d48);--rodape:#404870'
+  },
+  {
+    id:'coral', nome:'Coral & Branco', preview:['#fff5f3','#e8614a','#2a0a05'],
+    vars:'--bg:#fff5f3;--surface:#ffeae5;--surface2:#ffddd5;--border:#f0c0b0;--acento:#e8614a;--acento2:#f07a62;--texto:#2a0a05;--texto2:#8a3020;--texto3:#b06050;--antes-bg:rgba(180,30,30,.06);--antes-border:rgba(200,60,60,.2);--antes-cor:#c04040;--depois-bg:rgba(20,120,60,.06);--depois-border:rgba(40,150,80,.2);--depois-cor:#208050;--oferta-bg:linear-gradient(160deg,#ffe0d8,#ffd5c8);--rodape:#e0a090'
+  },
+  {
+    id:'noite-azul', nome:'Noite Azul', preview:['#08080f','#6070e8','#d0d5f8'],
+    vars:'--bg:#08080f;--surface:#0e0e1e;--surface2:#141428;--border:#202040;--acento:#6070e8;--acento2:#8090f8;--texto:#d0d5f8;--texto2:#8890c8;--texto3:#6070a0;--antes-bg:rgba(180,30,30,.12);--antes-border:rgba(200,60,60,.25);--antes-cor:#e05555;--depois-bg:rgba(30,120,80,.1);--depois-border:rgba(50,160,110,.2);--depois-cor:#40c890;--oferta-bg:linear-gradient(160deg,#0c0c20,#101030);--rodape:#303060'
+  }
+];
+
+function getPaleta(id){
+  return PALETAS.find(function(p){ return p.id===id; }) || PALETAS[0];
+}
+
+function buildPage(v, paletaId) {
   function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function r(k){ return v[k]||''; }
 
-  // FAQ: C42 = título, C43 = "Pergunta? Resposta.,Pergunta? Resposta." (separado por .,)
+  var pal = getPaleta(paletaId || v['PALETA'] || 'noir-dourado');
+
+  // FAQ
   var faqItens = [];
   var c43raw = r('C43');
   if(c43raw){
-    // Remove JSON array brackets se existirem
     c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
-    // Separa itens por ".,", "." seguido de "," ou por JSON ","
-    var itens = c43raw.split(/\.,\s*/);
-    // Remove aspas residuais de cada item
-    itens.forEach(function(item){
+    c43raw.split(/\.,\s*/).forEach(function(item){
       item = item.replace(/^"|"$|^'|'$/g,'').trim();
       if(!item) return;
       var qIdx = item.indexOf('?');
@@ -721,7 +821,6 @@ function buildPage(v) {
       }
     });
   }
-  // Fallback campos individuais C43_1P/C43_1R
   if(!faqItens.length){
     for(var i=1;i<=6;i++){
       var fp = r('C43_'+i+'P') || r('C43'+i+'P') || '';
@@ -729,16 +828,17 @@ function buildPage(v) {
       if(fp) faqItens.push([fp, fr]);
     }
   }
+
   var faqHtml = !faqItens.length ? '' :
-    '<div class="section" style="border-top:1px solid #1e1c10">'
+    '<div class="section" style="border-top:1px solid var(--border)">'
     +'<div class="wrap">'
-    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
+    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:var(--texto);text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
     +'<div style="display:flex;flex-direction:column;gap:8px">'
     +faqItens.map(function(item){
-      return '<details style="background:#141210;border:1px solid #2a2618;border-radius:12px;overflow:hidden">'
-        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#e8e0cc;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
-        +'<span>'+item[0]+'</span><span style="color:#C9A84C;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
-        +'<div style="padding:16px 24px 20px;font-size:14px;color:#8a8070;line-height:1.75;border-top:1px solid #2a2618">'+item[1]+'</div>'
+      return '<details style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">'
+        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:var(--texto);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
+        +'<span>'+item[0]+'</span><span style="color:var(--acento);font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
+        +'<div style="padding:16px 24px 20px;font-size:14px;color:var(--texto3);line-height:1.75;border-top:1px solid var(--border)">'+item[1]+'</div>'
         +'</details>';
     }).join('')
     +'</div></div></div>';
@@ -751,21 +851,22 @@ function buildPage(v) {
 <title>${s('C2')} — ${s('C1')}</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{${pal.vars}}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0d0d;color:#e8e0cc;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+body{background:var(--bg);color:var(--texto);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
 a{color:inherit;text-decoration:none}
 .wrap{max-width:780px;margin:0 auto;padding:0 28px}
-.btn-cta{display:inline-block;background:#C9A84C;color:#0d0d0d;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
-.btn-cta:hover{background:#dbb95e}
+.btn-cta{display:inline-block;background:var(--acento);color:var(--bg);font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase;transition:background .2s}
+.btn-cta:hover{background:var(--acento2)}
 .section{padding:60px 0}
-.card{background:#181610;border:1px solid #2a2618;border-radius:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px}
 @media(max-width:640px){
   #sec1{flex-direction:column!important}
   .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
   .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
   .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
   .ben-cols{flex-direction:column!important}
-  .ben-col{border-right:none!important;border-bottom:1px solid #2a2618!important;text-align:center!important}
+  .ben-col{border-right:none!important;border-bottom:1px solid var(--border)!important;text-align:center!important}
   .ben-col:last-child{border-bottom:none!important}
   .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
   .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
@@ -775,326 +876,122 @@ a{color:inherit;text-decoration:none}
 </head>
 <body>
 
-<!-- ══ SEÇÃO 1: HERO ══ C1-C5 -->
-<div id="sec1" style="background:#0d0d0d;border:1px solid #2a2618;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;position:relative;display:flex;align-items:stretch;min-height:340px">
+<div id="sec1" style="background:var(--surface);border:1px solid var(--border);border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;display:flex;align-items:stretch;min-height:340px">
   <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
-    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#8a8070;margin-bottom:18px;font-weight:500">${s('C1')}</div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
-    <p style="font-size:15px;color:#8a8070;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
+    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--texto3);margin-bottom:18px;font-weight:500">${s('C1')}</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:var(--acento);letter-spacing:.06em;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
+    <p style="font-size:15px;color:var(--texto3);line-height:1.7;margin-bottom:36px">${s('C3')}</p>
     <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
   </div>
   <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
-    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#1c1a10"></div>'}
+    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:var(--surface2)"></div>'}
   </div>
 </div>
 
-<!-- ══ SEÇÃO 2: DOR ══ C6-C10 -->
 <div class="section">
   <div class="wrap" style="text-align:center">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;margin-bottom:28px">${s('C6')}</h2>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--texto);margin-bottom:28px">${s('C6')}</h2>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
       ${['C7','C8','C9'].map(function(k){
-        return '<div style="background:#181610;border:1px solid #2a2618;border-radius:100px;padding:12px 24px;font-size:13px;color:#a09070;font-weight:500">'+s(k)+'</div>';
+        return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:12px 24px;font-size:13px;color:var(--texto2);font-weight:500">'+s(k)+'</div>';
       }).join('')}
     </div>
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc">${s('C10')}</h2>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--texto)">${s('C10')}</h2>
   </div>
 </div>
 
-<!-- ══ SEÇÃO 3: PARA QUEM ══ C11-C17 -->
 <div class="section" style="padding-top:0">
   <div class="wrap">
     <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
-      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2618;flex-shrink:0">
-        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;line-height:1.3">${s('C11')}</div>
+      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border);flex-shrink:0">
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:var(--acento);text-align:center;line-height:1.3">${s('C11')}</div>
       </div>
       <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
         ${['C12','C13','C14','C15','C16'].map(function(k,i){
-          return '<div style="font-size:14px;color:#c0b090;display:flex;align-items:baseline;gap:8px">'
-            +'<span style="color:#8a8070;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
-            +'<span>'+s(k)+'</span></div>';
-        }).join('')}
-      </div>
-    </div>
-    <div style="text-align:center">
-      <a href="#sec6" class="btn-cta">${s('C17')}</a>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SEÇÃO 4: BENEFÍCIOS ══ C18-C24 -->
-<div class="section">
-  <div class="wrap">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:32px">${s('C18')}</h2>
-    <div class="ben-cols" style="display:flex;gap:0;background:#181610;border:1px solid #2a2618;border-radius:14px;overflow:hidden">
-      ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
-        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #2a2618':'')+'">'
-          +'<div style="font-size:11px;font-weight:700;color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
-          +'<p style="font-size:13px;color:#8a8070;line-height:1.65">'+s(pair[1])+'</p>'
-          +'</div>';
-      }).join('')}
-    </div>
-  </div>
-</div>
-
-<!-- ══ SEÇÃO 5: ANTES E DEPOIS ══ C25-C31 -->
-<div class="section" style="padding-top:0">
-  <div class="wrap">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#e8e0cc;text-align:center;margin-bottom:36px">${s('C25')}</h2>
-    <div style="display:flex;flex-direction:column;gap:20px">
-      ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
-        return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
-          +'<div style="flex:1;background:rgba(180,30,30,.12);border:1px solid rgba(200,60,60,.25);border-radius:14px;padding:22px 24px">'
-          +'<div style="font-size:10px;font-weight:700;color:#e05555;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
-          +'<p style="font-size:14px;color:#c0a8a8;line-height:1.65">'+s(pair[0])+'</p>'
-          +'</div>'
-          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#C9A84C;font-size:22px;margin:0 4px">→</div>'
-          +'<div style="flex:1;background:rgba(20,140,90,.1);border:1px solid rgba(40,160,100,.2);border-radius:14px;padding:22px 24px">'
-          +'<div style="font-size:10px;font-weight:700;color:#3dbf8a;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
-          +'<p style="font-size:14px;color:#a0c0b0;line-height:1.65">'+s(pair[1])+'</p>'
-          +'</div>'
-          +'</div>';
-      }).join('')}
-    </div>
-  </div>
-</div>
-
-<!-- ══ SEÇÃO 6: OFERTA ══ C32-C38 -->
-<div id="sec6" class="section">
-  <div class="wrap" style="display:flex;justify-content:center">
-    <div style="background:linear-gradient(160deg,#1c1a08,#221e0a);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:40px 36px;width:100%;max-width:480px">
-      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#C9A84C;text-align:center;margin-bottom:28px">${s('C32')}</h3>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
-        ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
-          return '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.15);border-radius:100px;padding:11px 22px;font-size:13px;color:#b0a070;text-align:center;font-weight:500">'+s(k)+'</div>';
-        }).join('')}
-      </div>
-      <a href="${r('C38B')||r('C38').match(/https?:\/\/\S+/)?r('C38').match(/https?:\/\/\S+/)[0]:'#'}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SEÇÃO 7: QUEM SOU EU ══ C39-C41 -->
-<div class="section" style="border-top:1px solid #1e1c10">
-  <div class="wrap">
-    <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
-      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid rgba(201,168,76,.2)">
-        ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
-          : '<div style="width:100%;height:100%;background:#1c1a10;display:flex;align-items:center;justify-content:center;color:#3a3428;font-size:11px">Foto</div>'}
-      </div>
-      <div style="flex:1;min-width:200px">
-        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#C9A84C;margin-bottom:14px">${s('C39')}</h2>
-        <p style="font-size:14px;color:#8a8070;line-height:1.75">${s('C40')}</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SEÇÃO 8: FAQ ══ C42-C43 -->
-${faqHtml}
-
-<!-- ══ RODAPÉ ══ C44-C45 -->
-<footer style="border-top:1px solid #1e1c10;padding:32px 28px;text-align:center">
-  <div style="font-size:13px;color:#4a4638;margin-bottom:4px">${s('C44')}</div>
-  ${r('C45') ? '<div style="font-size:12px;color:#4a4638;margin-top:4px">'+s('C45')+'</div>' : ''}
-</footer>
-
-</body></html>`;
-}
-
-// ══════════════════════════════════════════
-// MODELO B — CLEAN (fundo branco/creme)
-// ══════════════════════════════════════════
-function buildPageClean(v) {
-  function s(k){ return (v[k]||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function r(k){ return v[k]||''; }
-
-  // FAQ igual ao dark
-  var faqItens = [];
-  var c43raw = r('C43');
-  if(c43raw){
-    c43raw = c43raw.replace(/^\[|\]$/g,'').replace(/^"|"$/g,'');
-    c43raw.split(/\.,\s*/).forEach(function(item){
-      item = item.replace(/^"|"$|^'|'$/g,'').trim();
-      if(!item) return;
-      var qIdx = item.indexOf('?');
-      if(qIdx !== -1) faqItens.push([item.substring(0,qIdx+1).trim(), item.substring(qIdx+1).trim().replace(/\.$/, '')]);
-    });
-  }
-  if(!faqItens.length){
-    for(var i=1;i<=6;i++){
-      var fp=r('C43_'+i+'P')||r('C43'+i+'P')||'';
-      var fr=r('C43_'+i+'R')||r('C43'+i+'R')||'';
-      if(fp) faqItens.push([fp,fr]);
-    }
-  }
-  var faqHtml = !faqItens.length ? '' :
-    '<section style="padding:60px 0;border-top:1px solid #e8e0d0">'
-    +'<div class="wrap">'
-    +'<h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">'+(s('C42')||'Perguntas frequentes')+'</h2>'
-    +'<div style="display:flex;flex-direction:column;gap:8px">'
-    +faqItens.map(function(item){
-      return '<details style="background:#faf7f0;border:1px solid #e0d8c8;border-radius:12px;overflow:hidden">'
-        +'<summary style="padding:20px 24px;font-size:15px;font-weight:600;color:#2a2018;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center">'
-        +'<span>'+item[0]+'</span><span style="color:#9a7a2a;font-size:20px;flex-shrink:0;margin-left:16px">+</span></summary>'
-        +'<div style="padding:16px 24px 20px;font-size:14px;color:#6a6050;line-height:1.75;border-top:1px solid #e0d8c8">'+item[1]+'</div>'
-        +'</details>';
-    }).join('')
-    +'</div></div></section>';
-
-  return `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${s('C2')} — ${s('C1')}</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#fdfaf4;color:#2a2018;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:780px;margin:0 auto;padding:0 28px}
-.btn-cta{display:inline-block;background:#9a7a2a;color:#fff;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;padding:13px 36px;border-radius:100px;border:none;cursor:pointer;text-align:center;text-transform:uppercase}
-.btn-cta:hover{background:#b08e38}
-.section{padding:60px 0}
-.card{background:#faf7f0;border:1px solid #e0d8c8;border-radius:14px}
-@media(max-width:640px){
-  #sec1{flex-direction:column!important}
-  .hero-text{text-align:center!important;align-items:center!important;padding:36px 24px 24px!important}
-  .hero-img-wrap{width:260px!important;height:260px!important;flex-shrink:0!important;align-self:center!important;margin:0 auto 32px!important;border-radius:14px!important;overflow:hidden!important}
-  .hero-img-wrap img{width:100%!important;height:100%!important;object-fit:cover!important}
-  .ben-cols{flex-direction:column!important}
-  .ben-col{border-right:none!important;border-bottom:1px solid #e0d8c8!important;text-align:center!important}
-  .ben-col:last-child{border-bottom:none!important}
-  .antes-depois-row{flex-direction:column!important;align-items:stretch!important}
-  .antes-depois-seta{transform:rotate(90deg);margin:4px auto!important}
-  .autor-inner{flex-direction:column!important;text-align:center!important;align-items:center!important}
-}
-</style>
-</head>
-<body>
-
-<!-- HERO -->
-<div id="sec1" style="background:#fdfaf4;border:1px solid #e0d8c8;border-radius:18px;margin:20px auto;max-width:780px;overflow:hidden;display:flex;align-items:stretch;min-height:340px">
-  <div class="hero-text" style="flex:1;min-width:0;padding:48px 40px;display:flex;flex-direction:column;justify-content:center">
-    <div style="font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#9a7a2a;margin-bottom:18px;font-weight:600">${s('C1')}</div>
-    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);font-weight:800;color:#2a2018;letter-spacing:.04em;line-height:1.05;margin-bottom:18px">${s('C2')}</h1>
-    <p style="font-size:15px;color:#6a6050;line-height:1.7;margin-bottom:36px">${s('C3')}</p>
-    <div><a href="#sec6" class="btn-cta">${s('C5')}</a></div>
-  </div>
-  <div class="hero-img-wrap" style="flex-shrink:0;width:340px;align-self:stretch;overflow:hidden">
-    ${r('C4') ? '<img src="'+r('C4')+'" alt="'+s('C1')+'" style="width:100%;height:100%;object-fit:cover;display:block">' : '<div style="width:100%;height:100%;background:#f0ead8"></div>'}
-  </div>
-</div>
-
-<!-- DOR -->
-<section class="section">
-  <div class="wrap" style="text-align:center">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;margin-bottom:28px">${s('C6')}</h2>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
-      ${['C7','C8','C9'].map(function(k){
-        return '<div style="background:#f5f0e4;border:1px solid #e0d8c8;border-radius:100px;padding:12px 24px;font-size:13px;color:#6a6050;font-weight:500">'+s(k)+'</div>';
-      }).join('')}
-    </div>
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018">${s('C10')}</h2>
-  </div>
-</section>
-
-<!-- PARA QUEM -->
-<section class="section" style="padding-top:0">
-  <div class="wrap">
-    <div class="card" style="display:flex;align-items:stretch;overflow:hidden;margin-bottom:24px">
-      <div style="width:30%;padding:32px 24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #e0d8c8;flex-shrink:0">
-        <div style="font-family:'Playfair Display',serif;font-size:clamp(15px,2.5vw,20px);font-weight:800;font-style:italic;color:#9a7a2a;text-align:center;line-height:1.3">${s('C11')}</div>
-      </div>
-      <div style="width:70%;padding:32px 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
-        ${['C12','C13','C14','C15','C16'].map(function(k,i){
-          return '<div style="font-size:14px;color:#4a4030;display:flex;align-items:baseline;gap:8px">'
-            +'<span style="color:#b0a080;font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
+          return '<div style="font-size:14px;color:var(--texto2);display:flex;align-items:baseline;gap:8px">'
+            +'<span style="color:var(--texto3);font-size:12px;min-width:16px;flex-shrink:0">'+(i+1)+'.</span>'
             +'<span>'+s(k)+'</span></div>';
         }).join('')}
       </div>
     </div>
     <div style="text-align:center"><a href="#sec6" class="btn-cta">${s('C17')}</a></div>
   </div>
-</section>
+</div>
 
-<!-- BENEFÍCIOS -->
-<section class="section" style="background:#f5f0e4">
+<div class="section">
   <div class="wrap">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:32px">${s('C18')}</h2>
-    <div class="ben-cols" style="display:flex;gap:0;background:#fff;border:1px solid #e0d8c8;border-radius:14px;overflow:hidden">
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--texto);text-align:center;margin-bottom:32px">${s('C18')}</h2>
+    <div class="ben-cols" style="display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
       ${[['C19','C20'],['C21','C22'],['C23','C24']].map(function(pair,i){
-        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid #e0d8c8':'')+'">'
-          +'<div style="font-size:11px;font-weight:700;color:#9a7a2a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
-          +'<p style="font-size:13px;color:#6a6050;line-height:1.65">'+s(pair[1])+'</p>'
+        return '<div class="ben-col" style="flex:1;padding:28px 24px'+(i<2?';border-right:1px solid var(--border)':'')+'">'
+          +'<div style="font-size:11px;font-weight:700;color:var(--acento);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">'+s(pair[0])+'</div>'
+          +'<p style="font-size:13px;color:var(--texto3);line-height:1.65">'+s(pair[1])+'</p>'
           +'</div>';
       }).join('')}
     </div>
   </div>
-</section>
+</div>
 
-<!-- ANTES E DEPOIS -->
-<section class="section">
+<div class="section" style="padding-top:0">
   <div class="wrap">
-    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:#2a2018;text-align:center;margin-bottom:36px">${s('C25')}</h2>
+    <h2 style="font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--texto);text-align:center;margin-bottom:36px">${s('C25')}</h2>
     <div style="display:flex;flex-direction:column;gap:20px">
       ${[['C26','C27'],['C28','C29'],['C30','C31']].map(function(pair){
         return '<div class="antes-depois-row" style="display:flex;align-items:center;gap:12px">'
-          +'<div style="flex:1;background:#fff0f0;border:1px solid #e8c8c8;border-radius:14px;padding:22px 24px">'
-          +'<div style="font-size:10px;font-weight:700;color:#c05050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
-          +'<p style="font-size:14px;color:#704040;line-height:1.65">'+s(pair[0])+'</p></div>'
-          +'<div class="antes-depois-seta" style="flex-shrink:0;color:#9a7a2a;font-size:22px;margin:0 4px">→</div>'
-          +'<div style="flex:1;background:#f0fff8;border:1px solid #b8e8c8;border-radius:14px;padding:22px 24px">'
-          +'<div style="font-size:10px;font-weight:700;color:#208050;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
-          +'<p style="font-size:14px;color:#306040;line-height:1.65">'+s(pair[1])+'</p></div>'
+          +'<div style="flex:1;background:var(--antes-bg);border:1px solid var(--antes-border);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--antes-cor);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">ANTES</div>'
+          +'<p style="font-size:14px;color:var(--texto2);line-height:1.65">'+s(pair[0])+'</p></div>'
+          +'<div class="antes-depois-seta" style="flex-shrink:0;color:var(--acento);font-size:22px;margin:0 4px">→</div>'
+          +'<div style="flex:1;background:var(--depois-bg);border:1px solid var(--depois-border);border-radius:14px;padding:22px 24px">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--depois-cor);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">DEPOIS</div>'
+          +'<p style="font-size:14px;color:var(--texto2);line-height:1.65">'+s(pair[1])+'</p></div>'
           +'</div>';
       }).join('')}
     </div>
   </div>
-</section>
+</div>
 
-<!-- OFERTA -->
-<section id="sec6" class="section" style="background:#f5f0e4">
+<div id="sec6" class="section">
   <div class="wrap" style="display:flex;justify-content:center">
-    <div style="background:#fff;border:2px solid #c8a840;border-radius:20px;padding:40px 36px;width:100%;max-width:480px;box-shadow:0 4px 40px rgba(154,122,42,.1)">
-      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:#2a2018;text-align:center;margin-bottom:28px">${s('C32')}</h3>
+    <div style="background:var(--oferta-bg);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:100%;max-width:480px;box-shadow:0 4px 40px rgba(0,0,0,.15)">
+      <h3 style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);font-weight:800;font-style:italic;color:var(--acento);text-align:center;margin-bottom:28px">${s('C32')}</h3>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
         ${['C33','C34','C35','C36','C37'].filter(function(k){return r(k);}).map(function(k){
-          return '<div style="background:#faf5e4;border:1px solid #e0d0a0;border-radius:100px;padding:11px 22px;font-size:13px;color:#6a5020;text-align:center;font-weight:500">'+s(k)+'</div>';
+          return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:11px 22px;font-size:13px;color:var(--texto2);text-align:center;font-weight:500">'+s(k)+'</div>';
         }).join('')}
       </div>
       <a href="${r('C38B')||((r('C38').match(/https?:\/\/\S+/)||['#'])[0])}" class="btn-cta" style="display:block;width:100%">${r('C38').replace(/https?:\/\/\S+/,'').trim()||s('C38')}</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- QUEM SOU EU -->
-<section class="section" style="border-top:1px solid #e0d8c8">
+<div class="section" style="border-top:1px solid var(--border)">
   <div class="wrap">
     <div class="autor-inner" style="display:flex;align-items:center;gap:36px">
-      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid #c8a840">
+      <div style="flex-shrink:0;width:150px;height:190px;border-radius:14px;overflow:hidden;border:2px solid var(--border)">
         ${r('C41') ? '<img src="'+r('C41')+'" alt="'+s('C39')+'" style="width:100%;height:100%;object-fit:cover">'
-          : '<div style="width:100%;height:100%;background:#f0ead8;display:flex;align-items:center;justify-content:center;color:#b0a080;font-size:11px">Foto</div>'}
+          : '<div style="width:100%;height:100%;background:var(--surface2);display:flex;align-items:center;justify-content:center;color:var(--border);font-size:11px">Foto</div>'}
       </div>
       <div style="flex:1;min-width:200px">
-        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:#9a7a2a;margin-bottom:14px">${s('C39')}</h2>
-        <p style="font-size:14px;color:#6a6050;line-height:1.75">${s('C40')}</p>
+        <h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,4.5vw,40px);font-weight:800;color:var(--acento);margin-bottom:14px">${s('C39')}</h2>
+        <p style="font-size:14px;color:var(--texto3);line-height:1.75">${s('C40')}</p>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 ${faqHtml}
 
-<!-- RODAPÉ -->
-<footer style="border-top:1px solid #e0d8c8;padding:32px 28px;text-align:center;background:#f5f0e4">
-  <div style="font-size:13px;color:#a09070;margin-bottom:4px">${s('C44')}</div>
-  ${r('C45') ? '<div style="font-size:12px;color:#a09070;margin-top:4px">'+s('C45')+'</div>' : ''}
+<footer style="border-top:1px solid var(--border);padding:32px 28px;text-align:center">
+  <div style="font-size:13px;color:var(--rodape);margin-bottom:4px">${s('C44')}</div>
+  ${r('C45') ? '<div style="font-size:12px;color:var(--rodape);margin-top:4px">'+s('C45')+'</div>' : ''}
 </footer>
 
 </body></html>`;
 }
+
+
+
 
 
 </script>
