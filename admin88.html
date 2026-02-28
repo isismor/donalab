@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dona Lab — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root { --gold:#C9A84C; --gold-light:#E8C96A; --gold-dim:rgba(201,168,76,0.15); --gold-border:rgba(201,168,76,0.3); --bg:#0D0D0D; --surface:#141414; --surface2:#1A1A1A; --surface3:#222222; --text:#F0EDE8; --text-muted:#888880; --text-dim:#555550; --danger:#e05555; --danger-dim:rgba(224,85,85,0.12); }
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -172,6 +173,25 @@
   .fno-status-opt[data-s="done"].sel { border-color:rgba(93,184,112,0.5); background:rgba(93,184,112,0.1); color:#5db870; }
   .fno-status-opt[data-s="error"].sel { border-color:rgba(224,85,85,0.5); background:rgba(224,85,85,0.1); color:#e05555; }
 
+  /* ── KANBAN ── */
+  .kb-col { flex:1; min-width:280px; max-width:380px; background:var(--surface); border:1px solid rgba(255,255,255,0.06); border-radius:16px; display:flex; flex-direction:column; overflow:hidden; transition:background 0.15s; }
+  .kb-col-header { display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14px; font-weight:600; }
+  .kb-col-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .kb-col-count { margin-left:auto; background:rgba(255,255,255,0.06); color:var(--text-dim); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .kb-col-body { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; min-height:100px; }
+  .kb-card { background:var(--surface2); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:16px; cursor:grab; transition:all 0.15s; position:relative; }
+  .kb-card:hover { border-color:var(--gold-border); transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+  .kb-card:active { cursor:grabbing; opacity:0.8; }
+  .kb-card-title { font-size:14px; font-weight:600; margin-bottom:6px; line-height:1.4; }
+  .kb-card-preview { font-size:12px; color:var(--text-muted); line-height:1.5; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .kb-card-meta { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:11px; color:var(--text-dim); }
+  .kb-card-type { background:var(--gold-dim); color:var(--gold); padding:2px 8px; border-radius:6px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+  .kb-card-actions { position:absolute; top:12px; right:12px; display:flex; gap:4px; opacity:0; transition:opacity 0.15s; }
+  .kb-card:hover .kb-card-actions { opacity:1; }
+  .kb-card-btn { width:24px; height:24px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-dim); transition:all 0.15s; }
+  .kb-card-btn:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+  .kb-card-btn.danger:hover { color:var(--danger); border-color:rgba(224,85,85,0.3); background:var(--danger-dim); }
+
   @keyframes fno-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.15)} 50%{box-shadow:0 0 20px 4px rgba(201,168,76,0.08)} }
   @keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.2)} 50%{box-shadow:0 0 0 6px rgba(201,168,76,0)} }
 
@@ -200,6 +220,11 @@
     <nav class="nav">
       <div class="nav-section">
         <div class="nav-label">Principal</div>
+        <!-- Hidden placeholders for JS compatibility -->
+        <div id="materiais-subitens" style="display:none"></div>
+        <div id="materiais-chevron" style="display:none"></div>
+        <div id="fluxos-subitens" style="display:none"></div>
+        <div id="fluxos-chevron" style="display:none"></div>
         <a class="nav-item active" id="nav-clientes" href="#" onclick="showSection('clientes');return false;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
           Clientes <span class="nav-badge" id="sidebar-badge">0</span>
@@ -208,47 +233,38 @@
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
           Paginas <span class="nav-badge" id="pages-badge" style="display:none">0</span>
         </a>
-        <div class="nav-item" id="nav-materiais" onclick="toggleMateriais()" style="justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-            Materiais
-          </div>
-          <svg id="materiais-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div id="materiais-subitens" style="display:none;padding-left:16px;margin-top:2px;">
-          <a class="nav-item nav-subitem" id="nav-plano-ouro" href="#" onclick="showMateriais('plano-ouro');return false;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Plano de Ouro
-          </a>
-          <a class="nav-item nav-subitem" id="nav-conteudo-alcance" href="#" onclick="showMateriais('conteudo-alcance');return false;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-            Conteúdo de Alto Alcance
-          </a>
-        </div>
-        <div class="nav-item" id="nav-fluxos" onclick="toggleFluxos()" style="justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Fluxos
-          </div>
-          <svg id="fluxos-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div id="fluxos-subitens" style="display:none;padding-left:16px;margin-top:2px;">
-          <a class="nav-item nav-subitem" id="nav-fluxo-paginas" href="#" onclick="showFluxo('paginas');return false;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            Páginas
-          </a>
-          <a class="nav-item nav-subitem" id="nav-fluxo-plano-ouro" href="#" onclick="showFluxo('plano-ouro');return false;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Plano de Ouro
-          </a>
-          <a class="nav-item nav-subitem" id="nav-fluxo-conteudo-alcance" href="#" onclick="showFluxo('conteudo-alcance');return false;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-            Conteúdo de Alto Alcance
-          </a>
-        </div>
+        
+        
         <a class="nav-item" id="nav-lote" href="#" onclick="showSection('lote');return false;">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           Lote
+        </a>
+
+        <div class="nav-item" id="nav-donaposts" onclick="toggleDonaPosts()" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+            DonaPosts
+          </div>
+          <svg id="donaposts-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="donaposts-subitens" style="display:none;padding-left:16px;margin-top:2px;">
+          <a class="nav-item nav-subitem" id="nav-dp-post-unico" href="#" onclick="showDonaPosts('dp-post-unico');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            Post Único
+          </a>
+          <a class="nav-item nav-subitem" id="nav-dp-carrossel" href="#" onclick="showDonaPosts('dp-carrossel');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="14" height="16" rx="2"/><rect x="8" y="2" width="14" height="16" rx="2"/></svg>
+            Carrossel
+          </a>
+          <a class="nav-item nav-subitem" id="nav-dp-aprovacao" href="#" onclick="showDonaPosts('dp-aprovacao');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Aprovação
+          </a>
+        </div>
+
+        <a class="nav-item" id="nav-dp-ebook" href="#" onclick="showSection('dp-ebook');return false;">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          Ebook
         </a>
 
         <a class="nav-item" id="nav-principal" href="#" onclick="showSection('principal');return false;">
@@ -1020,6 +1036,173 @@ C56: (texto de contato/suporte — opcional)"></textarea>
       </div>
     </div>
 
+    <!-- ══ DONAPOSTS: POST ÚNICO ══ -->
+    <div id="section-dp-post-unico" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Post Único</div>
+      </div>
+      <div style="display:flex;gap:24px;height:calc(100vh - 140px)">
+        <!-- Sidebar config -->
+        <div style="width:340px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden">
+          <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06)">
+            <button class="dp-tab-btn active" data-tab="dp-conteudo" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);font-family:'DM Sans',sans-serif">Conteúdo</button>
+            <button class="dp-tab-btn" data-tab="dp-config" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">Config</button>
+            <button class="dp-tab-btn" data-tab="dp-json" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">JSON / N8N</button>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:20px">
+            <!-- Tab: Conteúdo -->
+            <div id="dp-conteudo" class="dp-tab-panel">
+              <label class="form-label">Texto do post</label>
+              <textarea class="form-input" id="dp-text" rows="14" style="min-height:240px;line-height:1.65;font-size:14px" oninput="dpUpdatePreview()">Habilidade subestimada: marcar a sua alegria primeiro.
+
+Um jantar com amigas.
+Um show.
+Uma tarde sem agenda.
+
+Porque quando você deixa a vida para "depois do trabalho", o depois quase nunca chega.</textarea>
+              <div style="font-size:11px;color:var(--text-dim);text-align:right;margin-top:8px" id="dp-char-count">0 caracteres</div>
+              <button class="btn-gold" id="btn-criar-imagem" onclick="dpCriarImagem()" style="width:100%;margin-top:16px;justify-content:center;padding:14px 20px;font-size:14px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Criar Imagem
+              </button>
+              <div id="dp-criar-status" style="display:none;margin-top:10px;font-size:12px;text-align:center;padding:10px;border-radius:8px"></div>
+            </div>
+            <!-- Tab: Config -->
+            <div id="dp-config" class="dp-tab-panel" style="display:none">
+              <label class="form-label">Formato</label>
+              <div style="display:flex;gap:8px;margin:8px 0 20px">
+                <button onclick="dpSetFormat('vertical')" id="dp-fmt-vertical" class="dp-fmt-btn" style="flex:1;padding:12px;border-radius:10px;border:2px solid var(--gold-border);background:var(--gold-dim);cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">Vertical</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:2px">1080×1350</div>
+                </button>
+                <button onclick="dpSetFormat('square')" id="dp-fmt-square" class="dp-fmt-btn" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">Quadrado</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:2px">1080×1080</div>
+                </button>
+              </div>
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 0"></div>
+              <label class="form-label">Foto de perfil</label>
+              <div style="display:flex;align-items:center;gap:14px;margin:10px 0 20px">
+                <div id="dp-avatar-preview" style="width:56px;height:56px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--text-dim);overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,0.08)">?</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <label style="padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;font-size:12px;cursor:pointer;color:var(--text-muted);font-weight:600;text-align:center;display:inline-block;font-family:'DM Sans',sans-serif">
+                    Enviar foto
+                    <input type="file" accept="image/png,image/jpeg,image/webp" onchange="dpUploadAvatar(this)" style="display:none">
+                  </label>
+                </div>
+              </div>
+              <label class="form-label">Nome</label>
+              <input class="form-input" id="dp-name" value="Isis Moreira" oninput="dpUpdatePreview()" style="margin:8px 0 16px">
+              <label class="form-label">@ do perfil</label>
+              <input class="form-input" id="dp-handle" value="@souisismoreira" oninput="dpUpdatePreview()" style="margin:8px 0 16px">
+            </div>
+            <!-- Tab: JSON -->
+            <div id="dp-json" class="dp-tab-panel" style="display:none">
+              <label class="form-label">Integração N8N / API</label>
+              <p style="font-size:12px;color:var(--text-muted);line-height:1.5;margin:4px 0 12px">Post único ou array para lote.</p>
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <button class="btn-gold" onclick="dpLoadJson()" style="font-size:12px;padding:8px 16px">Carregar</button>
+                <button class="btn-outline" onclick="dpExportJson()" style="font-size:12px;padding:8px 16px">Exportar</button>
+              </div>
+              <textarea class="form-input" id="dp-json-input" rows="10" style="font-family:monospace;font-size:12px;line-height:1.6" placeholder='{ "text": "Seu texto...", "name": "Nome", "handle": "@perfil" }'></textarea>
+              <div style="background:var(--surface3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;margin-top:12px">
+                <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px">Formato JSON</div>
+                <pre style="margin:0;white-space:pre-wrap;font-size:11px;line-height:1.5;color:var(--text-muted);font-family:monospace">{ "text": "Texto do post...",
+  "name": "Isis Moreira",
+  "handle": "@moreira.isis",
+  "format": "vertical" }
+
+Lote: [{ "text": "Post 1" }, ...]</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+          <div id="dp-preview-frame" style="width:405px;height:506px;border-radius:14px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.3)">
+            <div id="dp-preview-inner" style="width:1080px;height:1350px;transform:scale(0.375);transform-origin:top left;background:#f2efe9;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px 164px;font-family:'DM Sans',sans-serif;color:#1a1a1a;box-sizing:border-box">
+              <!-- Header -->
+              <div id="dp-preview-header" style="display:flex;align-items:center;gap:24px;margin-bottom:56px;align-self:center">
+                <div id="dp-preview-avatar" style="width:96px;height:96px;border-radius:50%;background:#d4d0c8;flex-shrink:0;overflow:hidden"></div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <span id="dp-preview-name" style="font-size:34px;font-weight:700;letter-spacing:-0.01em;line-height:1.2">Isis Moreira</span>
+                  <span id="dp-preview-handle" style="font-size:26px;color:#888;font-weight:400;line-height:1.2">@souisismoreira</span>
+                </div>
+              </div>
+              <!-- Text -->
+              <div id="dp-preview-text" style="font-size:38px;line-height:1.55;font-weight:400;white-space:pre-line;text-align:left;width:100%;max-width:860px;letter-spacing:-0.01em;color:#1a1a1a"></div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-dim)" id="dp-format-label">1080 × 1350 — Post Único</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DONAPOSTS: CARROSSEL ══ -->
+    <div id="section-dp-carrossel" style="display:none">
+      <div class="topbar"><div class="page-title">Carrossel</div></div>
+      <div style="display:flex;align-items:center;justify-content:center;height:calc(100vh - 200px);flex-direction:column;gap:16px">
+        <div style="width:72px;height:72px;border-radius:18px;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="2" y="4" width="14" height="16" rx="2"/><rect x="8" y="2" width="14" height="16" rx="2"/></svg>
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">Carrossel</div>
+        <div style="font-size:14px;color:var(--text-muted)">Em breve — vamos construir juntos!</div>
+      </div>
+    </div>
+
+    <!-- ══ DONAPOSTS: APROVAÇÃO (KANBAN) ══ -->
+    <div id="section-dp-aprovacao" style="display:none">
+      <div class="topbar">
+        <div class="page-title">Fluxo de Aprovação</div>
+        <button class="btn-gold" onclick="dpAddCard()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Post
+        </button>
+      </div>
+
+      <div style="display:flex;gap:20px;height:calc(100vh - 160px);overflow-x:auto;padding-bottom:16px">
+        <!-- Coluna: Posts Criados -->
+        <div class="kb-col" data-col="criados" ondragover="event.preventDefault();this.style.background='rgba(201,168,76,0.06)'" ondragleave="this.style.background=''" ondrop="dpDrop(event,'criados');this.style.background=''">
+          <div class="kb-col-header">
+            <div class="kb-col-dot" style="background:#C9A84C"></div>
+            <span>Posts Criados</span>
+            <span class="kb-col-count" id="kb-count-criados">0</span>
+          </div>
+          <div class="kb-col-body" id="kb-list-criados"></div>
+        </div>
+        <!-- Coluna: Revisados / A publicar -->
+        <div class="kb-col" data-col="revisados" ondragover="event.preventDefault();this.style.background='rgba(93,184,112,0.06)'" ondragleave="this.style.background=''" ondrop="dpDrop(event,'revisados');this.style.background=''">
+          <div class="kb-col-header">
+            <div class="kb-col-dot" style="background:#5db870"></div>
+            <span>Revisados / A publicar</span>
+            <span class="kb-col-count" id="kb-count-revisados">0</span>
+          </div>
+          <div class="kb-col-body" id="kb-list-revisados"></div>
+        </div>
+        <!-- Coluna: Publicados -->
+        <div class="kb-col" data-col="publicados" ondragover="event.preventDefault();this.style.background='rgba(76,154,201,0.06)'" ondragleave="this.style.background=''" ondrop="dpDrop(event,'publicados');this.style.background=''">
+          <div class="kb-col-header">
+            <div class="kb-col-dot" style="background:#4c9ac9"></div>
+            <span>Publicados</span>
+            <span class="kb-col-count" id="kb-count-publicados">0</span>
+          </div>
+          <div class="kb-col-body" id="kb-list-publicados"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DONAPOSTS: EBOOK ══ -->
+    <div id="section-dp-ebook" style="display:none">
+      <div class="topbar"><div class="page-title">Ebook</div></div>
+      <div style="display:flex;align-items:center;justify-content:center;height:calc(100vh - 200px);flex-direction:column;gap:16px">
+        <div style="width:72px;height:72px;border-radius:18px;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">Ebook</div>
+        <div style="font-size:14px;color:var(--text-muted)">Em breve — vamos construir juntos!</div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1233,7 +1416,8 @@ function showMateriais(categoria) {
   document.getElementById('materiais-chevron').style.transform = 'rotate(180deg)';
   // Esconde todas as sections (incluindo fluxos)
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
-   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+   'fluxo-plano-ouro','fluxo-conteudo-alcance',
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
   });
@@ -1243,6 +1427,8 @@ function showMateriais(categoria) {
   document.getElementById('nav-materiais').classList.add('active');
   var navEl = document.getElementById('nav-'+categoria);
   if (navEl) navEl.classList.add('active');
+  document.getElementById('donaposts-subitens').style.display = 'none';
+  document.getElementById('donaposts-chevron').style.transform = '';
   if(categoria === 'plano-ouro'){
     loadPlanosOuro();
   } else {
@@ -1263,7 +1449,8 @@ function showFluxo(nome) {
   document.getElementById('fluxos-chevron').style.transform = 'rotate(180deg)';
   // Esconde todas as sections (materiais e fluxo)
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
-   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+   'fluxo-plano-ouro','fluxo-conteudo-alcance',
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
   });
@@ -1274,23 +1461,27 @@ function showFluxo(nome) {
   document.getElementById('nav-fluxos').classList.add('active');
   var navEl = document.getElementById('nav-fluxo-'+nome);
   if (navEl) navEl.classList.add('active');
+  document.getElementById('donaposts-subitens').style.display = 'none';
+  document.getElementById('donaposts-chevron').style.transform = '';
 }
 
 function showSection(name) {
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
-   'fluxo-plano-ouro','fluxo-conteudo-alcance'].forEach(function(s) {
+   'fluxo-plano-ouro','fluxo-conteudo-alcance',
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = (s===name)?'':'none';
     var n = document.getElementById('nav-'+s);
     if (n) n.classList.toggle('active', s===name);
   });
-  // Fecha menus de materiais e fluxos
+  // Fecha menus
   document.getElementById('fluxos-subitens').style.display = 'none';
   document.getElementById('fluxos-chevron').style.transform = '';
   document.getElementById('materiais-subitens').style.display = 'none';
   document.getElementById('materiais-chevron').style.transform = '';
-  document.querySelectorAll('#nav-fluxos, #nav-materiais').forEach(function(n){ if(n) n.classList.remove('active'); });
-  // Fecha subitens de fluxos e limpa active
+  document.getElementById('donaposts-subitens').style.display = 'none';
+  document.getElementById('donaposts-chevron').style.transform = '';
+  document.querySelectorAll('#nav-fluxos, #nav-materiais, #nav-donaposts').forEach(function(n){ if(n) n.classList.remove('active'); });
   document.querySelectorAll('.nav-subitem').forEach(function(el){ el.classList.remove('active'); });
   if (name==='config') document.getElementById('config-openai-key').value = localStorage.getItem('openai_key')||'';
 }
@@ -3256,6 +3447,348 @@ var origShowSection = showSection;
 showSection = function(name){
   origShowSection(name);
   if(name==='principal' && !_ppLoaded){ _ppLoaded=true; ppLoad(); }
+};
+
+// ══ DONAPOSTS ══
+
+var _dpAvatarUrl = 'data:image/jpeg;base64,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';
+var _dpFormat = 'vertical';
+
+function toggleDonaPosts() {
+  var sub = document.getElementById('donaposts-subitens');
+  var chev = document.getElementById('donaposts-chevron');
+  var open = sub.style.display !== 'none';
+  sub.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function showDonaPosts(secName) {
+  document.getElementById('donaposts-subitens').style.display = 'block';
+  document.getElementById('donaposts-chevron').style.transform = 'rotate(180deg)';
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
+   'fluxo-plano-ouro','fluxo-conteudo-alcance',
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('section-'+secName).style.display = '';
+  document.querySelectorAll('.nav-item, .nav-subitem').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('nav-donaposts').classList.add('active');
+  var navEl = document.getElementById('nav-'+secName);
+  if (navEl) navEl.classList.add('active');
+  // Fecha outros menus
+  document.getElementById('fluxos-subitens').style.display = 'none';
+  document.getElementById('fluxos-chevron').style.transform = '';
+  document.getElementById('materiais-subitens').style.display = 'none';
+  document.getElementById('materiais-chevron').style.transform = '';
+  // Init preview
+  if (secName === 'dp-post-unico') {
+    // Init avatar in sidebar
+    if (_dpAvatarUrl) {
+      document.getElementById('dp-avatar-preview').innerHTML = '<img src="'+_dpAvatarUrl+'" style="width:100%;height:100%;object-fit:cover">';
+    }
+    dpUpdatePreview();
+  }
+}
+
+function dpSwitchTab(btn) {
+  var tabId = btn.getAttribute('data-tab');
+  document.querySelectorAll('.dp-tab-btn').forEach(function(b) {
+    b.style.color = 'var(--text-dim)';
+    b.style.borderBottom = '2px solid transparent';
+    b.classList.remove('active');
+  });
+  btn.style.color = 'var(--gold)';
+  btn.style.borderBottom = '2px solid var(--gold)';
+  btn.classList.add('active');
+  document.querySelectorAll('.dp-tab-panel').forEach(function(p) { p.style.display = 'none'; });
+  document.getElementById(tabId).style.display = '';
+}
+
+function dpSetFormat(fmt) {
+  _dpFormat = fmt;
+  var inner = document.getElementById('dp-preview-inner');
+  var frame = document.getElementById('dp-preview-frame');
+  if (fmt === 'vertical') {
+    inner.style.width = '1080px'; inner.style.height = '1350px';
+    inner.style.transform = 'scale(0.375)';
+    inner.style.padding = '80px 164px';
+    frame.style.width = '405px'; frame.style.height = '506px';
+    document.getElementById('dp-format-label').textContent = '1080 × 1350 — Post Único';
+  } else {
+    inner.style.width = '1080px'; inner.style.height = '1080px';
+    inner.style.transform = 'scale(0.3889)';
+    inner.style.padding = '60px 164px';
+    frame.style.width = '420px'; frame.style.height = '420px';
+    document.getElementById('dp-format-label').textContent = '1080 × 1080 — Post Único';
+  }
+  // Update button styles
+  document.getElementById('dp-fmt-vertical').style.border = fmt === 'vertical' ? '2px solid var(--gold-border)' : '1px solid rgba(255,255,255,0.1)';
+  document.getElementById('dp-fmt-vertical').style.background = fmt === 'vertical' ? 'var(--gold-dim)' : 'transparent';
+  document.getElementById('dp-fmt-square').style.border = fmt === 'square' ? '2px solid var(--gold-border)' : '1px solid rgba(255,255,255,0.1)';
+  document.getElementById('dp-fmt-square').style.background = fmt === 'square' ? 'var(--gold-dim)' : 'transparent';
+}
+
+function dpUploadAvatar(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _dpAvatarUrl = e.target.result;
+    document.getElementById('dp-avatar-preview').innerHTML = '<img src="'+_dpAvatarUrl+'" style="width:100%;height:100%;object-fit:cover">';
+    dpUpdatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function dpUpdatePreview() {
+  var text = document.getElementById('dp-text').value;
+  var name = document.getElementById('dp-name').value;
+  var handle = document.getElementById('dp-handle').value;
+  document.getElementById('dp-preview-text').textContent = text;
+  document.getElementById('dp-preview-name').textContent = name;
+  document.getElementById('dp-preview-handle').textContent = handle;
+  document.getElementById('dp-char-count').textContent = text.length + ' caracteres';
+  // Avatar
+  var avatarEl = document.getElementById('dp-preview-avatar');
+  if (_dpAvatarUrl) {
+    avatarEl.innerHTML = '<img src="'+_dpAvatarUrl+'" style="width:100%;height:100%;object-fit:cover">';
+  } else {
+    avatarEl.innerHTML = '';
+    avatarEl.style.background = '#d4d0c8';
+  }
+}
+
+function dpLoadJson() {
+  var raw = document.getElementById('dp-json-input').value;
+  try {
+    var data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      if (data[0] && data[0].text) document.getElementById('dp-text').value = data[0].text;
+      if (data[0] && data[0].name) document.getElementById('dp-name').value = data[0].name;
+      if (data[0] && data[0].handle) document.getElementById('dp-handle').value = data[0].handle;
+      alert(data.length + ' posts no array. Mostrando o primeiro.');
+    } else {
+      if (data.text !== undefined) document.getElementById('dp-text').value = data.text;
+      if (data.name !== undefined) document.getElementById('dp-name').value = data.name;
+      if (data.handle !== undefined) document.getElementById('dp-handle').value = data.handle;
+      if (data.format) dpSetFormat(data.format);
+    }
+    dpUpdatePreview();
+  } catch(e) {
+    alert('JSON inválido: ' + e.message);
+  }
+}
+
+function dpExportJson() {
+  var obj = {
+    text: document.getElementById('dp-text').value,
+    name: document.getElementById('dp-name').value,
+    handle: document.getElementById('dp-handle').value,
+    format: _dpFormat
+  };
+  document.getElementById('dp-json-input').value = JSON.stringify(obj, null, 2);
+}
+
+// ══ CRIAR IMAGEM (html2canvas + Supabase) ══
+
+function dpShowStatus(msg, type) {
+  var el = document.getElementById('dp-criar-status');
+  el.style.display = 'block';
+  el.textContent = msg;
+  if (type === 'ok') { el.style.background = 'rgba(93,184,112,0.12)'; el.style.color = '#5db870'; }
+  else if (type === 'err') { el.style.background = 'var(--danger-dim)'; el.style.color = 'var(--danger)'; }
+  else { el.style.background = 'var(--gold-dim)'; el.style.color = 'var(--gold)'; }
+}
+
+function dpCriarImagem() {
+  var btn = document.getElementById('btn-criar-imagem');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#0D0D0D;border-radius:50%;animation:spin .8s linear infinite;display:inline-block"></div> Gerando...';
+  dpShowStatus('Renderizando imagem...', 'loading');
+
+  var inner = document.getElementById('dp-preview-inner');
+  var isVert = _dpFormat === 'vertical';
+  var w = 1080;
+  var h = isVert ? 1350 : 1080;
+
+  // Temporarily set full size for capture
+  var origTransform = inner.style.transform;
+  var origWidth = inner.style.width;
+  var origHeight = inner.style.height;
+  inner.style.transform = 'none';
+  inner.style.width = w + 'px';
+  inner.style.height = h + 'px';
+
+  html2canvas(inner, {
+    width: w,
+    height: h,
+    scale: 1,
+    useCORS: true,
+    backgroundColor: '#f2efe9'
+  }).then(function(canvas) {
+    // Restore preview
+    inner.style.transform = origTransform;
+    inner.style.width = origWidth;
+    inner.style.height = origHeight;
+
+    dpShowStatus('Enviando para Supabase...', 'loading');
+
+    // Convert to blob
+    canvas.toBlob(function(blob) {
+      var timestamp = Date.now();
+      var filename = 'post_' + timestamp + '.jpg';
+
+      // Upload to Supabase Storage
+      fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
+        method: 'POST',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Content-Type': 'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: blob
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Upload falhou: ' + res.status);
+        // Build public URL
+        var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
+
+        // Insert into posts_aprovacao table
+        var title = document.getElementById('dp-text').value.split('\n')[0].substring(0, 60);
+        var text = document.getElementById('dp-text').value;
+        var payload = {
+          title: title || 'Post ' + timestamp,
+          text: text,
+          type: 'post',
+          status: 'criados',
+          image_url: imageUrl
+        };
+
+        return sbFetch('posts_aprovacao', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        }).then(function() {
+          dpShowStatus('✓ Imagem criada e enviada para aprovação!', 'ok');
+          setTimeout(function() {
+            document.getElementById('dp-criar-status').style.display = 'none';
+          }, 4000);
+        });
+      }).catch(function(err) {
+        dpShowStatus('Erro: ' + err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Criar Imagem';
+      });
+    }, 'image/jpeg', 0.92);
+  }).catch(function(err) {
+    inner.style.transform = origTransform;
+    inner.style.width = origWidth;
+    inner.style.height = origHeight;
+    dpShowStatus('Erro ao renderizar: ' + err.message, 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Criar Imagem';
+  });
+}
+
+
+// ══ KANBAN APROVAÇÃO (Supabase) ══
+
+var _kbCards = [];
+
+function dpLoadKanban() {
+  sbFetch('posts_aprovacao?select=*&order=created_at.desc').then(function(data) {
+    if (Array.isArray(data)) {
+      _kbCards = data;
+      dpRenderKanban();
+    }
+  }).catch(function(err) {
+    console.error('Erro ao carregar kanban:', err);
+  });
+}
+
+function dpRenderKanban() {
+  ['criados','revisados','publicados'].forEach(function(col) {
+    var list = document.getElementById('kb-list-' + col);
+    if (!list) return;
+    list.innerHTML = '';
+    var cards = _kbCards.filter(function(c) { return c.status === col; });
+    document.getElementById('kb-count-' + col).textContent = cards.length;
+    cards.forEach(function(card) {
+      var el = document.createElement('div');
+      el.className = 'kb-card';
+      el.draggable = true;
+      el.setAttribute('data-id', card.id);
+      el.ondragstart = function(e) { e.dataTransfer.setData('text/plain', card.id); };
+      var preview = card.text ? card.text.substring(0, 120) + (card.text.length > 120 ? '...' : '') : 'Sem texto';
+      var dateStr = card.created_at ? new Date(card.created_at).toLocaleDateString('pt-BR') : '';
+      var imgThumb = card.image_url
+        ? '<img src="'+card.image_url+'" style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:10px">'
+        : '';
+      el.innerHTML = '<div class="kb-card-actions">'
+        + '<button class="kb-card-btn danger" onclick="event.stopPropagation();dpDeleteCard('+card.id+')" title="Excluir"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>'
+        + '</div>'
+        + imgThumb
+        + '<div class="kb-card-title">' + (card.title || 'Post #' + card.id) + '</div>'
+        + '<div class="kb-card-preview">' + preview + '</div>'
+        + '<div class="kb-card-meta">'
+        + '<span class="kb-card-type">' + (card.type || 'post') + '</span>'
+        + '<span>' + dateStr + '</span>'
+        + '</div>';
+      list.appendChild(el);
+    });
+  });
+}
+
+function dpDrop(e, targetCol) {
+  e.preventDefault();
+  var cardId = parseInt(e.dataTransfer.getData('text/plain'));
+  var card = _kbCards.find(function(c) { return c.id === cardId; });
+  if (card) {
+    card.status = targetCol;
+    // Update in Supabase
+    sbFetch('posts_aprovacao?id=eq.' + cardId, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: targetCol })
+    }).then(function() {
+      dpRenderKanban();
+    });
+  }
+}
+
+function dpAddCard() {
+  var title = prompt('Título do post:');
+  if (!title) return;
+  var text = prompt('Texto / descrição (opcional):') || '';
+  var type = prompt('Tipo (post / carrossel):') || 'post';
+  var payload = {
+    title: title,
+    text: text,
+    type: type,
+    status: 'criados',
+    image_url: ''
+  };
+  sbFetch('posts_aprovacao', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }).then(function() {
+    dpLoadKanban();
+  });
+}
+
+function dpDeleteCard(id) {
+  if (!confirm('Excluir este post?')) return;
+  sbFetch('posts_aprovacao?id=eq.' + id, { method: 'DELETE' }).then(function() {
+    _kbCards = _kbCards.filter(function(c) { return c.id !== id; });
+    dpRenderKanban();
+  });
+}
+
+// Init kanban when section opens
+var _origShowDonaPosts = showDonaPosts;
+showDonaPosts = function(secName) {
+  _origShowDonaPosts(secName);
+  if (secName === 'dp-aprovacao') dpLoadKanban();
 };
 
 </script>
