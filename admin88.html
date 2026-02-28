@@ -3811,111 +3811,114 @@ function dpLoteGerar() {
     // 2. Wait for preview to render
     setTimeout(function() {
 
-      // 3. Capture at full size
+      // 3. Clone the preview into an offscreen element for capture
       var inner = document.getElementById('dp-preview-inner');
       var w = 1080, h = _dpFormat === 'vertical' ? 1350 : 1080;
-      var origT = inner.style.transform;
-      var origW = inner.style.width;
-      var origH = inner.style.height;
-      inner.style.transform = 'none';
-      inner.style.width = w + 'px';
-      inner.style.height = h + 'px';
 
-      html2canvas(inner, {
-        width: w, height: h, scale: 1, useCORS: true, backgroundColor: '#f2efe9',
-        logging: false
-      }).then(function(canvas) {
-        // Restore preview
-        inner.style.transform = origT;
-        inner.style.width = origW;
-        inner.style.height = origH;
+      var clone = inner.cloneNode(true);
+      clone.id = '';
+      clone.style.transform = 'none';
+      clone.style.width = w + 'px';
+      clone.style.height = h + 'px';
+      clone.style.position = 'fixed';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.zIndex = '-1';
+      document.body.appendChild(clone);
 
-        // 4. Convert to blob
-        canvas.toBlob(function(blob) {
-          if (!blob) {
-            console.error('Blob is null');
-            log.innerHTML += '<div style="color:var(--danger)">✗ Erro: imagem vazia</div>';
-            done++; counter.textContent = done + ' de ' + qty;
-            bar.style.width = (done / qty * 100) + '%';
-            setTimeout(function() { processNext(idx + 1); }, 300);
-            return;
-          }
+      // Small delay for clone to render
+      setTimeout(function() {
+        html2canvas(clone, {
+          width: w, height: h, scale: 1, useCORS: true, backgroundColor: '#f2efe9',
+          logging: false
+        }).then(function(canvas) {
+          document.body.removeChild(clone);
 
-          var filename = 'post_lote_' + Date.now() + '_' + idx + '.jpg';
-          jarvisStatus('Upload ' + (idx + 1) + ' de ' + qty);
+          // 4. Convert to blob
+          canvas.toBlob(function(blob) {
+            if (!blob) {
+              console.error('Blob is null');
+              log.innerHTML += '<div style="color:var(--danger)">✗ Erro: imagem vazia</div>';
+              done++; counter.textContent = done + ' de ' + qty;
+              bar.style.width = (done / qty * 100) + '%';
+              setTimeout(function() { processNext(idx + 1); }, 300);
+              return;
+            }
 
-          // 5. Upload to Supabase Storage
-          fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
-            method: 'POST',
-            headers: {
-              'apikey': SB_KEY,
-              'Authorization': 'Bearer ' + SB_KEY,
-              'Content-Type': 'image/jpeg',
-              'x-upsert': 'true'
-            },
-            body: blob
-          }).then(function(res) {
-            console.log('Upload response:', res.status);
-            if (!res.ok) throw new Error('Upload: ' + res.status);
+            var filename = 'post_lote_' + Date.now() + '_' + idx + '.jpg';
+            jarvisStatus('Upload ' + (idx + 1) + ' de ' + qty);
 
-            var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
-            var title = item.trecho.split('\n')[0].substring(0, 60) || 'Post Lote';
-
-            // 6. Insert into Supabase table
-            return fetch(SB_URL + '/rest/v1/posts_aprovacao', {
+            // 5. Upload to Supabase Storage
+            fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
               method: 'POST',
               headers: {
                 'apikey': SB_KEY,
                 'Authorization': 'Bearer ' + SB_KEY,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
+                'Content-Type': 'image/jpeg',
+                'x-upsert': 'true'
               },
-              body: JSON.stringify({
-                title: title,
-                text: item.trecho,
-                type: 'post',
-                status: 'criados',
-                image_url: imageUrl
-              })
+              body: blob
+            }).then(function(res) {
+              console.log('Upload response:', res.status);
+              if (!res.ok) throw new Error('Upload: ' + res.status);
+
+              var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
+              var title = item.trecho.split('\n')[0].substring(0, 60) || 'Post Lote';
+
+              // 6. Insert into Supabase table
+              return fetch(SB_URL + '/rest/v1/posts_aprovacao', {
+                method: 'POST',
+                headers: {
+                  'apikey': SB_KEY,
+                  'Authorization': 'Bearer ' + SB_KEY,
+                  'Content-Type': 'application/json',
+                  'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                  title: title,
+                  text: item.trecho,
+                  type: 'post',
+                  status: 'criados',
+                  image_url: imageUrl
+                })
+              });
+            }).then(function(res2) {
+              console.log('DB insert response:', res2.status);
+              if (!res2.ok) throw new Error('DB: ' + res2.status);
+
+              // 7. Mark as Postado in sheet (silent fail ok)
+              dpLoteMarkPostado(item.rowIndex);
+              _loteAvailable = _loteAvailable.filter(function(a) { return a.rowIndex !== item.rowIndex; });
+
+              done++;
+              counter.textContent = done + ' de ' + qty;
+              bar.style.width = (done / qty * 100) + '%';
+              log.innerHTML += '<div style="color:#5db870">✓ ' + done + ' de ' + qty + '</div>';
+              log.scrollTop = log.scrollHeight;
+
+              setTimeout(function() { processNext(idx + 1); }, 400);
+
+            }).catch(function(err) {
+              console.error('Lote erro:', err);
+              log.innerHTML += '<div style="color:var(--danger)">✗ ' + err.message + '</div>';
+              done++;
+              counter.textContent = done + ' de ' + qty;
+              bar.style.width = (done / qty * 100) + '%';
+              setTimeout(function() { processNext(idx + 1); }, 300);
             });
-          }).then(function(res2) {
-            console.log('DB insert response:', res2.status);
-            if (!res2.ok) throw new Error('DB: ' + res2.status);
 
-            // 7. Mark as Postado in sheet (silent fail ok)
-            dpLoteMarkPostado(item.rowIndex);
-            _loteAvailable = _loteAvailable.filter(function(a) { return a.rowIndex !== item.rowIndex; });
+          }, 'image/jpeg', 0.92);
 
-            done++;
-            counter.textContent = done + ' de ' + qty;
-            bar.style.width = (done / qty * 100) + '%';
-            log.innerHTML += '<div style="color:#5db870">✓ ' + done + ' de ' + qty + '</div>';
-            log.scrollTop = log.scrollHeight;
-
-            setTimeout(function() { processNext(idx + 1); }, 400);
-
-          }).catch(function(err) {
-            console.error('Lote erro:', err);
-            log.innerHTML += '<div style="color:var(--danger)">✗ ' + err.message + '</div>';
-            done++;
-            counter.textContent = done + ' de ' + qty;
-            bar.style.width = (done / qty * 100) + '%';
-            setTimeout(function() { processNext(idx + 1); }, 300);
-          });
-
-        }, 'image/jpeg', 0.92);
-
-      }).catch(function(err) {
-        inner.style.transform = origT;
-        inner.style.width = origW;
-        inner.style.height = origH;
-        console.error('html2canvas erro:', err);
-        log.innerHTML += '<div style="color:var(--danger)">✗ Render: ' + err.message + '</div>';
-        done++;
-        counter.textContent = done + ' de ' + qty;
-        bar.style.width = (done / qty * 100) + '%';
-        setTimeout(function() { processNext(idx + 1); }, 300);
-      });
+        }).catch(function(err) {
+          if (clone.parentNode) document.body.removeChild(clone);
+          console.error('html2canvas erro:', err);
+          log.innerHTML += '<div style="color:var(--danger)">✗ Render: ' + err.message + '</div>';
+          done++;
+          counter.textContent = done + ' de ' + qty;
+          bar.style.width = (done / qty * 100) + '%';
+          setTimeout(function() { processNext(idx + 1); }, 300);
+        });
+      }, 200);
 
     }, 600);
   }
@@ -4063,21 +4066,10 @@ function dpRenderKanban() {
       var imgHtml = card.image_url
         ? '<img class="kb-card-img" src="'+card.image_url+'" draggable="false" onclick="event.stopPropagation();kbOpenPreview('+card.id+')" style="cursor:pointer">'
         : '<div style="width:100%;aspect-ratio:4/5;background:var(--surface3);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:12px;border-bottom:1px solid rgba(255,255,255,0.06)">Sem imagem</div>';
-      var captionVal = card.caption || '';
       el.innerHTML = '<div class="kb-card-actions">'
         + '<button class="kb-card-btn danger" onclick="event.stopPropagation();dpDeleteCard('+card.id+')" title="Excluir"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>'
         + '</div>'
-        + imgHtml
-        + '<div class="kb-card-body">'
-        + '<div class="kb-card-title">' + (card.title || 'Post #' + card.id) + '</div>'
-        + '<label style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-dim);font-weight:600">Legenda</label>'
-        + '<textarea class="kb-card-caption-input" placeholder="Escreva a legenda do Instagram..." data-cardid="'+card.id+'" onblur="dpSaveCaption(this)">' + captionVal + '</textarea>'
-        + '<div class="kb-card-meta">'
-        + '<span class="kb-card-type">' + (card.type || 'post') + '</span>'
-        + '<span>' + dateStr + '</span>'
-        + '</div>'
-        + (card.status !== 'publicados' ? '<button onclick="event.stopPropagation();dpPublishCard('+card.id+')" style="width:100%;margin-top:10px;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,#5db870,#3a8a4a);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:\'DM Sans\',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.15s"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Publicar</button>' : '<div style="width:100%;margin-top:10px;padding:8px;border-radius:8px;background:rgba(76,154,201,0.12);color:#4c9ac9;font-size:12px;font-weight:600;text-align:center;font-family:\'DM Sans\',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Publicado</div>')
-        + '</div>';
+        + imgHtml;
       list.appendChild(el);
     });
   });
