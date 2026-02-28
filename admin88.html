@@ -1137,7 +1137,7 @@ C56: (texto de contato/suporte — opcional)"></textarea>
                   <button onclick="var el=document.getElementById('dp-lote-qty');el.value=Math.min(50,parseInt(el.value)+1)" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
                 </div>
 
-                <div style="font-size:11px;color:var(--text-dim);margin-bottom:20px"><span id="dp-lote-available" style="color:var(--gold);font-weight:600">...</span> disponíveis</div>
+                <div style="height:20px"></div>
 
                 <!-- Generate button -->
                 <button class="btn-gold" id="btn-lote-gerar" onclick="dpLoteGerar()" style="width:100%;justify-content:center;padding:14px;font-size:13px;letter-spacing:0.04em">
@@ -3733,10 +3733,21 @@ function dpLoteMarkPostado(rowIndex) {
 
 function dpLoteGerar() {
   var qty = parseInt(document.getElementById('dp-lote-qty').value) || 5;
+
   if (_loteAvailable.length === 0) {
-    jarvisStatus('Nenhum trecho disponível');
+    // Try loading first
+    jarvisStatus('Carregando planilha...');
+    dpLoteLoadAvailable();
+    setTimeout(function() {
+      if (_loteAvailable.length === 0) {
+        jarvisStatus('Nenhum trecho disponível');
+      } else {
+        dpLoteGerar();
+      }
+    }, 2000);
     return;
   }
+
   if (qty > _loteAvailable.length) qty = _loteAvailable.length;
 
   var shuffled = _loteAvailable.slice().sort(function() { return 0.5 - Math.random(); });
@@ -3748,7 +3759,7 @@ function dpLoteGerar() {
   btn.style.pointerEvents = 'none';
 
   jarvisActivate(true);
-  jarvisStatus('Iniciando geração...');
+  jarvisStatus('Iniciando...');
 
   var progress = document.getElementById('dp-lote-progress');
   progress.style.display = 'block';
@@ -3760,92 +3771,141 @@ function dpLoteGerar() {
   bar.style.width = '0%';
 
   var done = 0;
+
+  function finishAll() {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    jarvisActivate(false);
+    jarvisStatus('✓ ' + done + ' posts criados');
+    log.innerHTML += '<div style="color:#5db870">✓ Completo!</div>';
+    dpLoteLoadAvailable();
+  }
+
   function processNext(idx) {
-    if (idx >= selected.length) {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.pointerEvents = 'auto';
-      jarvisActivate(false);
-      jarvisStatus('✓ ' + qty + ' posts criados');
-      log.innerHTML += '<div style="color:#5db870">✓ Completo!</div>';
-      dpLoteLoadAvailable();
-      return;
-    }
+    if (idx >= selected.length) { finishAll(); return; }
+
     var item = selected[idx];
-    var shortTitle = item.trecho.substring(0, 40) + '...';
-    jarvisStatus('Gerando ' + (idx + 1) + '/' + qty);
+    var shortTitle = item.trecho.substring(0, 35) + '...';
+    jarvisStatus((idx + 1) + ' de ' + qty);
     log.innerHTML += '<div>⏳ ' + shortTitle + '</div>';
     log.scrollTop = log.scrollHeight;
 
-    // Set text in preview and wait for render
+    // 1. Set text and update preview
     document.getElementById('dp-text').value = item.trecho;
     dpUpdatePreview();
 
+    // 2. Wait for preview to render
     setTimeout(function() {
+
+      // 3. Capture at full size
       var inner = document.getElementById('dp-preview-inner');
       var w = 1080, h = _dpFormat === 'vertical' ? 1350 : 1080;
-      var origT = inner.style.transform, origW = inner.style.width, origH = inner.style.height;
+      var origT = inner.style.transform;
+      var origW = inner.style.width;
+      var origH = inner.style.height;
       inner.style.transform = 'none';
       inner.style.width = w + 'px';
       inner.style.height = h + 'px';
 
-      html2canvas(inner, { width: w, height: h, scale: 1, useCORS: true, backgroundColor: '#f2efe9' }).then(function(canvas) {
+      html2canvas(inner, {
+        width: w, height: h, scale: 1, useCORS: true, backgroundColor: '#f2efe9',
+        logging: false
+      }).then(function(canvas) {
+        // Restore preview
         inner.style.transform = origT;
         inner.style.width = origW;
         inner.style.height = origH;
 
-        return new Promise(function(resolve) {
-          canvas.toBlob(function(blob) { resolve(blob); }, 'image/jpeg', 0.92);
-        });
-      }).then(function(blob) {
-        var filename = 'post_lote_' + Date.now() + '_' + idx + '.jpg';
-        jarvisStatus('Upload ' + (idx + 1) + '/' + qty);
+        // 4. Convert to blob
+        canvas.toBlob(function(blob) {
+          if (!blob) {
+            console.error('Blob is null');
+            log.innerHTML += '<div style="color:var(--danger)">✗ Erro: imagem vazia</div>';
+            done++; counter.textContent = done + ' de ' + qty;
+            bar.style.width = (done / qty * 100) + '%';
+            setTimeout(function() { processNext(idx + 1); }, 300);
+            return;
+          }
 
-        return fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
-          method: 'POST',
-          headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
-          body: blob
-        }).then(function(res) {
-          if (!res.ok) throw new Error('Upload falhou: ' + res.status);
-          return filename;
-        });
-      }).then(function(filename) {
-        var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
-        var title = item.trecho.split('\n')[0].substring(0, 60);
-        jarvisStatus('Salvando ' + (idx + 1) + '/' + qty);
+          var filename = 'post_lote_' + Date.now() + '_' + idx + '.jpg';
+          jarvisStatus('Upload ' + (idx + 1) + ' de ' + qty);
 
-        return sbFetch('posts_aprovacao', {
-          method: 'POST',
-          body: JSON.stringify({
-            title: title || 'Post Lote',
-            text: item.trecho,
-            type: 'post',
-            status: 'criados',
-            image_url: imageUrl,
-            caption: ''
-          })
-        });
-      }).then(function() {
-        // Try to mark as Postado (may fail silently)
-        dpLoteMarkPostado(item.rowIndex);
-        _loteAvailable = _loteAvailable.filter(function(a) { return a.rowIndex !== item.rowIndex; });
+          // 5. Upload to Supabase Storage
+          fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
+            method: 'POST',
+            headers: {
+              'apikey': SB_KEY,
+              'Authorization': 'Bearer ' + SB_KEY,
+              'Content-Type': 'image/jpeg',
+              'x-upsert': 'true'
+            },
+            body: blob
+          }).then(function(res) {
+            console.log('Upload response:', res.status);
+            if (!res.ok) throw new Error('Upload: ' + res.status);
 
-        done++;
-        counter.textContent = done + ' de ' + qty;
-        bar.style.width = (done / qty * 100) + '%';
-        log.innerHTML += '<div style="color:#5db870">✓ Post ' + done + '</div>';
-        log.scrollTop = log.scrollHeight;
+            var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
+            var title = item.trecho.split('\n')[0].substring(0, 60) || 'Post Lote';
 
-        setTimeout(function() { processNext(idx + 1); }, 400);
+            // 6. Insert into Supabase table
+            return fetch(SB_URL + '/rest/v1/posts_aprovacao', {
+              method: 'POST',
+              headers: {
+                'apikey': SB_KEY,
+                'Authorization': 'Bearer ' + SB_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+              },
+              body: JSON.stringify({
+                title: title,
+                text: item.trecho,
+                type: 'post',
+                status: 'criados',
+                image_url: imageUrl,
+                caption: ''
+              })
+            });
+          }).then(function(res2) {
+            console.log('DB insert response:', res2.status);
+            if (!res2.ok) throw new Error('DB: ' + res2.status);
+
+            // 7. Mark as Postado in sheet (silent fail ok)
+            dpLoteMarkPostado(item.rowIndex);
+            _loteAvailable = _loteAvailable.filter(function(a) { return a.rowIndex !== item.rowIndex; });
+
+            done++;
+            counter.textContent = done + ' de ' + qty;
+            bar.style.width = (done / qty * 100) + '%';
+            log.innerHTML += '<div style="color:#5db870">✓ ' + done + ' de ' + qty + '</div>';
+            log.scrollTop = log.scrollHeight;
+
+            setTimeout(function() { processNext(idx + 1); }, 400);
+
+          }).catch(function(err) {
+            console.error('Lote erro:', err);
+            log.innerHTML += '<div style="color:var(--danger)">✗ ' + err.message + '</div>';
+            done++;
+            counter.textContent = done + ' de ' + qty;
+            bar.style.width = (done / qty * 100) + '%';
+            setTimeout(function() { processNext(idx + 1); }, 300);
+          });
+
+        }, 'image/jpeg', 0.92);
+
       }).catch(function(err) {
-        console.error('Lote erro post ' + (idx + 1) + ':', err);
-        log.innerHTML += '<div style="color:var(--danger)">✗ Erro: ' + err.message + '</div>';
+        inner.style.transform = origT;
+        inner.style.width = origW;
+        inner.style.height = origH;
+        console.error('html2canvas erro:', err);
+        log.innerHTML += '<div style="color:var(--danger)">✗ Render: ' + err.message + '</div>';
         done++;
         counter.textContent = done + ' de ' + qty;
         bar.style.width = (done / qty * 100) + '%';
-        setTimeout(function() { processNext(idx + 1); }, 400);
+        setTimeout(function() { processNext(idx + 1); }, 300);
       });
-    }, 500);
+
+    }, 600);
   }
 
   processNext(0);
