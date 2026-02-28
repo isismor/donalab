@@ -1052,7 +1052,7 @@ C56: (texto de contato/suporte — opcional)"></textarea>
           <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06)">
             <button class="dp-tab-btn active" data-tab="dp-conteudo" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);font-family:'DM Sans',sans-serif">Conteúdo</button>
             <button class="dp-tab-btn" data-tab="dp-config" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">Config</button>
-            <button class="dp-tab-btn" data-tab="dp-json" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">JSON / N8N</button>
+            <button class="dp-tab-btn" data-tab="dp-lote" onclick="dpSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">Criar em Lote</button>
           </div>
           <div style="flex:1;overflow-y:auto;padding:20px">
             <!-- Tab: Conteúdo -->
@@ -1101,23 +1101,47 @@ Porque quando você deixa a vida para "depois do trabalho", o depois quase nunca
               <label class="form-label">@ do perfil</label>
               <input class="form-input" id="dp-handle" value="@souisismoreira" oninput="dpUpdatePreview()" style="margin:8px 0 16px">
             </div>
-            <!-- Tab: JSON -->
-            <div id="dp-json" class="dp-tab-panel" style="display:none">
-              <label class="form-label">Integração N8N / API</label>
-              <p style="font-size:12px;color:var(--text-muted);line-height:1.5;margin:4px 0 12px">Post único ou array para lote.</p>
-              <div style="display:flex;gap:6px;margin-bottom:12px">
-                <button class="btn-gold" onclick="dpLoadJson()" style="font-size:12px;padding:8px 16px">Carregar</button>
-                <button class="btn-outline" onclick="dpExportJson()" style="font-size:12px;padding:8px 16px">Exportar</button>
-              </div>
-              <textarea class="form-input" id="dp-json-input" rows="10" style="font-family:monospace;font-size:12px;line-height:1.6" placeholder='{ "text": "Seu texto...", "name": "Nome", "handle": "@perfil" }'></textarea>
-              <div style="background:var(--surface3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;margin-top:12px">
-                <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px">Formato JSON</div>
-                <pre style="margin:0;white-space:pre-wrap;font-size:11px;line-height:1.5;color:var(--text-muted);font-family:monospace">{ "text": "Texto do post...",
-  "name": "Isis Moreira",
-  "handle": "@moreira.isis",
-  "format": "vertical" }
+            <!-- Tab: Criar em Lote -->
+            <div id="dp-lote" class="dp-tab-panel" style="display:none">
+              <label class="form-label">Criar posts em lote</label>
+              <p style="font-size:12px;color:var(--text-muted);line-height:1.6;margin:4px 0 16px">
+                Puxa trechos da planilha marcados como "A publicar", gera as imagens e envia para aprovação.
+              </p>
 
-Lote: [{ "text": "Post 1" }, ...]</pre>
+              <label class="form-label" style="margin-bottom:8px">Quantos posts criar?</label>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <input type="number" id="dp-lote-qty" class="form-input" value="3" min="1" max="50" style="width:80px;text-align:center;font-size:18px;font-weight:600;padding:12px">
+                <div style="font-size:12px;color:var(--text-dim);line-height:1.4">
+                  <div id="dp-lote-available" style="color:var(--gold)">Carregando...</div>
+                  trechos disponíveis
+                </div>
+              </div>
+
+              <button class="btn-gold" id="btn-lote-gerar" onclick="dpLoteGerar()" style="width:100%;justify-content:center;padding:14px;font-size:14px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Criar em Lote
+              </button>
+
+              <div id="dp-lote-progress" style="display:none;margin-top:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <span style="font-size:12px;font-weight:600;color:var(--text)">Gerando posts...</span>
+                  <span style="font-size:12px;color:var(--gold)" id="dp-lote-counter">0/0</span>
+                </div>
+                <div style="width:100%;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden">
+                  <div id="dp-lote-bar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width 0.4s ease"></div>
+                </div>
+                <div id="dp-lote-log" style="margin-top:12px;max-height:200px;overflow-y:auto;font-size:11px;color:var(--text-muted);line-height:1.8"></div>
+              </div>
+
+              <div style="background:var(--surface3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;margin-top:16px">
+                <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px">Como funciona</div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.6">
+                  1. Lê a planilha e filtra trechos "A publicar"<br>
+                  2. Seleciona aleatoriamente a quantidade escolhida<br>
+                  3. Gera a imagem de cada post<br>
+                  4. Envia para o fluxo de aprovação<br>
+                  5. Marca como "Postado" na planilha
+                </div>
               </div>
             </div>
           </div>
@@ -3614,36 +3638,141 @@ function dpUpdatePreview() {
   }
 }
 
-function dpLoadJson() {
-  var raw = document.getElementById('dp-json-input').value;
-  try {
-    var data = JSON.parse(raw);
-    if (Array.isArray(data)) {
-      if (data[0] && data[0].text) document.getElementById('dp-text').value = data[0].text;
-      if (data[0] && data[0].name) document.getElementById('dp-name').value = data[0].name;
-      if (data[0] && data[0].handle) document.getElementById('dp-handle').value = data[0].handle;
-      alert(data.length + ' posts no array. Mostrando o primeiro.');
-    } else {
-      if (data.text !== undefined) document.getElementById('dp-text').value = data.text;
-      if (data.name !== undefined) document.getElementById('dp-name').value = data.name;
-      if (data.handle !== undefined) document.getElementById('dp-handle').value = data.handle;
-      if (data.format) dpSetFormat(data.format);
+// ══ CRIAR EM LOTE (Google Sheets) ══
+
+var GSHEET_ID = '1G60eVaBqmM8SgcSXvGgVLNdo52X8FDCx4cq7djw8stM';
+var GSHEET_KEY = 'AIzaSyD3dYGRBz-hf1bVoIdSZh2VsEPph8rZwRg';
+var _loteAvailable = [];
+
+function dpLoteLoadAvailable() {
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/Sheet1!A:F?key=' + GSHEET_KEY;
+  fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+    var rows = data.values || [];
+    _loteAvailable = [];
+    for (var i = 1; i < rows.length; i++) {
+      var row = rows[i];
+      if (row[5] && row[5].trim().toLowerCase() === 'a publicar') {
+        _loteAvailable.push({ rowIndex: i + 1, trecho: row[4] || '', cat: row[1] || '', assunto: row[2] || '' });
+      }
     }
-    dpUpdatePreview();
-  } catch(e) {
-    alert('JSON inválido: ' + e.message);
-  }
+    var el = document.getElementById('dp-lote-available');
+    if (el) el.textContent = _loteAvailable.length;
+  }).catch(function(err) {
+    console.error('Erro ao ler planilha:', err);
+    var el = document.getElementById('dp-lote-available');
+    if (el) { el.textContent = 'Erro'; el.style.color = 'var(--danger)'; }
+  });
 }
 
-function dpExportJson() {
-  var obj = {
-    text: document.getElementById('dp-text').value,
-    name: document.getElementById('dp-name').value,
-    handle: document.getElementById('dp-handle').value,
-    format: _dpFormat
-  };
-  document.getElementById('dp-json-input').value = JSON.stringify(obj, null, 2);
+function dpLoteMarkPostado(rowIndex) {
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/Sheet1!F' + rowIndex + '?valueInputOption=RAW&key=' + GSHEET_KEY;
+  return fetch(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['Postado']] })
+  });
 }
+
+function dpLoteGerar() {
+  var qty = parseInt(document.getElementById('dp-lote-qty').value) || 3;
+  if (_loteAvailable.length === 0) {
+    alert('Nenhum trecho "A publicar" encontrado na planilha.');
+    return;
+  }
+  if (qty > _loteAvailable.length) {
+    alert('Só existem ' + _loteAvailable.length + ' trechos disponíveis.');
+    return;
+  }
+
+  var shuffled = _loteAvailable.slice().sort(function() { return 0.5 - Math.random(); });
+  var selected = shuffled.slice(0, qty);
+
+  var btn = document.getElementById('btn-lote-gerar');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#0D0D0D;border-radius:50%;animation:spin .8s linear infinite;display:inline-block"></div> Gerando...';
+
+  var progress = document.getElementById('dp-lote-progress');
+  progress.style.display = 'block';
+  var counter = document.getElementById('dp-lote-counter');
+  var bar = document.getElementById('dp-lote-bar');
+  var log = document.getElementById('dp-lote-log');
+  log.innerHTML = '';
+  counter.textContent = '0/' + qty;
+  bar.style.width = '0%';
+
+  var done = 0;
+  function processNext(idx) {
+    if (idx >= selected.length) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Criar em Lote';
+      log.innerHTML += '<div style="color:#5db870;font-weight:600;margin-top:6px">✅ ' + qty + ' posts criados com sucesso!</div>';
+      dpLoteLoadAvailable();
+      return;
+    }
+    var item = selected[idx];
+    var title = item.trecho.substring(0, 50);
+    log.innerHTML += '<div>⏳ ' + (idx + 1) + '/' + qty + ' — "' + title + '..."</div>';
+    log.scrollTop = log.scrollHeight;
+
+    document.getElementById('dp-text').value = item.trecho;
+    dpUpdatePreview();
+
+    setTimeout(function() {
+      dpLoteCapture(item, idx, qty, function() {
+        done++;
+        counter.textContent = done + '/' + qty;
+        bar.style.width = (done / qty * 100) + '%';
+        log.innerHTML += '<div style="color:#5db870">✓ Post ' + done + ' → Aprovação</div>';
+        log.scrollTop = log.scrollHeight;
+        setTimeout(function() { processNext(idx + 1); }, 500);
+      });
+    }, 400);
+  }
+  processNext(0);
+}
+
+function dpLoteCapture(item, idx, total, callback) {
+  var inner = document.getElementById('dp-preview-inner');
+  var w = 1080, h = _dpFormat === 'vertical' ? 1350 : 1080;
+  var origT = inner.style.transform, origW = inner.style.width, origH = inner.style.height;
+  inner.style.transform = 'none';
+  inner.style.width = w + 'px';
+  inner.style.height = h + 'px';
+
+  html2canvas(inner, { width: w, height: h, scale: 1, useCORS: true, backgroundColor: '#f2efe9' }).then(function(canvas) {
+    inner.style.transform = origT; inner.style.width = origW; inner.style.height = origH;
+    canvas.toBlob(function(blob) {
+      var filename = 'post_lote_' + Date.now() + '_' + idx + '.jpg';
+      fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
+        body: blob
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Upload falhou');
+        var imageUrl = SB_URL + '/storage/v1/object/public/donaposts/' + filename;
+        var title = item.trecho.split('\n')[0].substring(0, 60);
+        return sbFetch('posts_aprovacao', {
+          method: 'POST',
+          body: JSON.stringify({ title: title, text: item.trecho, type: 'post', status: 'criados', image_url: imageUrl, caption: '' })
+        });
+      }).then(function() {
+        return dpLoteMarkPostado(item.rowIndex);
+      }).then(function() {
+        _loteAvailable = _loteAvailable.filter(function(a) { return a.rowIndex !== item.rowIndex; });
+        callback();
+      }).catch(function(err) { console.error('Lote erro:', err); callback(); });
+    }, 'image/jpeg', 0.92);
+  }).catch(function(err) {
+    inner.style.transform = origT; inner.style.width = origW; inner.style.height = origH;
+    console.error('Canvas erro:', err); callback();
+  });
+}
+
+var _origDpSwitchTab = dpSwitchTab;
+dpSwitchTab = function(btn) {
+  _origDpSwitchTab(btn);
+  if (btn.getAttribute('data-tab') === 'dp-lote') dpLoteLoadAvailable();
+};
 
 // ══ CRIAR IMAGEM (html2canvas + Supabase) ══
 
@@ -4045,11 +4174,19 @@ function dpDeleteCard(id) {
   });
 }
 
-// Init kanban when section opens
+// Init kanban when section opens + auto-refresh for cascade effect
 var _origShowDonaPosts = showDonaPosts;
+var _kbPollInterval = null;
 showDonaPosts = function(secName) {
   _origShowDonaPosts(secName);
-  if (secName === 'dp-aprovacao') dpLoadKanban();
+  if (secName === 'dp-aprovacao') {
+    dpLoadKanban();
+    // Start polling every 3 seconds for cascade effect
+    if (_kbPollInterval) clearInterval(_kbPollInterval);
+    _kbPollInterval = setInterval(dpLoadKanban, 3000);
+  } else {
+    if (_kbPollInterval) { clearInterval(_kbPollInterval); _kbPollInterval = null; }
+  }
 };
 
 </script>
