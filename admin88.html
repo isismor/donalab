@@ -3645,7 +3645,7 @@ var GSHEET_KEY = 'AIzaSyD3dYGRBz-hf1bVoIdSZh2VsEPph8rZwRg';
 var _loteAvailable = [];
 
 function dpLoteLoadAvailable() {
-  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/Sheet1!A:F?key=' + GSHEET_KEY;
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/P%C3%A1gina1!A:F?key=' + GSHEET_KEY;
   fetch(url).then(function(r) { return r.json(); }).then(function(data) {
     var rows = data.values || [];
     _loteAvailable = [];
@@ -3665,7 +3665,7 @@ function dpLoteLoadAvailable() {
 }
 
 function dpLoteMarkPostado(rowIndex) {
-  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/Sheet1!F' + rowIndex + '?valueInputOption=RAW&key=' + GSHEET_KEY;
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + GSHEET_ID + '/values/P%C3%A1gina1!F' + rowIndex + '?valueInputOption=RAW&key=' + GSHEET_KEY;
   return fetch(url, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
