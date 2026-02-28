@@ -3887,16 +3887,48 @@ document.addEventListener('keydown', function(e) {
 function dpPublishCard(id) {
   var card = _kbCards.find(function(c) { return c.id === id; });
   if (!card) return;
-  if (!confirm('Publicar este post?\n\n"' + (card.title || 'Post #' + id) + '"')) return;
+  if (!confirm('Publicar este post no Instagram?\n\n"' + (card.title || 'Post #' + id) + '"')) return;
 
-  // Save caption first, then move to publicados
-  sbFetch('posts_aprovacao?id=eq.' + id, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'publicados' })
+  // Save caption first, then call N8N webhook
+  var caption = card.caption || '';
+  var imageUrl = card.image_url || '';
+
+  if (!imageUrl) { alert('Este post não tem imagem. Gere a imagem primeiro.'); return; }
+
+  // Update button to loading
+  dpShowPublishLoading(id, true);
+
+  // Call N8N webhook
+  fetch('https://isismalves.app.n8n.cloud/webhook/publicar-instagram', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      caption: caption,
+      post_id: id
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('Erro no N8N: ' + res.status);
+    return res.json();
+  }).then(function() {
+    // Move to publicados in Supabase
+    return sbFetch('posts_aprovacao?id=eq.' + id, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'publicados', caption: caption })
+    });
   }).then(function() {
     card.status = 'publicados';
     dpRenderKanban();
+    alert('✅ Post publicado no Instagram com sucesso!');
+  }).catch(function(err) {
+    alert('Erro ao publicar: ' + err.message + '\n\nVerifique se o workflow do N8N está ativo.');
+    dpShowPublishLoading(id, false);
   });
+}
+
+function dpShowPublishLoading(id, loading) {
+  // Re-render will handle the state
+  if (!loading) dpRenderKanban();
 }
 
 function kbPublishFromPreview() {
@@ -3904,34 +3936,57 @@ function kbPublishFromPreview() {
   var card = _kbCards.find(function(c) { return c.id === _kbPreviewId; });
   if (!card || card.status === 'publicados') return;
 
-  // Save caption first
   var caption = document.getElementById('kb-preview-caption').value;
   card.caption = caption;
+  var imageUrl = card.image_url || '';
 
-  sbFetch('posts_aprovacao?id=eq.' + _kbPreviewId, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'publicados', caption: caption })
+  if (!imageUrl) { alert('Este post não tem imagem.'); return; }
+  if (!confirm('Publicar este post no Instagram?')) return;
+
+  // Update button
+  var pubBtn = document.getElementById('kb-preview-publish-btn');
+  pubBtn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block"></div> Publicando...';
+  pubBtn.style.cursor = 'wait';
+
+  // Call N8N webhook
+  fetch('https://isismalves.app.n8n.cloud/webhook/publicar-instagram', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      image_url: imageUrl,
+      caption: caption,
+      post_id: _kbPreviewId
+    })
+  }).then(function(res) {
+    if (!res.ok) throw new Error('Erro no N8N: ' + res.status);
+    return res.json();
+  }).then(function() {
+    return sbFetch('posts_aprovacao?id=eq.' + _kbPreviewId, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: 'publicados', caption: caption })
+    });
   }).then(function() {
     card.status = 'publicados';
-    // Update button in modal
-    var pubBtn = document.getElementById('kb-preview-publish-btn');
+    // Update modal
     pubBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publicado';
     pubBtn.style.background = 'rgba(76,154,201,0.15)';
     pubBtn.style.color = '#4c9ac9';
     pubBtn.style.cursor = 'default';
     pubBtn.onclick = null;
-    // Update status badge
     var statusEl = document.getElementById('kb-preview-status');
     statusEl.textContent = 'Publicado';
     statusEl.style.background = 'rgba(76,154,201,0.12)';
     statusEl.style.color = '#4c9ac9';
     statusEl.style.border = '1px solid rgba(76,154,201,0.3)';
-    // Show feedback
     var msg = document.getElementById('kb-preview-saved');
-    msg.textContent = '✓ Post publicado!';
+    msg.textContent = '✅ Publicado no Instagram!';
     msg.style.display = 'block';
-    setTimeout(function() { msg.style.display = 'none'; msg.textContent = '✓ Legenda salva!'; }, 3000);
+    setTimeout(function() { msg.style.display = 'none'; msg.textContent = '✓ Legenda salva!'; }, 4000);
     dpRenderKanban();
+  }).catch(function(err) {
+    pubBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Publicar';
+    pubBtn.style.cursor = 'pointer';
+    alert('Erro ao publicar: ' + err.message);
   });
 }
 
