@@ -1261,22 +1261,44 @@ C56: (texto de contato/suporte — opcional)"></textarea>
 
     <!-- ══ FOTOS ══ -->
     <div id="section-fotos" style="display:none">
-      <div class="topbar">
-        <div class="page-title">Fotos</div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <button class="btn-outline" onclick="fotosLoad()" style="display:flex;align-items:center;gap:6px">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Atualizar
+      <div class="topbar"><div class="page-title">Fotos</div></div>
+
+      <!-- Buttons under title -->
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px">
+        <button class="btn-gold" id="fotos-gerar-btn" onclick="fotosGerar()" style="display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Gerar Fotos
+        </button>
+        <button class="btn-outline" onclick="fotosLoad()" style="display:flex;align-items:center;gap:6px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Atualizar
+        </button>
+        <!-- Bulk action buttons (hidden by default) -->
+        <div id="fotos-bulk-actions" style="display:none;margin-left:auto;display:none;gap:8px;align-items:center">
+          <span id="fotos-sel-count" style="font-size:12px;color:var(--gold)">0 selecionadas</span>
+          <button class="btn-outline" onclick="fotosBulkFav()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Favoritar
           </button>
-          <button class="btn-gold" id="fotos-gerar-btn" onclick="fotosGerar()" style="display:flex;align-items:center;gap:8px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Gerar Fotos
+          <button class="btn-outline" onclick="fotosBulkExcluir()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;border-color:rgba(224,85,85,0.3);color:var(--danger)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            Excluir
           </button>
+          <button class="btn-outline" onclick="fotosClearSelection()" style="font-size:12px;padding:7px 14px">Cancelar</button>
+        </div>
+        <!-- Delete permanently (only in excluidas tab) -->
+        <div id="fotos-delete-actions" style="display:none;margin-left:auto;gap:8px;align-items:center">
+          <span id="fotos-del-count" style="font-size:12px;color:var(--danger)">0 selecionadas</span>
+          <button class="btn-danger" onclick="fotosBulkDeletePermanent()" style="display:flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            Excluir Definitivamente
+          </button>
+          <button class="btn-outline" onclick="fotosClearSelection()" style="font-size:12px;padding:7px 14px">Cancelar</button>
         </div>
       </div>
 
       <!-- Status bar -->
-      <div id="fotos-status" style="display:none;margin-bottom:20px;padding:14px 20px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:12px;font-size:13px;color:var(--gold-light);display:none;align-items:center;gap:10px">
+      <div id="fotos-status" style="display:none;margin-bottom:20px;padding:14px 20px;background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:12px;font-size:13px;color:var(--gold-light);align-items:center;gap:10px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
         <span id="fotos-status-text">Gerando fotos...</span>
       </div>
@@ -1284,12 +1306,12 @@ C56: (texto de contato/suporte — opcional)"></textarea>
       <!-- Filter tabs -->
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
         <div class="tabs-bar" id="fotos-tabs">
-          <button class="tab-btn active" onclick="fotosFilter('todos')">Todos</button>
-          <button class="tab-btn inactive" onclick="fotosFilter('com-foto')">Com Foto</button>
-          <button class="tab-btn inactive" onclick="fotosFilter('sem-foto')">Sem Foto</button>
+          <button class="tab-btn active" onclick="fotosFilter('todas')">Todas</button>
+          <button class="tab-btn inactive" onclick="fotosFilter('favoritas')">Favoritas</button>
+          <button class="tab-btn inactive" onclick="fotosFilter('excluidas')">Excluidas</button>
         </div>
         <div style="margin-left:auto;font-size:13px;color:var(--text-muted)">
-          <span id="fotos-count">0</span> prompts
+          <span id="fotos-count">0</span> fotos
         </div>
       </div>
 
@@ -1300,13 +1322,12 @@ C56: (texto de contato/suporte — opcional)"></textarea>
       </div>
 
       <!-- Grid -->
-      <div id="fotos-grid" style="display:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px"></div>
+      <div id="fotos-grid" style="display:none;grid-template-columns:repeat(auto-fill,minmax(154px,1fr));gap:12px"></div>
 
       <!-- Empty state -->
       <div id="fotos-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--text-dim)">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" style="margin-bottom:16px;opacity:0.4"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <p style="font-size:14px">Nenhuma foto encontrada</p>
-        <p style="font-size:12px;margin-top:6px">Clique em "Gerar Fotos" para começar</p>
       </div>
 
       <!-- Lightbox -->
@@ -1315,7 +1336,6 @@ C56: (texto de contato/suporte — opcional)"></textarea>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </div>
         <img id="fotos-lightbox-img" src="" style="max-width:90%;max-height:85vh;border-radius:12px;object-fit:contain" onclick="event.stopPropagation()">
-        <div id="fotos-lightbox-prompt" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--text-muted);max-width:600px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       </div>
     </div>
 
@@ -4421,8 +4441,17 @@ showDonaPosts = function(secName) {
 var FOTOS_SHEET_ID = '1n2IuCR0f_YplRy8AJDyWPiiBPnOlCER_QJqgMuMpsOw';
 var FOTOS_API_KEY = 'AIzaSyDUgq_ohLQbV9oeSOXPO91dnxYlC9jak0c';
 var FOTOS_WEBHOOK = 'https://isismalves.app.n8n.cloud/webhook/129089c1-d5a1-4e67-9bd9-08f225fea37d';
-var _fotosData = [];
-var _fotosCurrentFilter = 'todos';
+var _fotosAll = []; // all individual photos {id, url, rowN, status}
+var _fotosSelected = {};
+var _fotosCurrentFilter = 'todas';
+
+// LocalStorage for favorites/excluded state
+function fotosGetState() {
+  try { return JSON.parse(localStorage.getItem('fotos_state') || '{}'); } catch(e) { return {}; }
+}
+function fotosSaveState(state) {
+  localStorage.setItem('fotos_state', JSON.stringify(state));
+}
 
 function fotosLoad() {
   var loading = document.getElementById('fotos-loading');
@@ -4431,6 +4460,8 @@ function fotosLoad() {
   loading.style.display = 'block';
   grid.style.display = 'none';
   empty.style.display = 'none';
+  _fotosSelected = {};
+  fotosUpdateBulkUI();
 
   var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + FOTOS_SHEET_ID + '/values/P%C3%A1gina1?key=' + FOTOS_API_KEY;
   fetch(url).then(function(r) { return r.json(); }).then(function(data) {
@@ -4440,13 +4471,19 @@ function fotosLoad() {
       return;
     }
     var headers = data.values[0];
-    _fotosData = [];
+    _fotosAll = [];
+    var state = fotosGetState();
     for (var i = 1; i < data.values.length; i++) {
       var row = {};
       for (var j = 0; j < headers.length; j++) {
         row[headers[j]] = data.values[i][j] || '';
       }
-      _fotosData.push(row);
+      var urls = [row.foto_url_1, row.foto_url_2, row.foto_url_3, row.foto_url_4].filter(function(u) { return u && u.length > 5; });
+      for (var k = 0; k < urls.length; k++) {
+        var fotoId = row.N + '_' + (k+1);
+        var s = state[fotoId] || 'normal';
+        _fotosAll.push({ id: fotoId, url: urls[k], rowN: row.N, status: s });
+      }
     }
     fotosRender();
   }).catch(function(err) {
@@ -4462,11 +4499,13 @@ function fotosRender() {
   var empty = document.getElementById('fotos-empty');
   loading.style.display = 'none';
 
-  var filtered = _fotosData;
-  if (_fotosCurrentFilter === 'com-foto') {
-    filtered = _fotosData.filter(function(r) { return r.foto_url_1 || r.foto_url_2 || r.foto_url_3 || r.foto_url_4; });
-  } else if (_fotosCurrentFilter === 'sem-foto') {
-    filtered = _fotosData.filter(function(r) { return !r.foto_url_1 && !r.foto_url_2 && !r.foto_url_3 && !r.foto_url_4; });
+  var filtered = _fotosAll;
+  if (_fotosCurrentFilter === 'todas') {
+    filtered = _fotosAll.filter(function(f) { return f.status !== 'excluida'; });
+  } else if (_fotosCurrentFilter === 'favoritas') {
+    filtered = _fotosAll.filter(function(f) { return f.status === 'favorita'; });
+  } else if (_fotosCurrentFilter === 'excluidas') {
+    filtered = _fotosAll.filter(function(f) { return f.status === 'excluida'; });
   }
 
   document.getElementById('fotos-count').textContent = filtered.length;
@@ -4481,97 +4520,148 @@ function fotosRender() {
   grid.style.display = 'grid';
   grid.innerHTML = '';
 
-  filtered.forEach(function(row) {
-    var urls = [row.foto_url_1, row.foto_url_2, row.foto_url_3, row.foto_url_4].filter(function(u) { return u && u.length > 5; });
-    var hasPhotos = urls.length > 0;
-
+  filtered.forEach(function(foto) {
     var card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transition:all 0.2s;';
-    card.onmouseenter = function() { card.style.borderColor = 'var(--gold-border)'; card.style.transform = 'translateY(-2px)'; };
-    card.onmouseleave = function() { card.style.borderColor = 'rgba(255,255,255,0.06)'; card.style.transform = 'none'; };
+    var isSelected = !!_fotosSelected[foto.id];
+    card.style.cssText = 'position:relative;border-radius:14px;overflow:hidden;transition:all 0.2s;border:2px solid ' + (isSelected ? 'var(--gold)' : 'transparent') + ';cursor:pointer;';
+    card.onmouseenter = function() { if (!isSelected) card.style.borderColor = 'var(--gold-border)'; };
+    card.onmouseleave = function() { if (!_fotosSelected[foto.id]) card.style.borderColor = 'transparent'; };
 
-    var photoArea = '';
-    if (hasPhotos) {
-      if (urls.length === 1) {
-        photoArea = '<div style="aspect-ratio:1;overflow:hidden;cursor:pointer" onclick="fotosOpenLightbox(\'' + urls[0].replace(/'/g, "\\'") + '\',\'' + (row.Prompt || '').replace(/'/g, "\\'").substring(0, 100) + '\')"><img src="' + urls[0] + '" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s" onmouseenter="this.style.transform=\'scale(1.05)\'" onmouseleave="this.style.transform=\'none\'"></div>';
-      } else {
-        photoArea = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;aspect-ratio:1;overflow:hidden">';
-        for (var p = 0; p < 4; p++) {
-          if (urls[p]) {
-            photoArea += '<div style="overflow:hidden;cursor:pointer" onclick="fotosOpenLightbox(\'' + urls[p].replace(/'/g, "\\'") + '\',\'' + (row.Prompt || '').replace(/'/g, "\\'").substring(0, 100) + '\')"><img src="' + urls[p] + '" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s" onmouseenter="this.style.transform=\'scale(1.08)\'" onmouseleave="this.style.transform=\'none\'"></div>';
-          } else {
-            photoArea += '<div style="background:var(--surface2);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" opacity="0.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
-          }
-        }
-        photoArea += '</div>';
-      }
-    } else {
-      photoArea = '<div style="aspect-ratio:1;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" opacity="0.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="font-size:11px;color:var(--text-dim)">Sem fotos</span></div>';
-    }
+    var favIcon = foto.status === 'favorita' ? '<div style="position:absolute;top:8px;left:8px;width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.9);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0D0D0D" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : '';
 
-    var statusColor = hasPhotos ? 'rgba(93,184,112,0.15)' : 'rgba(255,255,255,0.06)';
-    var statusTextColor = hasPhotos ? '#5db870' : 'var(--text-dim)';
-    var statusText = hasPhotos ? urls.length + ' foto' + (urls.length > 1 ? 's' : '') : 'Pendente';
-
-    card.innerHTML = photoArea +
-      '<div style="padding:14px">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">' +
-          '<span style="font-size:11px;padding:3px 10px;border-radius:6px;background:' + statusColor + ';color:' + statusTextColor + '">' + statusText + '</span>' +
-          '<span style="font-size:11px;color:var(--text-dim)">' + (row.N || row.ID || '?') + '</span>' +
-        '</div>' +
-        '<div style="font-size:12px;color:var(--text-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + (row.Prompt || 'Sem prompt') + '</div>' +
+    card.innerHTML = '<div style="aspect-ratio:1;overflow:hidden;background:var(--surface2)">' +
+      '<img src="' + foto.url + '" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s" onmouseenter="this.style.transform=\'scale(1.05)\'" onmouseleave="this.style.transform=\'none\'">' +
+      '</div>' +
+      favIcon +
+      '<div style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;background:' + (isSelected ? 'var(--gold)' : 'rgba(0,0,0,0.5)') + ';border:2px solid ' + (isSelected ? 'var(--gold)' : 'rgba(255,255,255,0.3)') + ';display:flex;align-items:center;justify-content:center">' +
+      (isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
       '</div>';
+
+    card.onclick = function(e) {
+      // Single click = select/deselect
+      if (_fotosSelected[foto.id]) {
+        delete _fotosSelected[foto.id];
+      } else {
+        _fotosSelected[foto.id] = foto;
+      }
+      fotosRender();
+      fotosUpdateBulkUI();
+    };
+
+    card.ondblclick = function(e) {
+      // Double click = lightbox
+      e.preventDefault();
+      fotosOpenLightbox(foto.url);
+    };
 
     grid.appendChild(card);
   });
 }
 
+function fotosUpdateBulkUI() {
+  var count = Object.keys(_fotosSelected).length;
+  var bulkEl = document.getElementById('fotos-bulk-actions');
+  var delEl = document.getElementById('fotos-delete-actions');
+
+  if (count > 0 && _fotosCurrentFilter === 'excluidas') {
+    bulkEl.style.display = 'none';
+    delEl.style.display = 'flex';
+    document.getElementById('fotos-del-count').textContent = count + ' selecionada' + (count > 1 ? 's' : '');
+  } else if (count > 0) {
+    bulkEl.style.display = 'flex';
+    delEl.style.display = 'none';
+    document.getElementById('fotos-sel-count').textContent = count + ' selecionada' + (count > 1 ? 's' : '');
+  } else {
+    bulkEl.style.display = 'none';
+    delEl.style.display = 'none';
+  }
+}
+
+function fotosClearSelection() {
+  _fotosSelected = {};
+  fotosRender();
+  fotosUpdateBulkUI();
+}
+
+function fotosBulkFav() {
+  var state = fotosGetState();
+  Object.keys(_fotosSelected).forEach(function(id) {
+    state[id] = 'favorita';
+    var foto = _fotosAll.find(function(f) { return f.id === id; });
+    if (foto) foto.status = 'favorita';
+  });
+  fotosSaveState(state);
+  _fotosSelected = {};
+  fotosRender();
+  fotosUpdateBulkUI();
+}
+
+function fotosBulkExcluir() {
+  var state = fotosGetState();
+  Object.keys(_fotosSelected).forEach(function(id) {
+    state[id] = 'excluida';
+    var foto = _fotosAll.find(function(f) { return f.id === id; });
+    if (foto) foto.status = 'excluida';
+  });
+  fotosSaveState(state);
+  _fotosSelected = {};
+  fotosRender();
+  fotosUpdateBulkUI();
+}
+
+function fotosBulkDeletePermanent() {
+  if (!confirm('Excluir definitivamente ' + Object.keys(_fotosSelected).length + ' foto(s)? Esta acao nao pode ser desfeita.')) return;
+  var state = fotosGetState();
+  Object.keys(_fotosSelected).forEach(function(id) {
+    state[id] = 'deletada';
+    _fotosAll = _fotosAll.filter(function(f) { return f.id !== id; });
+  });
+  fotosSaveState(state);
+  _fotosSelected = {};
+  fotosRender();
+  fotosUpdateBulkUI();
+}
+
 function fotosFilter(filter) {
   _fotosCurrentFilter = filter;
+  _fotosSelected = {};
   var tabs = document.querySelectorAll('#fotos-tabs .tab-btn');
   tabs.forEach(function(t) { t.className = 'tab-btn inactive'; });
-  var labels = { 'todos': 'Todos', 'com-foto': 'Com Foto', 'sem-foto': 'Sem Foto' };
+  var labels = { 'todas': 'Todas', 'favoritas': 'Favoritas', 'excluidas': 'Excluidas' };
   tabs.forEach(function(t) {
     if (t.textContent === labels[filter]) t.className = 'tab-btn active';
   });
   fotosRender();
+  fotosUpdateBulkUI();
 }
 
 function fotosGerar() {
   var btn = document.getElementById('fotos-gerar-btn');
-  var status = document.getElementById('fotos-status');
   btn.disabled = true;
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Gerando...';
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
+  var status = document.getElementById('fotos-status');
   status.style.display = 'flex';
-  document.getElementById('fotos-status-text').textContent = 'Enviando para o N8N... Isso pode levar alguns minutos.';
+  status.style.background = 'rgba(93,184,112,0.1)';
+  status.style.borderColor = 'rgba(93,184,112,0.3)';
+  document.getElementById('fotos-status-text').textContent = 'Webhook disparado! As fotos estao sendo geradas. Atualize em alguns minutos.';
 
-  fetch(FOTOS_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
-    .then(function(r) {
-      if (!r.ok) throw new Error('Erro: ' + r.status);
-      document.getElementById('fotos-status-text').textContent = 'Fotos sendo geradas! Atualize em alguns minutos para ver os resultados.';
-      status.style.background = 'rgba(93,184,112,0.1)';
-      status.style.borderColor = 'rgba(93,184,112,0.3)';
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
-      setTimeout(function() {
-        btn.disabled = false;
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Gerar Fotos';
-      }, 5000);
-      setTimeout(function() { status.style.display = 'none'; }, 15000);
-    })
-    .catch(function(err) {
-      document.getElementById('fotos-status-text').textContent = 'Erro ao gerar: ' + err.message;
-      status.style.background = 'rgba(224,85,85,0.1)';
-      status.style.borderColor = 'rgba(224,85,85,0.3)';
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Gerar Fotos';
-      setTimeout(function() { status.style.display = 'none'; }, 8000);
-    });
+  // Open webhook via hidden image to bypass CORS
+  var img = new Image();
+  img.src = FOTOS_WEBHOOK + '?t=' + Date.now();
+
+  // Also try GET request
+  fetch(FOTOS_WEBHOOK, { method: 'GET', mode: 'no-cors' }).catch(function(){});
+
+  setTimeout(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Gerar Fotos';
+  }, 5000);
+  setTimeout(function() { status.style.display = 'none'; }, 15000);
 }
 
-function fotosOpenLightbox(url, promptText) {
+function fotosOpenLightbox(url) {
   var lb = document.getElementById('fotos-lightbox');
   document.getElementById('fotos-lightbox-img').src = url;
-  document.getElementById('fotos-lightbox-prompt').textContent = promptText || '';
   lb.style.display = 'flex';
 }
 
