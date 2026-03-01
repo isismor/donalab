@@ -288,10 +288,23 @@
           Ebook
         </a>
 
-        <a class="nav-item" id="nav-fotos" href="#" onclick="showSection('fotos');return false;">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Fotos
-        </a>
+        <div class="nav-item" id="nav-fotos-parent" onclick="toggleFotos()" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Fotos
+          </div>
+          <svg id="fotos-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 0.2s;opacity:0.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="fotos-subitens" style="display:none;padding-left:16px;margin-top:2px;">
+          <a class="nav-item nav-subitem" id="nav-fotos-gerar" href="#" onclick="showFotos('fotos-gerar');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Gerar Fotos
+          </a>
+          <a class="nav-item nav-subitem" id="nav-fotos-upload" href="#" onclick="showFotos('fotos-upload');return false;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload de Fotos
+          </a>
+        </div>
 
 
         <a class="nav-item" id="nav-config" href="#" onclick="showSection('config');return false;">
@@ -1196,13 +1209,100 @@ C56: (texto de contato/suporte — opcional)"></textarea>
 
     <!-- ══ DONAPOSTS: CARROSSEL ══ -->
     <div id="section-dp-carrossel" style="display:none">
-      <div class="topbar"><div class="page-title">Carrossel</div></div>
-      <div style="display:flex;align-items:center;justify-content:center;height:calc(100vh - 200px);flex-direction:column;gap:16px">
-        <div style="width:72px;height:72px;border-radius:18px;background:var(--gold-dim);border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="2" y="4" width="14" height="16" rx="2"/><rect x="8" y="2" width="14" height="16" rx="2"/></svg>
+      <div class="topbar">
+        <div class="page-title">Carrossel</div>
+      </div>
+      <div style="display:flex;gap:24px;height:calc(100vh - 140px)">
+        <!-- Sidebar config -->
+        <div style="width:360px;flex-shrink:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden">
+          <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06)">
+            <button class="cr-tab-btn active" data-tab="cr-conteudo" onclick="crSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold);border-bottom:2px solid var(--gold);font-family:'DM Sans',sans-serif">Conteúdo</button>
+            <button class="cr-tab-btn" data-tab="cr-config" onclick="crSwitchTab(this)" style="flex:1;padding:12px 0;border:none;background:transparent;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;font-family:'DM Sans',sans-serif">Config</button>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:20px">
+            <!-- Tab: Conteúdo -->
+            <div id="cr-conteudo" class="cr-tab-panel">
+              <!-- Slide count -->
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <label class="form-label" style="margin:0">Slides:</label>
+                <select class="form-input" id="cr-slide-count" onchange="crChangeSlideCount()" style="width:70px;padding:6px 10px;font-size:13px">
+                  <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                  <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                  <option value="10" selected>10</option>
+                </select>
+              </div>
+              <!-- Slide dots -->
+              <div id="cr-slide-dots" style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap"></div>
+              <!-- CAPA (slide 0) -->
+              <div id="cr-capa-fields">
+                <label class="form-label" style="margin-bottom:6px">Texto da capa</label>
+                <textarea class="form-input" id="cr-capa-text" rows="3" style="min-height:70px;line-height:1.6;font-size:14px" oninput="crUpdatePreview()" placeholder="Ex: Antes de tentar agradar todo mundo,&#10;**faça isso.**"></textarea>
+                <div style="font-size:10px;color:var(--text-dim);margin-top:4px">Use **texto** para negrito</div>
+                <label class="form-label" style="margin-top:14px;margin-bottom:6px">Foto da capa</label>
+                <div id="cr-foto-picker" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:240px;overflow-y:auto;margin-bottom:12px;padding:2px"></div>
+                <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px">Selecione entre fotos favoritas ou uploads</div>
+              </div>
+              <!-- TEXT SLIDES (slide 1+) -->
+              <div id="cr-text-fields" style="display:none">
+                <label class="form-label" style="margin-bottom:6px">Texto do slide <span id="cr-slide-num">2</span></label>
+                <textarea class="form-input" id="cr-text" rows="14" style="min-height:240px;line-height:1.65;font-size:14px" oninput="crUpdatePreview()" placeholder="Texto do slide..."></textarea>
+                <div style="font-size:11px;color:var(--text-dim);text-align:right;margin-top:8px" id="cr-char-count">0 caracteres</div>
+              </div>
+              <!-- Actions -->
+              <button class="btn-gold" id="btn-criar-carrossel" onclick="crCriarImagens()" style="width:100%;margin-top:16px;justify-content:center;padding:14px 20px;font-size:14px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Criar Carrossel
+              </button>
+              <div id="cr-criar-status" style="display:none;margin-top:10px;font-size:12px;text-align:center;padding:10px;border-radius:8px"></div>
+            </div>
+            <!-- Tab: Config -->
+            <div id="cr-config" class="cr-tab-panel" style="display:none">
+              <label class="form-label">Nome (capa)</label>
+              <input class="form-input" id="cr-name" value="ISIS MOREIRA" oninput="crUpdatePreview()" style="margin:8px 0 16px">
+              <div style="height:1px;background:rgba(255,255,255,0.06);margin:8px 0 16px"></div>
+              <label class="form-label">Nome (slides de texto)</label>
+              <input class="form-input" id="cr-name2" value="Isis Moreira" oninput="crUpdatePreview()" style="margin:8px 0 16px">
+              <label class="form-label">@ do perfil</label>
+              <input class="form-input" id="cr-handle" value="@souisismoreira" oninput="crUpdatePreview()" style="margin:8px 0 16px">
+            </div>
+          </div>
         </div>
-        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">Carrossel</div>
-        <div style="font-size:14px;color:var(--text-muted)">Em breve — vamos construir juntos!</div>
+        <!-- Preview with slider -->
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div onclick="crNavSlide(-1)" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.borderColor='var(--gold-border)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <!-- Preview frame -->
+            <div id="cr-preview-frame" style="width:405px;height:506px;border-radius:14px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.3);position:relative">
+              <!-- CAPA preview -->
+              <div id="cr-preview-capa" style="width:1080px;height:1350px;transform:scale(0.375);transform-origin:top left;position:relative;overflow:hidden;font-family:'DM Sans',sans-serif">
+                <img id="cr-preview-bg" src="" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">
+                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.18)"></div>
+                <div style="position:absolute;inset:0;background-image:url('data:image/svg+xml,%3Csvg viewBox=%270 0 256 256%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%270.9%27 numOctaves=%274%27 stitchTiles=%27stitch%27/%3E%3C/filter%3E%3Crect width=%27100%25%27 height=%27100%25%27 filter=%27url(%23n)%27 opacity=%270.06%27/%3E%3C/svg%3E');opacity:0.5"></div>
+                <div style="position:absolute;bottom:160px;left:80px;right:80px;background:#fff;padding:48px 56px;text-align:center">
+                  <div id="cr-preview-capa-text" style="font-size:42px;line-height:1.4;color:#1a1a1a;font-weight:400"></div>
+                </div>
+                <div id="cr-preview-capa-name" style="position:absolute;bottom:80px;left:0;right:0;text-align:center;font-size:22px;letter-spacing:0.2em;color:#fff;font-weight:500">ISIS MOREIRA</div>
+              </div>
+              <!-- TEXT SLIDE preview -->
+              <div id="cr-preview-text-slide" style="display:none;width:1080px;height:1350px;transform:scale(0.375);transform-origin:top left;background:#f2efe9;font-family:'DM Sans',sans-serif;color:#1a1a1a;box-sizing:border-box;overflow:hidden;display:none;flex-direction:column;justify-content:center;align-items:center;padding:80px 164px">
+                <div style="display:flex;align-items:center;gap:24px;margin-bottom:56px;align-self:center">
+                  <div id="cr-preview-avatar" style="width:96px;height:96px;border-radius:50%;background:#d4d0c8;flex-shrink:0;overflow:hidden"></div>
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <span id="cr-preview-tname" style="font-size:34px;font-weight:700;letter-spacing:-0.01em;line-height:1.2">Isis Moreira</span>
+                    <span id="cr-preview-thandle" style="font-size:26px;color:#888;font-weight:400;line-height:1.2">@souisismoreira</span>
+                  </div>
+                </div>
+                <div id="cr-preview-ttext" style="font-size:38px;line-height:1.55;font-weight:400;white-space:pre-line;text-align:left;width:100%;max-width:860px;letter-spacing:-0.01em;color:#1a1a1a"></div>
+              </div>
+            </div>
+            <div onclick="crNavSlide(1)" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.borderColor='var(--gold-border)'" onmouseleave="this.style.borderColor='rgba(255,255,255,0.1)'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-dim)" id="cr-format-label">1080 × 1350 — Capa</div>
+        </div>
       </div>
     </div>
 
@@ -1260,8 +1360,8 @@ C56: (texto de contato/suporte — opcional)"></textarea>
     </div>
 
     <!-- ══ FOTOS ══ -->
-    <div id="section-fotos" style="display:none">
-      <div class="topbar"><div class="page-title">Fotos</div></div>
+    <div id="section-fotos-gerar" style="display:none">
+      <div class="topbar"><div class="page-title">Gerar Fotos</div></div>
 
       <!-- Buttons under title -->
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:20px">
@@ -1330,12 +1430,51 @@ C56: (texto de contato/suporte — opcional)"></textarea>
         <p style="font-size:14px">Nenhuma foto encontrada</p>
       </div>
 
-      <!-- Lightbox -->
+      <!-- Lightbox with slider -->
       <div id="fotos-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:24px;cursor:pointer" onclick="fotosCloseLightbox()">
-        <div style="position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <div style="position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="event.stopPropagation();fotosCloseLightbox()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </div>
-        <img id="fotos-lightbox-img" src="" style="max-width:90%;max-height:85vh;border-radius:12px;object-fit:contain" onclick="event.stopPropagation()">
+        <!-- Left arrow -->
+        <div onclick="event.stopPropagation();fotosLightboxNav(-1)" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.background='rgba(255,255,255,0.2)'" onmouseleave="this.style.background='rgba(255,255,255,0.1)'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </div>
+        <!-- Right arrow -->
+        <div onclick="event.stopPropagation();fotosLightboxNav(1)" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.background='rgba(255,255,255,0.2)'" onmouseleave="this.style.background='rgba(255,255,255,0.1)'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <img id="fotos-lightbox-img" src="" style="max-width:80%;max-height:85vh;border-radius:12px;object-fit:contain;transition:opacity 0.2s" onclick="event.stopPropagation()">
+        <!-- Counter -->
+        <div id="fotos-lightbox-counter" style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 18px;font-size:12px;color:var(--text-muted)"></div>
+      </div>
+    </div>
+
+    <!-- UPLOAD DE FOTOS -->
+    <div id="section-fotos-upload" style="display:none">
+      <div class="topbar"><div class="page-title">Upload de Fotos</div></div>
+
+      <!-- Drop zone -->
+      <div id="fotos-dropzone" style="border:2px dashed var(--gold-border);border-radius:16px;padding:60px 40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--surface);margin-bottom:24px"
+        onclick="document.getElementById('fotos-file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--gold)';this.style.background='var(--gold-dim)'"
+        ondragleave="this.style.borderColor='var(--gold-border)';this.style.background='var(--surface)'"
+        ondrop="event.preventDefault();this.style.borderColor='var(--gold-border)';this.style.background='var(--surface)';fotosHandleDrop(event)">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" style="margin-bottom:16px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:8px">Arraste fotos aqui</div>
+        <div style="font-size:13px;color:var(--text-muted)">ou clique para selecionar arquivos</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:8px">JPG, PNG, WEBP — máximo 5MB por foto</div>
+        <input type="file" id="fotos-file-input" multiple accept="image/*" style="display:none" onchange="fotosHandleFiles(this.files)">
+      </div>
+
+      <!-- Upload progress -->
+      <div id="fotos-upload-progress" style="display:none;margin-bottom:24px"></div>
+
+      <!-- Uploaded photos grid -->
+      <div id="fotos-upload-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(154px,1fr));gap:12px"></div>
+
+      <!-- Empty state -->
+      <div id="fotos-upload-empty" style="text-align:center;padding:40px 20px;color:var(--text-dim)">
+        <p style="font-size:14px">Nenhuma foto enviada ainda</p>
       </div>
     </div>
 
@@ -1603,7 +1742,7 @@ function showMateriais(categoria) {
   // Esconde todas as sections (incluindo fluxos)
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance',
-   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos'].forEach(function(s) {
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos-gerar','fotos-upload'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
   });
@@ -1636,7 +1775,7 @@ function showFluxo(nome) {
   // Esconde todas as sections (materiais e fluxo)
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance',
-   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos'].forEach(function(s) {
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos-gerar','fotos-upload'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
   });
@@ -1654,7 +1793,7 @@ function showFluxo(nome) {
 function showSection(name) {
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance',
-   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos'].forEach(function(s) {
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos-gerar','fotos-upload'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = (s===name)?'':'none';
     var n = document.getElementById('nav-'+s);
@@ -1667,6 +1806,8 @@ function showSection(name) {
   document.getElementById('materiais-chevron').style.transform = '';
   document.getElementById('donaposts-subitens').style.display = 'none';
   document.getElementById('donaposts-chevron').style.transform = '';
+  document.getElementById('fotos-subitens').style.display = 'none';
+  document.getElementById('fotos-chevron').style.transform = '';
   document.querySelectorAll('#nav-fluxos, #nav-materiais, #nav-donaposts').forEach(function(n){ if(n) n.classList.remove('active'); });
   document.querySelectorAll('.nav-subitem').forEach(function(el){ el.classList.remove('active'); });
   if (name==='config') document.getElementById('config-openai-key').value = localStorage.getItem('openai_key')||'';
@@ -3656,12 +3797,46 @@ function toggleDonaPosts() {
   chev.style.transform = open ? '' : 'rotate(180deg)';
 }
 
+function toggleFotos() {
+  var sub = document.getElementById('fotos-subitens');
+  var chev = document.getElementById('fotos-chevron');
+  var open = sub.style.display !== 'none';
+  sub.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function showFotos(secName) {
+  document.getElementById('fotos-subitens').style.display = 'block';
+  document.getElementById('fotos-chevron').style.transform = 'rotate(180deg)';
+  ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
+   'fluxo-plano-ouro','fluxo-conteudo-alcance',
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos-gerar','fotos-upload'].forEach(function(s) {
+    var el = document.getElementById('section-'+s);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('section-'+secName).style.display = '';
+  document.querySelectorAll('.nav-item, .nav-subitem').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('nav-fotos-parent').classList.add('active');
+  var navEl = document.getElementById('nav-'+secName);
+  if (navEl) navEl.classList.add('active');
+  // Fecha outros menus
+  document.getElementById('fluxos-subitens').style.display = 'none';
+  document.getElementById('fluxos-chevron').style.transform = '';
+  document.getElementById('materiais-subitens').style.display = 'none';
+  document.getElementById('materiais-chevron').style.transform = '';
+  document.getElementById('donaposts-subitens').style.display = 'none';
+  document.getElementById('donaposts-chevron').style.transform = '';
+  // Auto-load
+  if (secName === 'fotos-gerar') fotosLoad();
+  if (secName === 'fotos-upload') fotosUploadLoad();
+}
+
 function showDonaPosts(secName) {
   document.getElementById('donaposts-subitens').style.display = 'block';
   document.getElementById('donaposts-chevron').style.transform = 'rotate(180deg)';
   ['clientes','plano-ouro','conteudo-alcance','paginas','config','principal','lote',
    'fluxo-plano-ouro','fluxo-conteudo-alcance',
-   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos'].forEach(function(s) {
+   'dp-post-unico','dp-carrossel','dp-ebook','dp-aprovacao','fotos-gerar','fotos-upload'].forEach(function(s) {
     var el = document.getElementById('section-'+s);
     if (el) el.style.display = 'none';
   });
@@ -4437,9 +4612,313 @@ showDonaPosts = function(secName) {
   }
 };
 
+// ── CARROSSEL ──
+var _crSlides = ['','','','','','','','','','']; // slides 1-9 = text slides (index 0-8)
+var _crCapaText = '';
+var _crCapaFoto = '';
+var _crCurrentSlide = 0; // 0 = capa, 1+ = text slides
+var _crSlideCount = 10;
+var _crFotoOptions = []; // available photos for cover
+
+function crSwitchTab(btn) {
+  var tabId = btn.getAttribute('data-tab');
+  document.querySelectorAll('.cr-tab-btn').forEach(function(b) {
+    b.style.color = 'var(--text-dim)'; b.style.borderBottom = '2px solid transparent'; b.classList.remove('active');
+  });
+  btn.style.color = 'var(--gold)'; btn.style.borderBottom = '2px solid var(--gold)'; btn.classList.add('active');
+  document.querySelectorAll('.cr-tab-panel').forEach(function(p) { p.style.display = 'none'; });
+  document.getElementById(tabId).style.display = '';
+}
+
+function crChangeSlideCount() {
+  _crSlideCount = parseInt(document.getElementById('cr-slide-count').value) || 10;
+  crRenderDots();
+  if (_crCurrentSlide >= _crSlideCount) crGoToSlide(0);
+  crUpdatePreview();
+}
+
+function crRenderDots() {
+  var dotsEl = document.getElementById('cr-slide-dots');
+  dotsEl.innerHTML = '';
+  for (var i = 0; i < _crSlideCount; i++) {
+    var isCapa = i === 0;
+    var hasContent = isCapa ? (_crCapaText.trim().length > 0 || _crCapaFoto) : (_crSlides[i-1] && _crSlides[i-1].trim().length > 0);
+    var dot = document.createElement('div');
+    dot.style.cssText = 'width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:pointer;transition:all 0.15s;border:1.5px solid ' +
+      (i === _crCurrentSlide ? 'var(--gold)' : hasContent ? 'rgba(93,184,112,0.4)' : 'rgba(255,255,255,0.1)') + ';background:' +
+      (i === _crCurrentSlide ? 'var(--gold-dim)' : hasContent ? 'rgba(93,184,112,0.08)' : 'transparent') + ';color:' +
+      (i === _crCurrentSlide ? 'var(--gold)' : hasContent ? '#5db870' : 'var(--text-dim)');
+    dot.textContent = isCapa ? 'C' : i;
+    dot.setAttribute('data-idx', i);
+    dot.onclick = function() { crGoToSlide(parseInt(this.getAttribute('data-idx'))); };
+    dotsEl.appendChild(dot);
+  }
+}
+
+function crGoToSlide(idx) {
+  // Save current
+  if (_crCurrentSlide === 0) {
+    _crCapaText = document.getElementById('cr-capa-text').value;
+  } else {
+    _crSlides[_crCurrentSlide - 1] = document.getElementById('cr-text').value;
+  }
+  _crCurrentSlide = idx;
+  // Show/hide fields
+  if (idx === 0) {
+    document.getElementById('cr-capa-fields').style.display = '';
+    document.getElementById('cr-text-fields').style.display = 'none';
+    document.getElementById('cr-capa-text').value = _crCapaText;
+  } else {
+    document.getElementById('cr-capa-fields').style.display = 'none';
+    document.getElementById('cr-text-fields').style.display = '';
+    document.getElementById('cr-text').value = _crSlides[idx - 1] || '';
+    document.getElementById('cr-text').placeholder = 'Texto do slide ' + (idx + 1) + '...';
+    document.getElementById('cr-slide-num').textContent = (idx + 1);
+  }
+  crRenderDots();
+  crUpdatePreview();
+}
+
+function crNavSlide(dir) {
+  var next = _crCurrentSlide + dir;
+  if (next < 0) next = _crSlideCount - 1;
+  if (next >= _crSlideCount) next = 0;
+  crGoToSlide(next);
+}
+
+function crParseBold(text) {
+  return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function crUpdatePreview() {
+  if (_crCurrentSlide === 0) {
+    _crCapaText = document.getElementById('cr-capa-text').value;
+  } else {
+    _crSlides[_crCurrentSlide - 1] = document.getElementById('cr-text').value;
+  }
+
+  var capaPreview = document.getElementById('cr-preview-capa');
+  var textPreview = document.getElementById('cr-preview-text-slide');
+
+  if (_crCurrentSlide === 0) {
+    capaPreview.style.display = 'block';
+    textPreview.style.display = 'none';
+    document.getElementById('cr-preview-capa-text').innerHTML = crParseBold(_crCapaText.replace(/\n/g, '<br>')) || '<span style="opacity:0.3">Texto da capa...</span>';
+    document.getElementById('cr-preview-capa-name').textContent = document.getElementById('cr-name').value;
+    if (_crCapaFoto) document.getElementById('cr-preview-bg').src = _crCapaFoto;
+    document.getElementById('cr-format-label').textContent = '1080 × 1350 — Capa';
+  } else {
+    capaPreview.style.display = 'none';
+    textPreview.style.display = 'flex';
+    var text = _crSlides[_crCurrentSlide - 1] || '';
+    document.getElementById('cr-preview-ttext').textContent = text;
+    document.getElementById('cr-preview-tname').textContent = document.getElementById('cr-name2').value;
+    document.getElementById('cr-preview-thandle').textContent = document.getElementById('cr-handle').value;
+    document.getElementById('cr-char-count').textContent = text.length + ' caracteres';
+    // Auto font-size
+    var len = text.length;
+    var fs = len < 100 ? 42 : len < 200 ? 38 : len < 350 ? 34 : len < 500 ? 30 : len < 700 ? 26 : 22;
+    document.getElementById('cr-preview-ttext').style.fontSize = fs + 'px';
+    // Avatar
+    var av = document.getElementById('cr-preview-avatar');
+    if (_dpAvatarUrl) av.innerHTML = '<img src="' + _dpAvatarUrl + '" style="width:100%;height:100%;object-fit:cover">';
+    document.getElementById('cr-format-label').textContent = '1080 × 1350 — Slide ' + (_crCurrentSlide + 1) + '/' + _crSlideCount;
+  }
+  crRenderDots();
+}
+
+function crSelectFoto(url) {
+  _crCapaFoto = url;
+  document.getElementById('cr-preview-bg').src = url;
+  crLoadFotoPicker(); // re-render to show selection
+  crUpdatePreview();
+}
+
+function crLoadFotoPicker() {
+  var picker = document.getElementById('cr-foto-picker');
+  picker.innerHTML = '';
+  _crFotoOptions = [];
+
+  // Get favorites from fotos (Google Sheets generated)
+  var state = fotosGetState();
+  _fotosAll.forEach(function(f) {
+    if (f.status === 'favorita' && f.url) _crFotoOptions.push(f.url);
+  });
+  // Also add all fotos with photos (non-excluded)
+  _fotosAll.forEach(function(f) {
+    if (f.status !== 'excluida' && f.status !== 'favorita' && f.url && _crFotoOptions.indexOf(f.url) === -1) _crFotoOptions.push(f.url);
+  });
+
+  // Get uploads from Supabase
+  fetch(SB_URL + '/storage/v1/object/list/fotos', {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: '', limit: 100, offset: 0, sortBy: { column: 'created_at', order: 'desc' } })
+  }).then(function(r) { return r.json(); }).then(function(files) {
+    (files || []).forEach(function(f) {
+      if (f.name && !f.name.endsWith('/')) {
+        var u = SB_URL + '/storage/v1/object/public/fotos/' + f.name;
+        if (_crFotoOptions.indexOf(u) === -1) _crFotoOptions.push(u);
+      }
+    });
+    crRenderFotoPicker();
+  }).catch(function() { crRenderFotoPicker(); });
+}
+
+function crRenderFotoPicker() {
+  var picker = document.getElementById('cr-foto-picker');
+  picker.innerHTML = '';
+  if (_crFotoOptions.length === 0) {
+    picker.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;font-size:11px;color:var(--text-dim)">Nenhuma foto disponível. Adicione fotos em Fotos > Upload ou marque como favorita.</div>';
+    return;
+  }
+  _crFotoOptions.forEach(function(url) {
+    var isSelected = url === _crCapaFoto;
+    var thumb = document.createElement('div');
+    thumb.style.cssText = 'aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid ' + (isSelected ? 'var(--gold)' : 'transparent') + ';transition:all 0.15s;position:relative';
+    thumb.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;display:block">' +
+      (isSelected ? '<div style="position:absolute;inset:0;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>' : '');
+    thumb.onclick = function() { crSelectFoto(url); };
+    thumb.onmouseenter = function() { if (!isSelected) this.style.borderColor = 'var(--gold-border)'; };
+    thumb.onmouseleave = function() { if (url !== _crCapaFoto) this.style.borderColor = 'transparent'; };
+    picker.appendChild(thumb);
+  });
+}
+
+function crShowStatus(msg, type) {
+  var el = document.getElementById('cr-criar-status');
+  el.style.display = 'block';
+  el.textContent = msg;
+  if (type === 'loading') { el.style.background = 'var(--gold-dim)'; el.style.color = 'var(--gold)'; }
+  else if (type === 'success') { el.style.background = 'rgba(93,184,112,0.12)'; el.style.color = '#5db870'; }
+  else { el.style.background = 'rgba(224,85,85,0.12)'; el.style.color = '#e05555'; }
+}
+
+function crCriarImagens() {
+  // Save current
+  if (_crCurrentSlide === 0) _crCapaText = document.getElementById('cr-capa-text').value;
+  else _crSlides[_crCurrentSlide - 1] = document.getElementById('cr-text').value;
+
+  if (!_crCapaFoto) { crShowStatus('Selecione uma foto para a capa', 'error'); return; }
+  if (!_crCapaText.trim()) { crShowStatus('Preencha o texto da capa', 'error'); return; }
+
+  var btn = document.getElementById('btn-criar-carrossel');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#0D0D0D;border-radius:50%;animation:spin .8s linear infinite;display:inline-block"></div> Gerando...';
+
+  var timestamp = Date.now();
+  var imageUrls = [];
+  var totalSlides = _crSlideCount;
+
+  function renderSlide(idx) {
+    if (idx >= totalSlides) {
+      // Done
+      crShowStatus('Salvando carrossel...', 'loading');
+      var title = _crCapaText.replace(/\*\*/g, '').split('\n')[0].substring(0, 60);
+      sbFetch('posts_aprovacao', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: title || 'Carrossel ' + timestamp,
+          text: _crCapaText + '\n---\n' + _crSlides.slice(0, _crSlideCount - 1).filter(function(s){return s&&s.trim();}).join('\n---\n'),
+          type: 'carrossel',
+          status: 'criados',
+          image_url: imageUrls[0] || ''
+        })
+      }).then(function() {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Criar Carrossel';
+        crShowStatus('Carrossel criado com ' + imageUrls.length + ' slides!', 'success');
+        setTimeout(function() { document.getElementById('cr-criar-status').style.display = 'none'; }, 5000);
+      });
+      return;
+    }
+
+    // Skip empty text slides (but always render capa)
+    if (idx > 0 && (!_crSlides[idx-1] || !_crSlides[idx-1].trim())) {
+      renderSlide(idx + 1);
+      return;
+    }
+
+    crGoToSlide(idx);
+    crShowStatus('Renderizando slide ' + (idx + 1) + ' de ' + totalSlides + '...', 'loading');
+
+    setTimeout(function() {
+      var target = idx === 0 ? document.getElementById('cr-preview-capa') : document.getElementById('cr-preview-text-slide');
+      var origT = target.style.transform;
+      var origW = target.style.width;
+      var origH = target.style.height;
+      target.style.transform = 'none';
+      target.style.width = '1080px';
+      target.style.height = '1350px';
+
+      html2canvas(target, { width: 1080, height: 1350, scale: 1, useCORS: true, backgroundColor: idx === 0 ? null : '#f2efe9' }).then(function(canvas) {
+        target.style.transform = origT;
+        target.style.width = origW;
+        target.style.height = origH;
+        canvas.toBlob(function(blob) {
+          var filename = 'carrossel_' + timestamp + '_s' + (idx + 1) + '.jpg';
+          fetch(SB_URL + '/storage/v1/object/donaposts/' + filename, {
+            method: 'POST',
+            headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
+            body: blob
+          }).then(function(res) {
+            if (!res.ok) throw new Error('Upload falhou');
+            imageUrls.push(SB_URL + '/storage/v1/object/public/donaposts/' + filename);
+            renderSlide(idx + 1);
+          }).catch(function(err) {
+            crShowStatus('Erro slide ' + (idx+1) + ': ' + err.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Criar Carrossel';
+          });
+        }, 'image/jpeg', 0.92);
+      });
+    }, 400);
+  }
+
+  renderSlide(0);
+}
+
+// Init carrossel on section open
+var _origShowDPforCR = showDonaPosts;
+showDonaPosts = function(secName) {
+  _origShowDPforCR(secName);
+  if (secName === 'dp-carrossel') {
+    crRenderDots();
+    crGoToSlide(0);
+    // Load fotos for picker (needs fotos to be loaded first)
+    if (_fotosAll.length === 0) {
+      var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + FOTOS_SHEET_ID + '/values/P%C3%A1gina1?key=' + FOTOS_API_KEY;
+      fetch(url).then(function(r){return r.json();}).then(function(data) {
+        if (!data.values || data.values.length < 2) { crLoadFotoPicker(); return; }
+        var headers = data.values[0];
+        _fotosAll = [];
+        var state = fotosGetState();
+        for (var i = 1; i < data.values.length; i++) {
+          var row = {};
+          for (var j = 0; j < headers.length; j++) row[headers[j]] = data.values[i][j] || '';
+          var rawUrl = row['Link da foto'] || '';
+          var fotoUrl = '';
+          if (rawUrl.length > 5) {
+            var match = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) fotoUrl = 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w800';
+            else if (rawUrl.indexOf('http') === 0) fotoUrl = rawUrl;
+          }
+          if (fotoUrl) {
+            var fId = row.N + '_1';
+            _fotosAll.push({ id: fId, url: fotoUrl, rowN: row.N, status: state[fId] || 'normal', prompt: row.Prompt || '' });
+          }
+        }
+        crLoadFotoPicker();
+      }).catch(function() { crLoadFotoPicker(); });
+    } else {
+      crLoadFotoPicker();
+    }
+  }
+};
+
 // ── FOTOS ──
 var FOTOS_SHEET_ID = '1n2IuCR0f_YplRy8AJDyWPiiBPnOlCER_QJqgMuMpsOw';
-var FOTOS_API_KEY = 'AIzaSyDUgq_ohLQbV9oeSOXPO91dnxYlC9jak0c';
+var FOTOS_API_KEY = 'AIzaSyCVtreRX5eWnq0n3Rza_nWBrOXVJDBQHA0';
 var FOTOS_WEBHOOK = 'https://isismalves.app.n8n.cloud/webhook/129089c1-d5a1-4e67-9bd9-08f225fea37d';
 var _fotosAll = []; // all individual photos {id, url, rowN, status}
 var _fotosSelected = {};
@@ -4478,11 +4957,22 @@ function fotosLoad() {
       for (var j = 0; j < headers.length; j++) {
         row[headers[j]] = data.values[i][j] || '';
       }
-      var urls = [row.foto_url_1, row.foto_url_2, row.foto_url_3, row.foto_url_4].filter(function(u) { return u && u.length > 5; });
+      var rawUrl = row['Link da foto'] || '';
+      // Convert Google Drive links to thumbnail
+      var fotoUrl = '';
+      if (rawUrl.length > 5) {
+        var match = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+          fotoUrl = 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w800';
+        } else if (rawUrl.indexOf('thumbnail') > -1 || rawUrl.indexOf('http') === 0) {
+          fotoUrl = rawUrl;
+        }
+      }
+      var urls = fotoUrl ? [fotoUrl] : [];
       for (var k = 0; k < urls.length; k++) {
         var fotoId = row.N + '_' + (k+1);
         var s = state[fotoId] || 'normal';
-        _fotosAll.push({ id: fotoId, url: urls[k], rowN: row.N, status: s });
+        _fotosAll.push({ id: fotoId, url: urls[k], rowN: row.N, status: s, prompt: row.Prompt || '' });
       }
     }
     fotosRender();
@@ -4524,15 +5014,18 @@ function fotosRender() {
     var card = document.createElement('div');
     var isSelected = !!_fotosSelected[foto.id];
     card.style.cssText = 'position:relative;border-radius:14px;overflow:hidden;transition:all 0.2s;border:2px solid ' + (isSelected ? 'var(--gold)' : 'transparent') + ';cursor:pointer;';
-    card.onmouseenter = function() { if (!isSelected) card.style.borderColor = 'var(--gold-border)'; };
-    card.onmouseleave = function() { if (!_fotosSelected[foto.id]) card.style.borderColor = 'transparent'; };
+    card.onmouseenter = function() { if (!isSelected) card.style.borderColor = 'var(--gold-border)'; var cb = card.querySelector('.foto-copy-btn'); if(cb) cb.style.opacity='1'; };
+    card.onmouseleave = function() { if (!_fotosSelected[foto.id]) card.style.borderColor = 'transparent'; var cb = card.querySelector('.foto-copy-btn'); if(cb) cb.style.opacity='0'; };
 
     var favIcon = foto.status === 'favorita' ? '<div style="position:absolute;top:8px;left:8px;width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.9);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0D0D0D" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : '';
+
+    var copyIcon = foto.prompt ? '<div class="foto-copy-btn" onclick="event.stopPropagation();fotosCopyPrompt(\'' + foto.id + '\')" style="position:absolute;bottom:8px;left:8px;width:28px;height:28px;border-radius:7px;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.2s;border:1px solid rgba(255,255,255,0.15)" title="Copiar prompt"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>' : '';
 
     card.innerHTML = '<div style="aspect-ratio:1;overflow:hidden;background:var(--surface2)">' +
       '<img src="' + foto.url + '" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s" onmouseenter="this.style.transform=\'scale(1.05)\'" onmouseleave="this.style.transform=\'none\'">' +
       '</div>' +
       favIcon +
+      copyIcon +
       '<div style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;background:' + (isSelected ? 'var(--gold)' : 'rgba(0,0,0,0.5)') + ';border:2px solid ' + (isSelected ? 'var(--gold)' : 'rgba(255,255,255,0.3)') + ';display:flex;align-items:center;justify-content:center">' +
       (isSelected ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D0D0D" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
       '</div>';
@@ -4638,31 +5131,73 @@ function fotosFilter(filter) {
 function fotosGerar() {
   var btn = document.getElementById('fotos-gerar-btn');
   btn.disabled = true;
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Gerando...';
   var status = document.getElementById('fotos-status');
   status.style.display = 'flex';
-  status.style.background = 'rgba(93,184,112,0.1)';
-  status.style.borderColor = 'rgba(93,184,112,0.3)';
-  document.getElementById('fotos-status-text').textContent = 'Webhook disparado! As fotos estao sendo geradas. Atualize em alguns minutos.';
+  status.style.background = 'var(--gold-dim)';
+  status.style.borderColor = 'var(--gold-border)';
+  document.getElementById('fotos-status-text').textContent = 'Disparando webhook...';
 
-  // Open webhook via hidden image to bypass CORS
-  var img = new Image();
-  img.src = FOTOS_WEBHOOK + '?t=' + Date.now();
+  // Use hidden iframe to trigger webhook (bypasses CORS)
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = FOTOS_WEBHOOK + '?trigger=' + Date.now();
+  document.body.appendChild(iframe);
 
-  // Also try GET request
-  fetch(FOTOS_WEBHOOK, { method: 'GET', mode: 'no-cors' }).catch(function(){});
+  setTimeout(function() {
+    document.body.removeChild(iframe);
+    status.style.background = 'rgba(93,184,112,0.1)';
+    status.style.borderColor = 'rgba(93,184,112,0.3)';
+    document.getElementById('fotos-status-text').textContent = 'Webhook disparado! As fotos estao sendo geradas. Clique Atualizar em alguns minutos.';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enviado!';
+  }, 3000);
 
   setTimeout(function() {
     btn.disabled = false;
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Gerar Fotos';
-  }, 5000);
-  setTimeout(function() { status.style.display = 'none'; }, 15000);
+  }, 6000);
+  setTimeout(function() { status.style.display = 'none'; }, 20000);
 }
 
+var _fotosLightboxIndex = 0;
+var _fotosLightboxList = [];
+
 function fotosOpenLightbox(url) {
-  var lb = document.getElementById('fotos-lightbox');
-  document.getElementById('fotos-lightbox-img').src = url;
-  lb.style.display = 'flex';
+  // Build list of visible photos for navigation
+  _fotosLightboxList = [];
+  var filtered = _fotosAll;
+  if (_fotosCurrentFilter === 'todas') {
+    filtered = _fotosAll.filter(function(f) { return f.status !== 'excluida'; });
+  } else if (_fotosCurrentFilter === 'favoritas') {
+    filtered = _fotosAll.filter(function(f) { return f.status === 'favorita'; });
+  } else if (_fotosCurrentFilter === 'excluidas') {
+    filtered = _fotosAll.filter(function(f) { return f.status === 'excluida'; });
+  }
+  filtered.forEach(function(f) {
+    if (f.url) _fotosLightboxList.push(f.url);
+  });
+  _fotosLightboxIndex = _fotosLightboxList.indexOf(url);
+  if (_fotosLightboxIndex < 0) _fotosLightboxIndex = 0;
+  fotosLightboxShow();
+  document.getElementById('fotos-lightbox').style.display = 'flex';
+}
+
+function fotosLightboxShow() {
+  var img = document.getElementById('fotos-lightbox-img');
+  var counter = document.getElementById('fotos-lightbox-counter');
+  img.style.opacity = '0';
+  setTimeout(function() {
+    img.src = _fotosLightboxList[_fotosLightboxIndex] || '';
+    img.style.opacity = '1';
+  }, 100);
+  counter.textContent = (_fotosLightboxIndex + 1) + ' / ' + _fotosLightboxList.length;
+}
+
+function fotosLightboxNav(dir) {
+  _fotosLightboxIndex += dir;
+  if (_fotosLightboxIndex < 0) _fotosLightboxIndex = _fotosLightboxList.length - 1;
+  if (_fotosLightboxIndex >= _fotosLightboxList.length) _fotosLightboxIndex = 0;
+  fotosLightboxShow();
 }
 
 function fotosCloseLightbox() {
@@ -4670,12 +5205,152 @@ function fotosCloseLightbox() {
   document.getElementById('fotos-lightbox-img').src = '';
 }
 
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  var lb = document.getElementById('fotos-lightbox');
+  if (!lb || lb.style.display === 'none') return;
+  if (e.key === 'ArrowLeft') { fotosLightboxNav(-1); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { fotosLightboxNav(1); e.preventDefault(); }
+  if (e.key === 'Escape') { fotosCloseLightbox(); e.preventDefault(); }
+});
+
+function fotosCopyPrompt(fotoId) {
+  var foto = _fotosAll.find(function(f) { return f.id === fotoId; });
+  if (!foto || !foto.prompt) return;
+  navigator.clipboard.writeText(foto.prompt).then(function() {
+    // Show brief toast
+    var toast = document.createElement('div');
+    toast.textContent = 'Prompt copiado!';
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gold);color:#0D0D0D;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;font-family:DM Sans,sans-serif;';
+    document.body.appendChild(toast);
+    setTimeout(function() { document.body.removeChild(toast); }, 2000);
+  });
+}
+
 // Auto-load when Fotos section opens
 var _origShowSectionForFotos = showSection;
 showSection = function(sec) {
   _origShowSectionForFotos(sec);
-  if (sec === 'fotos') fotosLoad();
+  if (sec === 'fotos-gerar') fotosLoad();
 };
+
+// ── FOTOS UPLOAD ──
+var SB_STORAGE_URL = SB_URL + '/storage/v1';
+var _fotosUploaded = [];
+
+function fotosUploadLoad() {
+  var grid = document.getElementById('fotos-upload-grid');
+  var empty = document.getElementById('fotos-upload-empty');
+  grid.innerHTML = '';
+
+  // List files from Supabase storage bucket "fotos"
+  fetch(SB_STORAGE_URL + '/object/list/fotos', {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: '', limit: 500, offset: 0, sortBy: { column: 'created_at', order: 'desc' } })
+  }).then(function(r) { return r.json(); }).then(function(files) {
+    _fotosUploaded = (files || []).filter(function(f) { return f.name && !f.name.endsWith('/'); });
+    if (_fotosUploaded.length === 0) {
+      empty.style.display = 'block';
+      grid.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.style.display = 'grid';
+    _fotosUploaded.forEach(function(file) {
+      var publicUrl = SB_URL + '/storage/v1/object/public/fotos/' + file.name;
+      var card = document.createElement('div');
+      card.style.cssText = 'position:relative;border-radius:14px;overflow:hidden;border:2px solid transparent;transition:all 0.2s;cursor:pointer;';
+      card.onmouseenter = function() { card.style.borderColor = 'var(--gold-border)'; };
+      card.onmouseleave = function() { card.style.borderColor = 'transparent'; };
+      card.ondblclick = function() { fotosOpenLightbox(publicUrl); };
+      card.innerHTML = '<div style="aspect-ratio:1;overflow:hidden;background:var(--surface2)">' +
+        '<img src="' + publicUrl + '" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s" onmouseenter="this.style.transform=\'scale(1.05)\'" onmouseleave="this.style.transform=\'none\'">' +
+        '</div>' +
+        '<div onclick="event.stopPropagation();fotosDeleteUploaded(\'' + file.name.replace(/'/g, "\\'") + '\')" style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:7px;background:rgba(224,85,85,0.8);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity 0.2s" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>' +
+        '</div>';
+      // Show delete on card hover
+      card.onmouseenter = function() { card.style.borderColor = 'var(--gold-border)'; card.querySelector('[onclick*="fotosDeleteUploaded"]').style.opacity = '1'; };
+      card.onmouseleave = function() { card.style.borderColor = 'transparent'; card.querySelector('[onclick*="fotosDeleteUploaded"]').style.opacity = '0'; };
+      grid.appendChild(card);
+    });
+  }).catch(function(err) {
+    console.error('Erro ao listar fotos:', err);
+    empty.style.display = 'block';
+    empty.querySelector('p').textContent = 'Erro ao carregar: ' + err.message;
+  });
+}
+
+function fotosHandleDrop(e) {
+  var files = e.dataTransfer.files;
+  fotosHandleFiles(files);
+}
+
+function fotosHandleFiles(files) {
+  if (!files || files.length === 0) return;
+  var progress = document.getElementById('fotos-upload-progress');
+  progress.style.display = 'block';
+  progress.innerHTML = '';
+  var total = files.length;
+  var done = 0;
+
+  for (var i = 0; i < files.length; i++) {
+    (function(file) {
+      var fileName = Date.now() + '_' + Math.random().toString(36).substr(2, 6) + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+      var bar = document.createElement('div');
+      bar.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:8px;font-size:12px;color:var(--text-muted)';
+      bar.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="animation:spin 1s linear infinite;flex-shrink:0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' +
+        '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + file.name + '</span>' +
+        '<span class="upload-status" style="flex-shrink:0">Enviando...</span>';
+      progress.appendChild(bar);
+
+      fetch(SB_STORAGE_URL + '/object/fotos/' + fileName, {
+        method: 'POST',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      }).then(function(r) {
+        if (!r.ok) throw new Error('Erro ' + r.status);
+        return r.json();
+      }).then(function() {
+        bar.querySelector('svg').style.animation = 'none';
+        bar.querySelector('svg').outerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5db870" stroke-width="2.5" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>';
+        bar.querySelector('.upload-status').textContent = 'Enviado!';
+        bar.querySelector('.upload-status').style.color = '#5db870';
+        done++;
+        if (done === total) {
+          setTimeout(function() { progress.style.display = 'none'; fotosUploadLoad(); }, 1500);
+        }
+      }).catch(function(err) {
+        bar.querySelector('svg').style.animation = 'none';
+        bar.querySelector('svg').outerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" style="flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        bar.querySelector('.upload-status').textContent = err.message;
+        bar.querySelector('.upload-status').style.color = 'var(--danger)';
+        done++;
+        if (done === total) {
+          setTimeout(function() { progress.style.display = 'none'; fotosUploadLoad(); }, 2000);
+        }
+      });
+    })(files[i]);
+  }
+}
+
+function fotosDeleteUploaded(fileName) {
+  if (!confirm('Excluir esta foto?')) return;
+  fetch(SB_STORAGE_URL + '/object/fotos/' + fileName, {
+    method: 'DELETE',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  }).then(function() {
+    fotosUploadLoad();
+  }).catch(function(err) {
+    alert('Erro ao excluir: ' + err.message);
+  });
+}
 
 </script>
 </html>
