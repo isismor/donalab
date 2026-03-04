@@ -155,7 +155,10 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
         <div class="si" onclick="goP('po-gen','Plano de Ouro · Criação')">Criação do E-book</div>
       </div>
       <div class="ni" onclick="toggleSub('ca')"><div class="ni-ic">◎</div>Conteúdo de Alto Alcance<span class="ni-arrow" id="arr-ca">▸</span></div>
-      <div class="sub" id="sub-ca"><div class="si" onclick="goP('ca-home','Conteúdo de Alto Alcance')">Visão geral</div></div>
+      <div class="sub" id="sub-ca">
+        <div class="si" onclick="goP('ca-tpl','Conteúdo A.A. · Template')">Template</div>
+        <div class="si" onclick="goP('ca-gen','Conteúdo A.A. · Criação')">Criação do E-book</div>
+      </div>
 
       <div class="sb-sec">Sistema</div>
       <div class="ni" onclick="goP('integ','Integrações')"><div class="ni-ic">⚙</div>Integrações</div>
@@ -238,12 +241,45 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
         </div>
       </div>
 
-      <!-- CONTEÚDO -->
-      <div class="pg" id="pg-ca-home">
-        <div style="margin-bottom:28px;">
-          <span class="label" style="font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--titanium);display:block;margin-bottom:14px;">Criação de Conteúdo</span>
-          <h1 style="font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.0;letter-spacing:-1.5px;">Conteúdo de <em style="font-family:var(--serif);font-style:italic;font-weight:400;color:var(--titanium);">Alto Alcance</em></h1>
-          <p style="font-size:15px;color:var(--cacao-70);margin-top:10px;font-weight:400;">Em breve.</p>
+      <!-- CONTEÚDO DE ALTO ALCANCE — TEMPLATE -->
+      <div class="pg" id="pg-ca-tpl">
+        <div class="ed-lay">
+          <div class="ed-pan">
+            <h3>Template · Conteúdo A.A.</h3>
+            <p class="psub">Textos fixos das 9 páginas</p>
+            <div id="ca-txt-fields"></div>
+            <div class="br"><button class="btn-p" onclick="saveCaTpl()">💾 Salvar Template</button><button class="btn-g" onclick="resetCaTpl()">↻ Resetar</button></div>
+          </div>
+          <div class="ed-prev">
+            <div class="prev-hd"><h3>Preview</h3><div class="sn"><button onclick="caPrevS()">◂</button><span id="ca-scnt">01 / 09</span><button onclick="caNextS()">▸</button></div></div>
+            <div class="sc-wrap"><div class="sc" id="ca-sc"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTEÚDO DE ALTO ALCANCE — CRIAÇÃO -->
+      <div class="pg" id="pg-ca-gen">
+        <div class="ed-lay">
+          <div class="ed-pan">
+            <h3>Dados da Cliente</h3>
+            <p class="psub">Nome e campos variáveis</p>
+            <div class="fd"><label>Nome da Cliente</label><input type="text" id="ca-gn" placeholder="Ex: Maria Clara" maxlength="50"></div>
+            <div class="fd"><label>Campos Variáveis</label><textarea id="ca-campos" placeholder="Cole aqui todos os campos variáveis (tom de voz, valores, assuntos, hooks...)..." style="min-height:300px;"></textarea><p class="fd-hint">Cole tudo de uma vez. O sistema identifica cada seção automaticamente.</p></div>
+            <div class="br"><button class="btn-p" id="ca-gbtn" onclick="caGenerate()">✦ Gerar E-book</button></div>
+            <div id="ca-gen-actions" style="display:none;margin-top:16px;">
+              <div style="font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--titanium);margin-bottom:8px;">✓ GERADO COM SUCESSO</div>
+              <div class="br" style="margin-top:0;"><button class="btn-t" onclick="caDlPDF()">📥 Baixar PDF</button><button class="btn-t" onclick="caExportDrive()" style="background:rgba(186,167,140,.12);border:1px solid rgba(186,167,140,.3);">📁 Exportar p/ Drive</button><button class="btn-g" onclick="caReset()">↻ Novo</button></div>
+              <div id="ca-drive-result" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
+            </div>
+          </div>
+          <div class="ed-prev">
+            <div class="prev-hd"><h3>Preview do E-book</h3><div class="sn"><button onclick="caGpS()">◂</button><span id="ca-gscnt">01 / 09</span><button onclick="caGnS()">▸</button></div></div>
+            <div id="ca-gph" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;color:var(--mirror);"><div style="font-size:36px;margin-bottom:10px;opacity:.4;">◎</div><p style="font-size:13px;max-width:240px;line-height:1.8;font-weight:400;">Preencha os campos e clique em <strong>Gerar</strong>.</p></div>
+            <div id="ca-gen-prev" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+              <div class="sc-wrap"><div class="sc" id="ca-gsc"></div></div>
+              <div id="ca-gthumbs" style="display:flex;justify-content:center;gap:6px;margin-top:12px;"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1241,6 +1277,396 @@ async function exportDrive(){
 
 // Load GD settings on page load
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(loadGDSt,100);});
+
+// ============================================================
+// CONTEÚDO DE ALTO ALCANCE — MODULE
+// ============================================================
+
+const CA_PAGES=[
+  {id:'ca-capa',name:'Capa',bg:'dark',fields:[
+    {id:'ca_titulo',def:'Conteúdo de Alto Alcance',label:'Título'},
+    {id:'ca_subtitulo',def:'Chegou a hora da sua mensagem ser espalhada',label:'Subtítulo'}
+  ]},
+  {id:'ca-boas',name:'Boas-vindas',bg:'light',fields:[
+    {id:'ca_boas_texto',def:'Boas vindas. Esse é um material para direcionar seu tom de voz, valores de conteúdo e te dar ideias de conteúdo. A sua mensagem, você importa: chegou a hora de alcançar pessoas com a sua voz.',label:'Texto de boas-vindas'}
+  ]},
+  {id:'ca-tom',name:'Tom + Valores',bg:'light',fields:[
+    {id:'ca_tom_titulo',def:'Seu tom de voz',label:'Título Tom'},
+    {id:'ca_tom_sub',def:'Esta é a forma que descreve sua forma de falar',label:'Sub Tom'},
+    {id:'ca_val_titulo',def:'Seus valores de marca',label:'Título Valores'},
+    {id:'ca_val_sub',def:'Aqui vão valores que guiam seu posicionamento',label:'Sub Valores'}
+  ]},
+  {id:'ca-linhas',name:'Linhas Editoriais',bg:'dark',fields:[
+    {id:'ca_linhas_titulo',def:'Linhas Editoriais',label:'Título'},
+    {id:'ca_linhas_intro',def:'Esses são os assuntos sugeridos para você. Escolha a linha principal e pelo menos mais 5 da sua preferência.',label:'Intro'}
+  ]},
+  {id:'ca-carr-aut',name:'Carrossel Autoridade',bg:'light',fields:[
+    {id:'ca_carr_aut_titulo',def:'Sugestões de carrosséis de autoridade',label:'Título'},
+    {id:'ca_carr_aut_intro',def:'Aqui vão 10 ideias de conteúdos para você usar como carrossel de autoridade.',label:'Intro'}
+  ]},
+  {id:'ca-carr-eng',name:'Carrossel Engajamento',bg:'dark',fields:[
+    {id:'ca_carr_eng_titulo',def:'Sugestões de carrosséis de engajamento',label:'Título'},
+    {id:'ca_carr_eng_intro',def:'Aqui vão 10 ideias de conteúdos para engajar seu público.',label:'Intro'}
+  ]},
+  {id:'ca-reels',name:'Reels Posicionamento',bg:'light',fields:[
+    {id:'ca_reels_titulo',def:'Sugestões de reels de posicionamento',label:'Título'},
+    {id:'ca_reels_intro',def:'Aqui vão 10 ideias de conteúdos para elevar sua posição no mercado.',label:'Intro'}
+  ]},
+  {id:'ca-roteiro',name:'Roteiros Virais',bg:'light',fields:[
+    {id:'ca_rot_titulo',def:'Como encontrar temas virais?',label:'Título'},
+    {id:'ca_rot_texto',def:'A melhor maneira de encontrar temas virais é:\n1. Pesquise as hashtags relacionadas aos seus assuntos na aba explorar do instagram.\n2. Procure por vídeos com mais de 1 milhão de views relacionados a esses assuntos.\n3. Entenda porque viralizou: o tema, a forma de iniciar.\n4. Grave sobre o mesmo tema mas com as suas palavras e o seu posicionamento.\n5. Salve os conteúdos! Quanto mais você salva, mais conteúdos assim aparecerão para você.',label:'Texto'}
+  ]},
+  {id:'ca-fim',name:'Encerramento',bg:'dark',fields:[
+    {id:'ca_fim_texto',def:'Obrigada por ter chegado até aqui. Esse material traduz a forma mais estratégica de você alcançar mais pessoas.',label:'Mensagem final'}
+  ]}
+];
+
+let caSlide=0;
+let caGenData=null;
+
+function caTfv(id){
+  const el=document.getElementById('ca-tf-'+id);
+  if(el)return el.value;
+  const pg=CA_PAGES.find(p=>p.fields.some(f=>f.id===id));
+  const f=pg?pg.fields.find(f=>f.id===id):null;
+  return f?f.def:'';
+}
+
+function caGfv(id){return caGenData&&caGenData[id]?caGenData[id]:'';}
+
+// Render template text fields in sidebar
+function renderCaTxtFields(){
+  const p=CA_PAGES[caSlide];
+  let h='<div style="font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--titanium);margin-bottom:12px;">'+p.name+'</div>';
+  p.fields.forEach(f=>{
+    h+=`<div class="fd"><label>${f.label}</label><textarea id="ca-tf-${f.id}" oninput="caR()" style="min-height:${f.id.includes('texto')?'100':'50'}px;">${f.def}</textarea></div>`;
+  });
+  document.getElementById('ca-txt-fields').innerHTML=h;
+  // Load saved
+  const saved=JSON.parse(localStorage.getItem('ca_tpl')||'{}');
+  if(saved.texts) p.fields.forEach(f=>{const el=document.getElementById('ca-tf-'+f.id);if(el&&saved.texts[f.id])el.value=saved.texts[f.id];});
+}
+
+function caRenderSlide(idx,vFn){
+  const c=colors(),l=layout(),p=CA_PAGES[idx];
+  const bg=p.bg==='dark'?c.cacao:c.marfim;
+  const fg=p.bg==='dark'?c.marfim:c.cacao;
+  const sub=p.bg==='dark'?c.titanium:c.cacao+'99';
+  const m=l.m,mt=l.mt;
+  const footer=`<div style="position:absolute;bottom:${mt/2}px;left:${m}px;right:${m}px;display:flex;justify-content:space-between;align-items:center;"><span style="font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${fg}44;">ISIS MOREIRA</span><span style="font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:2px;color:${fg}44;">${String(idx+1).padStart(2,'0')} / ${String(CA_PAGES.length).padStart(2,'0')}</span></div>`;
+
+  if(p.id==='ca-capa'){
+    return `<div style="width:100%;height:100%;background:${c.cacao};padding:${mt}px ${m}px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;">
+      <div style="position:absolute;top:${mt}px;left:${m}px;display:flex;align-items:center;gap:8px;"><div style="width:28px;height:1.5px;background:${c.titanium};"></div><span style="font-family:var(--mono);font-size:${l.fs+1}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};">ISIS MOREIRA</span></div>
+      <div style="margin-bottom:60px;">
+        <h1 style="font-family:var(--serif);font-weight:400;font-size:${l.ts*1.3}px;color:${c.marfim};line-height:1.05;letter-spacing:-2px;">${vFn('ca_titulo')}</h1>
+        <p style="font-family:var(--serif);font-style:italic;font-size:${l.bs+4}px;color:${c.titanium};margin-top:8px;">${vFn('ca_subtitulo')}</p>
+        <div style="width:60px;height:1.5px;background:${c.titanium};margin-top:24px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:20px;">
+          <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${c.titanium};">PREPARADO PARA</span>
+          <span style="font-family:var(--sans);font-size:${l.bs+6}px;font-weight:900;color:${c.marfim};">${vFn('ca_nome')||'[Nome]'}</span>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:${mt}px;left:${m}px;width:28px;height:1.5px;background:${c.titanium};"></div>
+    </div>`;
+  }
+
+  if(p.id==='ca-boas'){
+    return `<div style="width:100%;height:100%;background:${c.marfim};display:grid;grid-template-columns:55% 45%;position:relative;">
+      <div style="padding:${mt*2}px ${m}px;display:flex;flex-direction:column;justify-content:center;">
+        <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};margin-bottom:10px;">BOAS-VINDAS</span>
+        <h2 style="font-family:var(--sans);font-weight:900;font-size:${l.ts*0.7}px;line-height:1.1;letter-spacing:-1px;color:${c.cacao};margin-bottom:14px;">Acesse o seu plano</h2>
+        <div style="width:40px;height:2px;background:${c.titanium};margin-bottom:18px;"></div>
+        <p style="font-size:${l.bs}px;color:${c.cacao}99;line-height:1.7;max-width:420px;">${vFn('ca_boas_texto')}</p>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:28px;"><div style="width:28px;height:1.5px;background:${c.titanium};"></div><span style="font-family:var(--serif);font-style:italic;font-size:${l.bs+2}px;color:${c.titanium};">Por Isis Moreira</span></div>
+      </div>
+      <div style="background:url('data:image/jpeg;base64,${ISIS_PHOTO}') center/cover;mix-blend-mode:multiply;opacity:.95;"></div>
+      ${footer}
+    </div>`;
+  }
+
+  if(p.id==='ca-tom'){
+    const tomTxt=vFn('ca_tom_de_voz')||'[Tom de voz da cliente]';
+    const valTxt=vFn('ca_valores_marca')||'[Valores de marca da cliente]';
+    return `<div style="width:100%;height:100%;background:${c.marfim};padding:${mt}px ${m}px;position:relative;">
+      <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};">IDENTIDADE DE CONTEÚDO</span>
+      <h2 style="font-family:var(--sans);font-weight:900;font-size:${l.bs+5}px;color:${c.cacao};margin-top:4px;margin-bottom:12px;">Como sua marca se comunica</h2>
+      <div style="display:grid;grid-template-columns:2fr 3fr;gap:14px;height:calc(100% - 100px);">
+        <div style="background:${c.creme};border:1px solid ${c.cacao}08;border-radius:${parseInt(l.bs)}px;padding:18px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:3px;height:14px;background:${c.titanium};border-radius:2px;"></div><h3 style="font-weight:900;font-size:${l.bs}px;">${vFn('ca_tom_titulo')}</h3></div>
+          <p style="color:${c.cacao}77;margin-bottom:8px;font-family:var(--mono);font-size:${l.ls-1}px;letter-spacing:1px;text-transform:uppercase;">${vFn('ca_tom_sub')}</p>
+          <p style="font-size:${Math.round((l.bs-1)*0.85)}px;color:${c.cacao}cc;line-height:1.5;flex:1;">${tomTxt}</p>
+        </div>
+        <div style="background:${c.creme};border:1px solid ${c.cacao}08;border-radius:${parseInt(l.bs)}px;padding:18px;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:3px;height:14px;background:${c.titanium};border-radius:2px;"></div><h3 style="font-weight:900;font-size:${l.bs}px;">${vFn('ca_val_titulo')}</h3></div>
+          <p style="color:${c.cacao}77;margin-bottom:8px;font-family:var(--mono);font-size:${l.ls-1}px;letter-spacing:1px;text-transform:uppercase;">${vFn('ca_val_sub')}</p>
+          <div style="font-size:${Math.round((l.bs-1)*0.82)}px;color:${c.cacao}cc;line-height:1.45;flex:1;">${valTxt.split('\n').filter(s=>s.trim()).map(v=>{const clean=v.replace(/^[-–•]\s*/,'');const parts=clean.split(':');return parts.length>1?'<div style="margin-bottom:1px;"><span style="font-weight:700;">· '+parts[0].trim()+':</span> '+parts.slice(1).join(':').trim()+'</div>':'<div style="margin-bottom:1px;">· '+clean+'</div>';}).join('')}</div>
+        </div>
+      </div>
+      ${footer}
+    </div>`;
+  }
+
+  if(p.id==='ca-linhas'){
+    const items=(vFn('ca_assuntos')||'').split('\n').filter(s=>s.trim());
+    const listH=items.map((it,i)=>{
+      const clean=it.replace(/^[-–•]\s*/,'');
+      const parts=clean.split(':');
+      const title=parts[0]?.trim()||clean;
+      const desc=parts[1]?.trim()||'';
+      return `<div style="display:flex;align-items:flex-start;gap:12px;padding:7px 0;${i<items.length-1?'border-bottom:1px solid '+c.marfim+'12;':''}">
+        <div style="min-width:24px;height:24px;border:1px solid ${c.titanium}55;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:${l.ls-1}px;font-weight:800;color:${c.titanium};flex-shrink:0;">${String(i+1).padStart(2,'0')}</div>
+        <div><div style="font-weight:700;font-size:${l.bs-2}px;color:${c.marfim};">${title}</div>${desc?`<div style="font-size:${l.bs-3}px;color:${c.marfim}88;margin-top:1px;">${desc}</div>`:''}</div>
+      </div>`;
+    }).join('');
+    return `<div style="width:100%;height:100%;background:${c.cacao};padding:${mt}px ${m}px;position:relative;">
+      <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};">${vFn('ca_linhas_titulo')}</span>
+      <p style="font-size:${l.bs-1}px;color:${c.marfim}88;margin-top:4px;margin-bottom:14px;max-width:600px;">${vFn('ca_linhas_intro')}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 36px;">${listH}</div>
+      ${footer}
+    </div>`;
+  }
+
+  // Hooks pages (ca-carr-aut, ca-carr-eng, ca-reels) — same layout
+  if(p.id==='ca-carr-aut'||p.id==='ca-carr-eng'||p.id==='ca-reels'){
+    const dataKey=p.id==='ca-carr-aut'?'ca_hooks_autoridade':p.id==='ca-carr-eng'?'ca_hooks_engajamento':'ca_hooks_reels';
+    const titleKey=p.id==='ca-carr-aut'?'ca_carr_aut_titulo':p.id==='ca-carr-eng'?'ca_carr_eng_titulo':'ca_reels_titulo';
+    const introKey=p.id==='ca-carr-aut'?'ca_carr_aut_intro':p.id==='ca-carr-eng'?'ca_carr_eng_intro':'ca_reels_intro';
+    const hooks=(vFn(dataKey)||'').split('\n').filter(s=>s.trim());
+    const isDark=p.bg==='dark';
+    const bgC=isDark?c.cacao:c.marfim;
+    const fgC=isDark?c.marfim:c.cacao;
+    const cardBg=isDark?c.marfim+'0A':c.creme;
+    const hookH=hooks.map((h,i)=>`<div style="background:${cardBg};border:1px solid ${isDark?c.marfim+'12':c.cacao+'08'};border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;">
+      <span style="font-family:var(--mono);font-size:${l.ls-1}px;font-weight:800;color:${c.titanium};min-width:18px;">${String(i+1).padStart(2,'0')}</span>
+      <span style="font-size:${l.bs-2}px;color:${fgC}cc;line-height:1.45;">${h.replace(/^[-–•]\s*/,'').replace(/^\d+[\.\)]\s*/,'')}</span>
+    </div>`).join('');
+    return `<div style="width:100%;height:100%;background:${bgC};padding:${mt}px ${m}px;position:relative;overflow:hidden;">
+      <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};">${vFn(titleKey)}</span>
+      <p style="font-size:${l.bs-1}px;color:${fgC}88;margin-top:4px;margin-bottom:16px;">${vFn(introKey)}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">${hookH}</div>
+      ${footer}
+    </div>`;
+  }
+
+  if(p.id==='ca-roteiro'){
+    const allLines=vFn('ca_rot_texto').split('\n').filter(s=>s.trim());
+    const intro=[];const steps=[];
+    allLines.forEach(line=>{
+      if(/^\d+[\.)\-]/.test(line.trim()))steps.push(line);
+      else intro.push(line);
+    });
+    const stepsH=steps.map((s,i)=>{
+      const clean=s.replace(/^\d+[\.)\-]\s*/,'');
+      return `<div style="display:flex;align-items:center;gap:14px;padding:8px 16px;background:${c.creme};border:1px solid ${c.cacao}08;border-radius:8px;">
+        <div style="min-width:24px;height:24px;background:${c.titanium}22;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:${l.ls-1}px;font-weight:800;color:${c.titanium};flex-shrink:0;">${i+1}</div>
+        <p style="font-size:${l.bs-2}px;color:${c.cacao}bb;line-height:1.4;">${clean}</p>
+      </div>`;
+    }).join('');
+    return `<div style="width:100%;height:100%;background:${c.marfim};padding:${mt}px ${m}px;position:relative;">
+      <span style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.titanium};">ROTEIROS VIRAIS</span>
+      <h2 style="font-family:var(--sans);font-weight:900;font-size:${l.bs+3}px;color:${c.cacao};margin-top:4px;">${vFn('ca_rot_titulo')}</h2>
+      ${intro.length?`<p style="font-size:${l.bs-1}px;color:${c.cacao}88;margin-top:4px;margin-bottom:12px;">${intro.join(' ')}</p>`:'<div style="margin-bottom:12px;"></div>'}
+      <div style="display:flex;flex-direction:column;gap:5px;">${stepsH}</div>
+      ${footer}
+    </div>`;
+  }
+
+  if(p.id==='ca-fim'){
+    return `<div style="width:100%;height:100%;background:${c.cacao};display:flex;align-items:center;justify-content:center;position:relative;">
+      <div style="text-align:center;max-width:600px;padding:0 ${m}px;">
+        <div style="width:50px;height:2px;background:${c.titanium};margin:0 auto 28px;"></div>
+        <p style="font-family:var(--serif);font-style:italic;font-size:${l.bs+8}px;color:${c.marfim};line-height:1.5;letter-spacing:-.5px;">${vFn('ca_fim_texto')}</p>
+        <div style="width:50px;height:2px;background:${c.titanium};margin:28px auto;"></div>
+        <p style="font-family:var(--serif);font-style:italic;font-size:${l.bs+2}px;color:${c.titanium};">Por Isis Moreira</p>
+      </div>
+      <div style="position:absolute;bottom:${mt}px;left:${m}px;right:${m}px;display:flex;justify-content:space-between;"><span style="font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${c.marfim}44;">ISIS MOREIRA</span><span style="font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:2px;color:${c.marfim}44;">${String(CA_PAGES.length).padStart(2,'0')} / ${String(CA_PAGES.length).padStart(2,'0')}</span></div>
+    </div>`;
+  }
+
+  return `<div style="width:100%;height:100%;background:${bg};padding:${mt}px ${m}px;"><p style="color:${fg};">${p.name}</p></div>`;
+}
+
+// Template preview
+function caR(){
+  const vFn=(id)=>{
+    if(id==='ca_nome')return '[Nome da Cliente]';
+    if(id==='ca_tom_de_voz')return '[Tom de voz será preenchido na criação]';
+    if(id==='ca_valores_marca')return '[Valores de marca serão preenchidos na criação]';
+    if(id==='ca_assuntos')return '- Assunto 1: Descrição\n- Assunto 2: Descrição\n- Assunto 3: Descrição\n- Assunto 4: Descrição\n- Assunto 5: Descrição\n- Assunto 6: Descrição\n- Assunto 7: Descrição\n- Assunto 8: Descrição\n- Assunto 9: Descrição\n- Assunto 10: Descrição';
+    if(id==='ca_hooks_autoridade'||id==='ca_hooks_engajamento'||id==='ca_hooks_reels')return 'Hook exemplo 1\nHook exemplo 2\nHook exemplo 3\nHook exemplo 4\nHook exemplo 5\nHook exemplo 6\nHook exemplo 7\nHook exemplo 8\nHook exemplo 9\nHook exemplo 10';
+    return caTfv(id);
+  };
+  document.getElementById('ca-sc').innerHTML=caRenderSlide(caSlide,vFn);
+  document.getElementById('ca-scnt').textContent=`${String(caSlide+1).padStart(2,'0')} / ${String(CA_PAGES.length).padStart(2,'0')}`;
+}
+function caPrevS(){caSlide=Math.max(0,caSlide-1);caR();renderCaTxtFields();}
+function caNextS(){caSlide=Math.min(CA_PAGES.length-1,caSlide+1);caR();renderCaTxtFields();}
+
+function saveCaTpl(){
+  const tpl={texts:{}};
+  CA_PAGES.forEach(p=>p.fields.forEach(f=>{const el=document.getElementById('ca-tf-'+f.id);if(el)tpl.texts[f.id]=el.value;}));
+  localStorage.setItem('ca_tpl',JSON.stringify(tpl));
+  alert('Template salvo!');
+}
+function loadCaTpl(){
+  const s=localStorage.getItem('ca_tpl');if(!s)return;
+  try{const t=JSON.parse(s);if(t.texts){CA_PAGES.forEach(p=>p.fields.forEach(f=>{if(t.texts[f.id]){f.def=t.texts[f.id];}}));}}catch(e){}
+}
+function resetCaTpl(){localStorage.removeItem('ca_tpl');location.reload();}
+
+// Generation (no AI — just uses pasted data)
+let caGSlide=0;
+
+function caGenerate(){
+  const nome=document.getElementById('ca-gn').value.trim();
+  const campos=document.getElementById('ca-campos').value.trim();
+  if(!nome){alert('Preencha o nome.');return;}
+  if(!campos){alert('Cole os campos variáveis.');return;}
+
+  // Parse sections from pasted text
+  // Expects numbered sections: 1) Tom de voz 2) Valores 3) Assuntos 4) Hooks autoridade 5) Hooks engajamento 6) Hooks reels
+  const sections=campos.split(/\n(?=\d+\)|\d+\.?\s*(?:Seu tom|Tom de|Valores|Assuntos|Títulos|Título))/i);
+  
+  // Smarter parsing: split by section headers
+  let tomVoz='',valores='',assuntos='',hooksAut='',hooksEng='',hooksReels='';
+  
+  const lines=campos.split('\n');
+  let current='';
+  const data={tom:[],val:[],ass:[],haut:[],heng:[],hreels:[]};
+  
+  for(const line of lines){
+    const l=line.trim().toLowerCase();
+    if(!l)continue;
+    // Detect section headers by number prefix
+    if(l.match(/^1\)/)){current='tom';const rest=line.trim().replace(/^1\)\s*/,'');if(rest)data.tom.push(rest);continue;}
+    else if(l.match(/^2\)/)){current='val';const rest=line.trim().replace(/^2\)\s*/,'');if(rest&&!rest.toLowerCase().startsWith('valores'))data.val.push(rest);continue;}
+    else if(l.match(/^3\)/)){current='ass';const rest=line.trim().replace(/^3\)\s*/,'');if(rest&&!rest.toLowerCase().startsWith('assuntos'))data.ass.push(rest);continue;}
+    else if(l.match(/^4\)/)){current='haut';continue;}
+    else if(l.match(/^5\)/)){current='heng';continue;}
+    else if(l.match(/^6\)/)){current='hreels';continue;}
+    // Also detect by keyword
+    else if(l.startsWith('seu tom')||l.startsWith('tom de voz')){current='tom';const rest=line.trim().replace(/^(seu tom de voz|tom de voz)[:\s]*/i,'');if(rest)data.tom.push(rest);continue;}
+    else if(l.startsWith('valores')){current='val';continue;}
+    else if(l.startsWith('assuntos')||l.startsWith('linhas')){current='ass';continue;}
+    else if(l.match(/carrossel\s*autorid|títulos\s*carrossel\s*autorid/i)){current='haut';continue;}
+    else if(l.match(/carrossel\s*engaj|títulos\s*carrossel\s*engaj/i)){current='heng';continue;}
+    else if(l.match(/reels|títulos\s*reels/i)){current='hreels';continue;}
+    if(current&&line.trim())data[current].push(line.trim());
+  }
+
+  caGenData={
+    ca_nome:nome,
+    ca_tom_de_voz:data.tom.join(' '),
+    ca_valores_marca:data.val.join('\n'),
+    ca_assuntos:data.ass.join('\n'),
+    ca_hooks_autoridade:data.haut.join('\n'),
+    ca_hooks_engajamento:data.heng.join('\n'),
+    ca_hooks_reels:data.hreels.join('\n')
+  };
+
+  document.getElementById('ca-gph').style.display='none';
+  document.getElementById('ca-gen-prev').style.display='flex';
+  document.getElementById('ca-gen-actions').style.display='block';
+  caGSlide=0;
+  caRenderGenPreview();
+}
+
+function caRenderGenSlide(idx){
+  const vFn=(id)=>{
+    if(caGenData&&caGenData[id])return caGenData[id];
+    return caTfv(id);
+  };
+  return caRenderSlide(idx,vFn);
+}
+
+function caRenderGenPreview(){
+  if(!caGenData)return;
+  document.getElementById('ca-gsc').innerHTML=caRenderGenSlide(caGSlide);
+  document.getElementById('ca-gscnt').textContent=`${String(caGSlide+1).padStart(2,'0')} / ${String(CA_PAGES.length).padStart(2,'0')}`;
+  const c=colors();
+  document.getElementById('ca-gthumbs').innerHTML=CA_PAGES.map((p,i)=>{
+    const isAct=i===caGSlide;
+    return `<div onclick="caGSlide=${i};caRenderGenPreview();" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:800;transition:all .15s;${isAct?'background:var(--titanium);color:var(--cacao);box-shadow:0 0 0 3px rgba(186,167,140,.3);':'background:rgba(245,240,230,.08);color:var(--mirror);border:1px solid rgba(245,240,230,.1);'}" title="${p.name}">${i+1}</div>`;
+  }).join('');
+}
+function caGpS(){caGSlide=Math.max(0,caGSlide-1);caRenderGenPreview();}
+function caGnS(){caGSlide=Math.min(CA_PAGES.length-1,caGSlide+1);caRenderGenPreview();}
+
+function caReset(){
+  caGenData=null;caGSlide=0;
+  document.getElementById('ca-gn').value='';document.getElementById('ca-gem').value='';document.getElementById('ca-gwh').value='';
+  document.getElementById('ca-campos').value='';
+  document.getElementById('ca-gen-actions').style.display='none';
+  document.getElementById('ca-gen-prev').style.display='none';
+  document.getElementById('ca-gph').style.display='flex';
+}
+
+// PDF
+async function caDlPDF(){
+  if(!caGenData)return;
+  const btn=document.querySelector('[onclick="caDlPDF()"]');
+  const origText=btn.textContent;btn.disabled=true;btn.textContent='⏳ Gerando...';
+  const saved=caGSlide;
+  try{
+    const {jsPDF}=window.jspdf;
+    const W=338.67,H=190.5;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:[W,H]});
+    const target=document.getElementById('ca-gsc');
+    for(let i=0;i<CA_PAGES.length;i++){
+      if(i>0)doc.addPage([W,H],'landscape');
+      caGSlide=i;target.innerHTML=caRenderGenSlide(i);
+      await new Promise(r=>setTimeout(r,300));
+      btn.textContent=`⏳ ${i+1}/${CA_PAGES.length}`;
+      const canvas=await html2canvas(target,{scale:2,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});
+      doc.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,W,H);
+    }
+    caGSlide=saved;caRenderGenPreview();
+    doc.save('Conteudo_Alto_Alcance_'+(caGenData.ca_nome||'Cliente').replace(/\s+/g,'_')+'.pdf');
+  }catch(err){console.error(err);alert('Erro: '+err.message);caGSlide=saved;caRenderGenPreview();}
+  btn.disabled=false;btn.textContent=origText;
+}
+
+// Export to Drive
+async function caExportDrive(){
+  if(!caGenData){alert('Gere primeiro.');return;}
+  const clientId=localStorage.getItem('gci'),folderId=localStorage.getItem('gfi');
+  if(!clientId||!folderId){alert('Configure Google Drive em Integrações.');return;}
+  const dr=document.getElementById('ca-drive-result');
+  dr.innerHTML='<span style="color:var(--titanium);">⏳ Preparando...</span>';
+  if(!gdToken){
+    dr.innerHTML='<span style="color:var(--titanium);">🔗 Conectando...</span>';
+    try{await new Promise((res,rej)=>{const cl=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:'https://www.googleapis.com/auth/drive.file',callback:(r)=>{if(r.error){rej(new Error(r.error));return;}gdToken=r.access_token;res();}});cl.requestAccessToken();});}catch(e){dr.innerHTML=`<span style="color:#E8614D;">${e.message}</span>`;return;}
+  }
+  dr.innerHTML='<span style="color:var(--titanium);">⏳ Gerando PDF...</span>';
+  const saved=caGSlide;
+  try{
+    const {jsPDF}=window.jspdf;
+    const W=338.67,H=190.5;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:[W,H]});
+    const target=document.getElementById('ca-gsc');
+    for(let i=0;i<CA_PAGES.length;i++){
+      if(i>0)doc.addPage([W,H],'landscape');
+      caGSlide=i;target.innerHTML=caRenderGenSlide(i);
+      await new Promise(r=>setTimeout(r,300));
+      dr.innerHTML=`<span style="color:var(--titanium);">⏳ Slide ${i+1}/${CA_PAGES.length}...</span>`;
+      const canvas=await html2canvas(target,{scale:2,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});
+      doc.addImage(canvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,W,H);
+    }
+    caGSlide=saved;caRenderGenPreview();
+    const fileName='Conteudo_AA_'+(caGenData.ca_nome||'Cliente').replace(/\s+/g,'_')+'.pdf';
+    const pdfBlob=doc.output('blob');
+    dr.innerHTML='<span style="color:var(--titanium);">⏳ Enviando...</span>';
+    const result=await uploadToDrive(pdfBlob,fileName);
+    const link=result.webViewLink||`https://drive.google.com/file/d/${result.id}/view`;
+    dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
+    // Webhook n8n
+    try{const whUrl='https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779';const fd=new URLSearchParams();fd.append('nome',caGenData.ca_nome||'');fd.append('email',document.getElementById('ca-gem').value.trim()||'');fd.append('whatsapp',document.getElementById('ca-gwh').value.trim()||'');fd.append('link',link);fd.append('tipo','Conteudo_Alto_Alcance');await fetch(whUrl,{method:'POST',body:fd});}catch(e){console.log('webhook:',e);}
+  }catch(err){console.error(err);dr.innerHTML=`<span style="color:#E8614D;">${err.message}</span>`;caGSlide=saved;caRenderGenPreview();}
+}
+
+// Init CA on load
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{loadCaTpl();renderCaTxtFields();caR();},200);});
 
 </script>
 </body>
