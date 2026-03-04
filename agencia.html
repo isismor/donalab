@@ -8,204 +8,122 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400;1,9..40,500;1,9..40,700&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-:root {
-  --marfim: #F5F0E6;
-  --creme: #EDE6D8;
-  --titanium: #BAA78C;
-  --cacao: #231710;
-  --mirror: #93979B;
-  --mirror-10: rgba(147,151,155,.06);
-  --mirror-20: rgba(147,151,155,.10);
-  --mirror-30: rgba(147,151,155,.18);
-  --cacao-70: rgba(35,23,16,.70);
-  --cacao-20: rgba(35,23,16,.20);
-  --cacao-10: rgba(35,23,16,.10);
-  --cacao-05: rgba(35,23,16,.05);
-  --marfim-20: rgba(245,240,230,.20);
-  --marfim-10: rgba(245,240,230,.10);
-  --marfim-05: rgba(245,240,230,.04);
-  --shadow-sm: 0 1px 2px rgba(35,23,16,.06);
-  --shadow-md: 0 2px 6px rgba(35,23,16,.08);
-  --shadow-precision: 0 1px 3px rgba(35,23,16,.12), 0 0 0 1px rgba(35,23,16,.04);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-full: 100px;
-  --sans: 'DM Sans', sans-serif;
-  --serif: 'DM Serif Display', serif;
-  --mono: 'Outfit', sans-serif;
-  --sidebar-w: 280px;
-}
+:root{--marfim:#F5F0E6;--creme:#EDE6D8;--titanium:#BAA78C;--cacao:#231710;--mirror:#93979B;--cacao-70:rgba(35,23,16,.70);--cacao-10:rgba(35,23,16,.10);--cacao-05:rgba(35,23,16,.05);--marfim-10:rgba(245,240,230,.10);--marfim-05:rgba(245,240,230,.04);--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:100px;--sans:'DM Sans',sans-serif;--serif:'DM Serif Display',serif;--mono:'Outfit',sans-serif;--sidebar-w:250px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow:hidden;height:100vh}
+::selection{background:var(--titanium);color:var(--marfim)}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--sans);
-  background: var(--marfim);
-  color: var(--cacao);
-  font-size: 15px;
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  height: 100vh;
-}
-::selection { background: var(--titanium); color: var(--marfim); }
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--cacao);display:flex;align-items:center;justify-content:center;transition:opacity .5s,visibility .5s}
+#login-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.login-container{width:100%;max-width:400px;padding:0 24px;text-align:center}
+.login-brand{font-weight:900;font-size:13px;letter-spacing:6px;text-transform:uppercase;color:var(--marfim);margin-bottom:4px}
+.login-sub{font-family:var(--serif);font-style:italic;font-size:26px;color:var(--titanium);margin-bottom:44px}
+.login-card{background:var(--marfim-05);border:1px solid var(--marfim-10);border-radius:var(--radius-xl);padding:36px 28px}
+.login-card h2{font-weight:900;font-size:20px;color:var(--marfim);margin-bottom:4px}
+.login-card>p{font-size:13px;color:var(--mirror);margin-bottom:24px;font-weight:400}
+.fg{margin-bottom:14px;text-align:left}
+.fg label{display:block;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--titanium);margin-bottom:6px}
+.fg input{width:100%;padding:13px 16px;background:rgba(245,240,230,.06);border:1px solid var(--marfim-10);border-radius:var(--radius-md);color:var(--marfim);font-family:var(--sans);font-size:15px;font-weight:400;outline:none;transition:border-color .2s}
+.fg input:focus{border-color:var(--titanium);box-shadow:0 0 0 3px rgba(186,167,140,.15)}
+.fg input::placeholder{color:var(--mirror);opacity:.5}
+.login-btn{width:100%;padding:14px;background:var(--titanium);color:var(--cacao);border:none;border-radius:var(--radius-md);font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .15s}
+.login-btn:hover{background:#C4B39A}
+.login-error{color:#E8614D;font-size:13px;margin-top:10px;min-height:18px}
+.login-footer{margin-top:36px;font-family:var(--mono);font-size:11px;color:var(--mirror);letter-spacing:2px}
 
-/* ═══════════════ LOGIN ═══════════════ */
-#login-screen {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--cacao);
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity .5s, visibility .5s;
-}
-#login-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* SIDEBAR */
+#app{display:none;height:100vh;width:100vw}#app.active{display:flex}
+.sb{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--cacao);display:flex;flex-direction:column;border-right:1px solid var(--marfim-10)}
+.sb-hd{padding:22px 18px 16px;border-bottom:1px solid var(--marfim-10)}
+.sb-brand{font-weight:900;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--marfim)}
+.sb-label{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--titanium)}
+.sb-nav{flex:1;overflow-y:auto;padding:6px 8px}
+.sb-sec{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--mirror);padding:16px 10px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-md);cursor:pointer;color:var(--creme);font-size:13px;font-weight:500;margin-bottom:1px;border:1px solid transparent;transition:all .15s}
+.ni:hover{background:var(--marfim-05);border-color:var(--marfim-10)}
+.ni.act{background:rgba(186,167,140,.08);border-color:rgba(186,167,140,.15);color:var(--marfim)}
+.ni-ic{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--marfim-05);border:1px solid var(--marfim-10);color:var(--mirror)}
+.ni.act .ni-ic{color:var(--titanium);background:rgba(186,167,140,.1);border-color:rgba(186,167,140,.2)}
+.ni-arrow{margin-left:auto;font-size:9px;color:var(--mirror);transition:transform .3s}.ni-arrow.open{transform:rotate(90deg)}
+.sub{padding-left:16px;max-height:0;overflow:hidden;transition:max-height .3s}.sub.open{max-height:300px}
+.si{padding:6px 10px 6px 20px;border-radius:var(--radius-sm);cursor:pointer;color:var(--mirror);font-size:12px;font-weight:500;transition:all .15s;position:relative}
+.si::before{content:'';position:absolute;left:8px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--mirror);transform:translateY(-50%);transition:background .15s}
+.si:hover{color:var(--creme);background:var(--marfim-05)}
+.si.act{color:var(--titanium);font-weight:700}.si.act::before{background:var(--titanium)}
+.sb-ft{padding:12px 18px;border-top:1px solid var(--marfim-10);display:flex;align-items:center;justify-content:space-between}
+.sb-user{display:flex;align-items:center;gap:7px}
+.u-av{width:26px;height:26px;border-radius:50%;background:var(--titanium);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:9px;color:var(--cacao)}
+.u-info span{display:block}.u-info span:first-child{font-size:11px;font-weight:700;color:var(--marfim)}.u-info span:last-child{font-family:var(--mono);font-size:9px;color:var(--mirror)}
+.logout{background:none;border:1px solid var(--marfim-10);border-radius:var(--radius-sm);color:var(--mirror);padding:4px 6px;cursor:pointer;font-size:11px;transition:all .15s}.logout:hover{border-color:rgba(232,97,77,.3);color:#E8614D}
 
-.login-container { width: 100%; max-width: 420px; padding: 0 24px; text-align: center; }
-.login-brand { font-weight: 900; font-size: 14px; letter-spacing: 6px; text-transform: uppercase; color: var(--marfim); margin-bottom: 6px; }
-.login-sub { font-family: var(--serif); font-style: italic; font-size: 28px; color: var(--titanium); margin-bottom: 48px; }
+/* MAIN */
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tb{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--creme);min-height:48px}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-title{font-weight:900;font-size:15px;letter-spacing:-.3px}
+.tb-badge{font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--titanium);background:rgba(186,167,140,.1);border:1px solid rgba(186,167,140,.2);padding:2px 8px;border-radius:var(--radius-full)}
+.ca{flex:1;overflow-y:auto;padding:24px}
+.pg{display:none}.pg.act{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-.login-card {
-  background: var(--marfim-05); border: 1px solid var(--marfim-10);
-  border-radius: var(--radius-xl); padding: 40px 32px;
-}
-.login-card h2 { font-weight: 800; font-size: 22px; color: var(--marfim); margin-bottom: 6px; }
-.login-card p { font-size: 13px; color: var(--mirror); margin-bottom: 28px; }
+/* EDITOR */
+.ed-lay{display:grid;grid-template-columns:340px 1fr;gap:16px;height:calc(100vh - 115px)}
+.ed-pan{background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:22px;overflow-y:auto}
+.ed-pan h3{font-weight:900;font-size:15px;margin-bottom:2px}
+.ed-pan .psub{font-family:var(--mono);font-size:11px;color:var(--mirror);margin-bottom:16px;letter-spacing:1px}
+.ed-prev{background:var(--cacao);border:1px solid var(--marfim-10);border-radius:var(--radius-xl);padding:16px;display:flex;flex-direction:column;overflow:hidden}
+.prev-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.prev-hd h3{font-weight:900;font-size:13px;color:var(--marfim)}
+.sn{display:flex;align-items:center;gap:6px}
+.sn button{background:var(--marfim-05);border:1px solid var(--marfim-10);color:var(--creme);width:28px;height:28px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}.sn button:hover{background:var(--marfim-10)}
+.sn span{font-family:var(--mono);font-size:9px;color:var(--mirror);min-width:55px;text-align:center;letter-spacing:1px}
+.sc-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sc{width:100%;aspect-ratio:16/9;border-radius:var(--radius-lg);overflow:hidden;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:14px}
+.thumb{aspect-ratio:16/9;border-radius:4px;cursor:pointer;border:2px solid transparent;overflow:hidden;position:relative;transition:all .15s}
+.thumb.act{border-color:var(--titanium);box-shadow:0 0 0 2px rgba(186,167,140,.3)}.thumb:hover:not(.act){border-color:rgba(255,255,255,.2)}
+.thumb-lbl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);color:#fff;font-family:var(--mono);font-size:6px;padding:1px 3px;text-align:center}
 
-.form-group { margin-bottom: 16px; text-align: left; }
-.form-group label { display: block; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--titanium); margin-bottom: 8px; }
-.form-group input { width: 100%; padding: 14px 18px; background: rgba(245,240,230,.06); border: 1px solid var(--marfim-10); border-radius: var(--radius-md); color: var(--marfim); font-family: var(--sans); font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
-.form-group input::placeholder { color: var(--mirror); opacity: .5; }
-.form-group input:focus { border-color: var(--titanium); box-shadow: 0 0 0 3px rgba(186,167,140,.15); }
+/* FORM */
+.fd{margin-bottom:14px}
+.fd label{display:block;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--cacao);margin-bottom:5px}
+.fd input,.fd textarea,.fd select{width:100%;padding:10px 14px;background:var(--marfim);border:1px solid var(--cacao-10);border-radius:var(--radius-md);color:var(--cacao);font-family:var(--sans);font-size:15px;font-weight:400;outline:none;transition:border-color .2s}
+.fd input:focus,.fd textarea:focus,.fd select:focus{border-color:var(--titanium);box-shadow:0 0 0 3px rgba(186,167,140,.12)}
+.fd textarea{resize:vertical;min-height:80px;line-height:1.7}
+.fd-hint{font-size:11px;color:var(--mirror);margin-top:3px}
+.fd-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fd-color{display:flex;align-items:center;gap:8px}
+.fd-color input[type=color]{width:36px;height:28px;border:1px solid var(--cacao-10);border-radius:var(--radius-sm);cursor:pointer;padding:1px}
+.tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--marfim);border-radius:var(--radius-md);padding:2px}
+.tab{flex:1;padding:6px;text-align:center;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border-radius:var(--radius-sm);cursor:pointer;color:var(--mirror);transition:all .15s}
+.tab.act{background:var(--creme);color:var(--cacao)}.tc{display:none}.tc.act{display:block}
+.btn-p{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--cacao);color:var(--marfim);border:none;border-radius:var(--radius-md);font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}.btn-p:hover{background:#3a2a1d}.btn-p:disabled{opacity:.5;cursor:not-allowed}
+.btn-t{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--titanium);color:var(--cacao);border:none;border-radius:var(--radius-md);font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer}.btn-t:hover{background:#C4B39A}
+.btn-g{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:transparent;color:var(--mirror);border:1px solid var(--cacao-10);border-radius:var(--radius-md);font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer}.btn-g:hover{color:var(--cacao);background:var(--cacao-05)}
+.br{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
 
-.login-btn { width: 100%; padding: 15px; background: var(--titanium); color: var(--cacao); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; margin-top: 8px; }
-.login-btn:hover { background: #C4B39A; }
-.login-error { color: #E8614D; font-size: 13px; margin-top: 14px; min-height: 20px; }
-.login-footer { margin-top: 40px; font-family: var(--mono); font-size: 11px; color: var(--mirror); letter-spacing: 1px; }
+/* PROGRESS */
+.gp{display:none;margin-top:14px}.gp.act{display:block}
+.pb-bg{width:100%;height:3px;background:var(--marfim-10);border-radius:20px;overflow:hidden;margin-bottom:10px}
+.pb-fill{height:100%;background:var(--titanium);border-radius:20px;width:0%;transition:width .6s}
+.pst{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--mirror);padding:3px 0}
+.pst.done{color:var(--creme)}.pst.cur{color:var(--titanium)}
+.sd{width:6px;height:6px;border-radius:50%;background:var(--mirror);flex-shrink:0}
+.pst.done .sd{background:var(--titanium)}.pst.cur .sd{background:var(--titanium);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(186,167,140,.15)}50%{box-shadow:0 0 0 6px rgba(186,167,140,.05)}}
+.rc{display:none;margin-top:14px}.rc.act{display:block}
+.rc-body{background:var(--marfim);border-radius:var(--radius-lg);padding:20px;color:var(--cacao);max-height:350px;overflow-y:auto;margin-bottom:10px;font-size:13px}
 
-/* ═══════════════ LAYOUT ═══════════════ */
-#app { display: none; height: 100vh; width: 100vw; }
-#app.active { display: flex; }
-
-.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--cacao); display: flex; flex-direction: column; border-right: 1px solid var(--marfim-10); }
-.sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--marfim-10); }
-.sidebar-brand { font-weight: 900; font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--marfim); margin-bottom: 2px; }
-.sidebar-label { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--titanium); }
-.sidebar-section-label { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mirror); padding: 24px 24px 10px; }
-.sidebar-nav { flex: 1; overflow-y: auto; padding: 0 12px; }
-
-.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-md); cursor: pointer; transition: background .15s; color: var(--creme); font-size: 14px; font-weight: 500; margin-bottom: 2px; border: 1px solid transparent; }
-.nav-item:hover { background: var(--marfim-05); border-color: var(--marfim-10); }
-.nav-item.active { background: rgba(186,167,140,.08); border-color: rgba(186,167,140,.15); color: var(--marfim); }
-.nav-item.active .nav-icon { color: var(--titanium); background: rgba(186,167,140,.1); border-color: rgba(186,167,140,.2); }
-
-.nav-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; background: var(--marfim-05); border: 1px solid var(--marfim-10); color: var(--mirror); transition: all .15s; }
-.nav-text { display: flex; flex-direction: column; }
-.nav-text span:first-child { font-weight: 700; font-size: 13.5px; }
-.nav-text span:last-child { font-family: var(--mono); font-size: 10px; color: var(--mirror); margin-top: 1px; }
-
-.sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--marfim-10); display: flex; align-items: center; justify-content: space-between; }
-.sidebar-user { display: flex; align-items: center; gap: 10px; }
-.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--titanium); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--cacao); }
-.user-info span:first-child { font-size: 12px; font-weight: 700; color: var(--marfim); display: block; }
-.user-info span:last-child { font-family: var(--mono); font-size: 10px; color: var(--mirror); }
-
-.logout-btn { background: none; border: 1px solid var(--marfim-10); border-radius: var(--radius-sm); color: var(--mirror); padding: 6px 8px; cursor: pointer; font-size: 14px; transition: all .15s; }
-.logout-btn:hover { border-color: rgba(232,97,77,.3); color: #E8614D; background: rgba(232,97,77,.06); }
-
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--marfim); }
-.topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 1px solid var(--creme); min-height: 60px; }
-.topbar-left { display: flex; align-items: center; gap: 14px; }
-.topbar-title { font-weight: 800; font-size: 18px; letter-spacing: -.2px; }
-.topbar-badge { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--titanium); background: rgba(186,167,140,.1); border: 1px solid rgba(186,167,140,.2); padding: 4px 10px; border-radius: var(--radius-full); }
-
-.content-area { flex: 1; overflow-y: auto; padding: 40px 32px; }
-
-.page { display: none; }
-.page.active { display: block; animation: fadeIn .35s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-.page-header { margin-bottom: 40px; }
-.page-header .sec-num { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--titanium); display: block; margin-bottom: 12px; }
-.page-header h1 { font-weight: 900; font-size: clamp(32px, 4vw, 48px); line-height: 1.05; letter-spacing: -1px; margin-bottom: 12px; }
-.page-header h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--titanium); }
-.page-header p { font-size: 15px; color: var(--cacao-70); max-width: 560px; line-height: 1.8; }
-
-/* ─── PLANO DE OURO ─── */
-.po-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: calc(100vh - 260px); }
-.po-panel { border-radius: var(--radius-xl); padding: 32px; overflow-y: auto; max-height: calc(100vh - 240px); }
-.po-panel-input { background: var(--creme); border: 1px solid var(--cacao-05); }
-.po-panel-preview { background: var(--cacao); border: 1px solid var(--marfim-10); color: var(--marfim); }
-.po-panel h3 { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-.po-panel-preview h3 { color: var(--marfim); }
-.panel-sub { font-family: var(--mono); font-size: 11px; color: var(--mirror); margin-bottom: 24px; }
-
-.field { margin-bottom: 20px; }
-.field label { display: block; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--cacao); margin-bottom: 8px; }
-.field input, .field textarea, .field select { width: 100%; padding: 12px 16px; background: var(--marfim); border: 1px solid var(--cacao-10); border-radius: var(--radius-md); color: var(--cacao); font-family: var(--sans); font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
-.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--titanium); box-shadow: 0 0 0 3px rgba(186,167,140,.12); }
-.field textarea { resize: vertical; min-height: 200px; line-height: 1.7; }
-.field .field-hint { font-size: 12px; color: var(--mirror); margin-top: 6px; }
-
-.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--cacao); color: var(--marfim); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
-.btn-primary:hover { background: #3a2a1d; box-shadow: var(--shadow-md); }
-.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-.btn-titanium { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--titanium); color: var(--cacao); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
-.btn-titanium:hover { background: #C4B39A; }
-.btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: transparent; color: var(--creme); border: 1px solid var(--marfim-10); border-radius: var(--radius-md); font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
-.btn-ghost:hover { border-color: var(--marfim-20); background: var(--marfim-05); }
-.btn-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
-
-.preview-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; color: var(--mirror); }
-.preview-placeholder .ph-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
-.preview-placeholder p { font-size: 14px; max-width: 280px; line-height: 1.7; }
-
-.gen-progress { display: none; margin-top: 20px; }
-.gen-progress.active { display: block; }
-.progress-bar-bg { width: 100%; height: 4px; background: var(--marfim-10); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 16px; }
-.progress-bar-fill { height: 100%; background: var(--titanium); border-radius: var(--radius-full); width: 0%; transition: width .6s ease; }
-.progress-steps { display: flex; flex-direction: column; gap: 10px; }
-.progress-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--mirror); transition: color .3s; }
-.progress-step.done { color: var(--creme); }
-.progress-step.current { color: var(--titanium); }
-.step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mirror); flex-shrink: 0; transition: all .3s; }
-.progress-step.done .step-dot { background: var(--titanium); }
-.progress-step.current .step-dot { background: var(--titanium); box-shadow: 0 0 0 4px rgba(186,167,140,.2); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(186,167,140,.15); } 50% { box-shadow: 0 0 0 8px rgba(186,167,140,.05); } }
-
-.result-container { display: none; margin-top: 20px; }
-.result-container.active { display: block; }
-.result-content { background: var(--marfim); border-radius: var(--radius-lg); padding: 28px; color: var(--cacao); max-height: 420px; overflow-y: auto; margin-bottom: 16px; }
-.result-content h4 { font-weight: 900; font-size: 20px; margin-bottom: 2px; }
-.result-content .rc-sub { font-family: var(--serif); font-style: italic; color: var(--titanium); font-size: 14px; margin-bottom: 18px; }
-.result-content .rc-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--creme); }
-.result-content .rc-section h5 { font-weight: 800; font-size: 13px; margin-bottom: 4px; letter-spacing: -.1px; }
-.result-content .rc-section p { font-size: 13px; line-height: 1.8; color: var(--cacao-70); }
-.result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-/* ─── CONTEUDO ALCANCE ─── */
-.tool-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 32px; }
-.tool-card { background: var(--creme); border: 1px solid var(--cacao-05); border-radius: var(--radius-lg); padding: 28px; }
-.tool-card-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(186,167,140,.1); border: 1px solid rgba(186,167,140,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; }
-.tool-card h3 { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
-.tool-card p { font-size: 13.5px; color: var(--cacao-70); line-height: 1.7; }
-.tool-card-tag { display: inline-block; margin-top: 14px; font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: var(--radius-full); }
-.status-soon { color: var(--mirror); background: var(--mirror-10); border: 1px solid var(--mirror-20); }
-
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--cacao-10); border-radius: 3px; }
-.sidebar ::-webkit-scrollbar-thumb, .po-panel-preview ::-webkit-scrollbar-thumb { background: var(--marfim-10); }
-
-@media (max-width: 1024px) { .po-layout { grid-template-columns: 1fr; } }
-@media (max-width: 768px) { .sidebar { display: none; } :root { --sidebar-w: 0px; } }
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--cacao-10);border-radius:3px}
+.sb ::-webkit-scrollbar-thumb,.ed-prev ::-webkit-scrollbar-thumb{background:var(--marfim-10)}
+@media(max-width:1100px){.ed-lay{grid-template-columns:1fr}}
+@media(max-width:768px){.sb{display:none}:root{--sidebar-w:0px}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-container">
     <div class="login-brand">ISIS MOREIRA</div>
@@ -213,200 +131,135 @@ body {
     <div class="login-card">
       <h2>Acesse o sistema</h2>
       <p>Área interna de criação de conteúdo</p>
-      <div class="form-group">
-        <label>E-mail</label>
-        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button class="login-btn" id="login-submit">Entrar</button>
-      <div class="login-error" id="login-error"></div>
+      <div class="fg"><label>E-mail</label><input type="email" id="le" placeholder="seu@email.com"></div>
+      <div class="fg"><label>Senha</label><input type="password" id="lp" placeholder="••••••••"></div>
+      <button class="login-btn" id="ls">Entrar</button>
+      <div class="login-error" id="lerr"></div>
     </div>
     <div class="login-footer">Ecossistema Donas do Ouro</div>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-brand">ISIS MOREIRA</div>
-      <div class="sidebar-label">Agência</div>
-    </div>
-    <div class="sidebar-section-label">Geradores</div>
-    <nav class="sidebar-nav">
-      <div class="nav-item active" data-page="plano-ouro">
-        <div class="nav-icon">✦</div>
-        <div class="nav-text"><span>Plano de Ouro</span><span>Gerador de e-book</span></div>
+  <aside class="sb">
+    <div class="sb-hd"><div class="sb-brand">ISIS MOREIRA</div><div class="sb-label">Agência</div></div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Principal</div>
+      <div class="ni act" onclick="goP('brand','Brandline Guide')"><div class="ni-ic">◆</div>Brandline Guide</div>
+
+      <div class="sb-sec">Geradores</div>
+      <div class="ni" onclick="toggleSub('po')"><div class="ni-ic">✦</div>Plano de Ouro<span class="ni-arrow open" id="arr-po">▸</span></div>
+      <div class="sub open" id="sub-po">
+        <div class="si" onclick="goP('po-tpl','Plano de Ouro · Template')">Template</div>
+        <div class="si" onclick="goP('po-gen','Plano de Ouro · Criação')">Criação do E-book</div>
       </div>
-      <div class="nav-item" data-page="conteudo-alcance">
-        <div class="nav-icon">◎</div>
-        <div class="nav-text"><span>Conteúdo de Alto Alcance</span><span>Posts e carrosséis</span></div>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--mirror);padding:20px 14px 8px;">Sistema</div>
-      <div class="nav-item" data-page="integracoes">
-        <div class="nav-icon">⚙</div>
-        <div class="nav-text"><span>Integrações</span><span>Chaves de API</span></div>
-      </div>
+      <div class="ni" onclick="toggleSub('ca')"><div class="ni-ic">◎</div>Conteúdo de Alto Alcance<span class="ni-arrow" id="arr-ca">▸</span></div>
+      <div class="sub" id="sub-ca"><div class="si" onclick="goP('ca-home','Conteúdo de Alto Alcance')">Visão geral</div></div>
+
+      <div class="sb-sec">Sistema</div>
+      <div class="ni" onclick="goP('integ','Integrações')"><div class="ni-ic">⚙</div>Integrações</div>
     </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="user-avatar">IM</div>
-        <div class="user-info"><span>Isis Moreira</span><span>Admin</span></div>
-      </div>
-      <button class="logout-btn" id="logout-btn" title="Sair">⏻</button>
-    </div>
+    <div class="sb-ft"><div class="sb-user"><div class="u-av">IM</div><div class="u-info"><span>Isis Moreira</span><span>Admin</span></div></div><button class="logout" id="lo">⏻</button></div>
   </aside>
 
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-left">
-        <span class="topbar-title" id="topbar-title">Plano de Ouro</span>
-        <span class="topbar-badge">GERADOR</span>
+  <div class="mn">
+    <div class="tb"><div class="tb-left"><span class="tb-title" id="tbt">Brandline Guide</span><span class="tb-badge">REFERÊNCIA</span></div><div style="font-family:var(--mono);font-size:9px;color:var(--mirror);letter-spacing:1px;">v2.0</div></div>
+    <div class="ca">
+
+      <!-- BRANDLINE GUIDE -->
+      <div class="pg act" id="pg-brand">
+        <iframe id="brand-iframe" src="" style="width:100%;height:calc(100vh - 120px);border:none;border-radius:var(--radius-xl);background:var(--marfim);" sandbox="allow-scripts allow-same-origin"></iframe>
       </div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--mirror);letter-spacing:1px;">v1.0</div>
-    </div>
 
-    <div class="content-area">
-
-      <!-- PLANO DE OURO -->
-      <div class="page active" id="page-plano-ouro">
-        <div class="page-header">
-          <span class="sec-num">Gerador Automático</span>
-          <h1>Plano de <em>Ouro</em></h1>
-          <p>Cole os dados do questionário da cliente. O agente copywriter cria o conteúdo personalizado e o diagramador gera o PDF estilizado.</p>
+      <!-- TEMPLATE EDITOR -->
+      <div class="pg" id="pg-po-tpl">
+        <div class="ed-lay">
+          <div class="ed-pan">
+            <h3>Editor de Template</h3>
+            <p class="psub">Clique no slide · preview ao vivo</p>
+            <div class="thumbs" id="thumbs"></div>
+            <div class="tabs">
+              <div class="tab act" onclick="sTab('t-cores')">Cores</div>
+              <div class="tab" onclick="sTab('t-textos')">Textos</div>
+              <div class="tab" onclick="sTab('t-layout')">Layout</div>
+            </div>
+            <div class="tc act" id="t-cores">
+              <div class="fd"><label>Fundo Escuro (Cacao)</label><div class="fd-color"><input type="color" id="cc" value="#231710" oninput="U()"><input type="text" value="#231710" oninput="syncC('cc',this.value)" style="font-family:var(--mono);font-size:11px;"></div></div>
+              <div class="fd"><label>Fundo Claro (Marfim)</label><div class="fd-color"><input type="color" id="cm" value="#F5F0E6" oninput="U()"><input type="text" value="#F5F0E6" oninput="syncC('cm',this.value)" style="font-family:var(--mono);font-size:11px;"></div></div>
+              <div class="fd"><label>Acento (Titanium)</label><div class="fd-color"><input type="color" id="ct" value="#BAA78C" oninput="U()"><input type="text" value="#BAA78C" oninput="syncC('ct',this.value)" style="font-family:var(--mono);font-size:11px;"></div></div>
+              <div class="fd"><label>Superfície (Creme)</label><div class="fd-color"><input type="color" id="ce" value="#EDE6D8" oninput="U()"><input type="text" value="#EDE6D8" oninput="syncC('ce',this.value)" style="font-family:var(--mono);font-size:11px;"></div></div>
+              <div class="fd"><label>Metadata (Mirror)</label><div class="fd-color"><input type="color" id="ci" value="#93979B" oninput="U()"><input type="text" value="#93979B" oninput="syncC('ci',this.value)" style="font-family:var(--mono);font-size:11px;"></div></div>
+            </div>
+            <div class="tc" id="t-textos"><div id="txt-fields"></div></div>
+            <div class="tc" id="t-layout">
+              <div class="fd-row"><div class="fd"><label>Margem lateral</label><input type="number" id="lm" value="48" min="20" max="100" oninput="U()"></div><div class="fd"><label>Margem topo</label><input type="number" id="lmt" value="40" min="16" max="80" oninput="U()"></div></div>
+              <div class="fd-row"><div class="fd"><label>Display (px)</label><input type="number" id="lts" value="48" min="24" max="80" oninput="U()"></div><div class="fd"><label>Body (px)</label><input type="number" id="lbs" value="14" min="9" max="22" oninput="U()"></div></div>
+              <div class="fd-row"><div class="fd"><label>Caption (px)</label><input type="number" id="lls" value="11" min="7" max="16" oninput="U()"></div><div class="fd"><label>Rodapé (px)</label><input type="number" id="lfs" value="8" min="5" max="12" oninput="U()"></div></div>
+            </div>
+            <div class="br"><button class="btn-p" onclick="saveTpl()">💾 Salvar Template</button><button class="btn-g" onclick="resetTpl()">↻ Resetar</button></div>
+          </div>
+          <div class="ed-prev">
+            <div class="prev-hd"><h3>Preview</h3><div class="sn"><button onclick="pS()">◂</button><span id="scnt">01 / 08</span><button onclick="nS()">▸</button></div></div>
+            <div class="sc-wrap"><div class="sc" id="sc"></div></div>
+          </div>
         </div>
+      </div>
 
-        <div class="po-layout">
-          <div class="po-panel po-panel-input">
+      <!-- CRIAÇÃO -->
+      <div class="pg" id="pg-po-gen">
+        <div class="ed-lay">
+          <div class="ed-pan">
             <h3>Dados da Cliente</h3>
-            <p class="panel-sub">Cole o nome e as respostas do questionário</p>
-
-            <div class="field">
-              <label>Nome da Cliente</label>
-              <input type="text" id="po-nome" placeholder="Ex: Maria Clara">
-            </div>
-
-            <div class="field">
-              <label>Dados do Questionário</label>
-              <textarea id="po-dados" placeholder="Cole aqui todas as respostas do questionário da cliente...
-
-Ex:
-1. Qual seu nicho? Moda feminina
-2. Há quanto tempo empreende? 3 anos
-3. Principal desafio? Não consigo escalar
-4. Faturamento atual? R$ 15.000/mês
-5. Onde quer chegar? R$ 50.000/mês
-6. O que já tentou? Tráfego pago, mentorias
-7. Como se sente? Cansada e desalinhada
-..."></textarea>
-              <p class="field-hint">Cole texto livre. O agente interpreta e estrutura automaticamente.</p>
-            </div>
-
-            <div class="btn-row">
-              <button class="btn-primary" id="btn-generate" onclick="startGeneration()">✦ Gerar Plano de Ouro</button>
+            <p class="psub">Nome e respostas do questionário</p>
+            <div class="fd"><label>Nome da Cliente</label><input type="text" id="gn" placeholder="Ex: Maria Clara" maxlength="40"></div>
+            <div class="fd"><label>Dados do Questionário</label><textarea id="gd" placeholder="Cole aqui as respostas completas do questionário..." style="min-height:160px;"></textarea><p class="fd-hint">O agente interpreta e preenche todos os campos automaticamente.</p></div>
+            <div class="br"><button class="btn-p" id="gbtn" onclick="startGen()">✦ Gerar Plano de Ouro</button></div>
+            <div class="gp" id="gpr"><div class="pb-bg"><div class="pb-fill" id="gfl"></div></div><div style="display:flex;flex-direction:column;gap:4px;"><div class="pst" data-s="1"><span class="sd"></span>Analisando dados</div><div class="pst" data-s="2"><span class="sd"></span>Copywriter escrevendo</div><div class="pst" data-s="3"><span class="sd"></span>Revisando tom de voz</div><div class="pst" data-s="4"><span class="sd"></span>Montando slides</div><div class="pst" data-s="5"><span class="sd"></span>Finalizando</div></div></div>
+            <!-- Post-gen controls -->
+            <div id="gen-actions" style="display:none;margin-top:16px;">
+              <div style="font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--titanium);margin-bottom:8px;">✓ GERADO COM SUCESSO</div>
+              <div id="gen-count" style="font-family:var(--mono);font-size:11px;color:var(--mirror);margin-bottom:12px;"></div>
+              <div class="br" style="margin-top:0;"><button class="btn-t" onclick="dlPDF()">📥 Baixar PDF</button><button class="btn-g" onclick="resetGen()">↻ Novo</button></div>
             </div>
           </div>
-
-          <div class="po-panel po-panel-preview">
-            <h3>Resultado</h3>
-            <p class="panel-sub">Agentes: Copywriter → Diagramador</p>
-
-            <div class="preview-placeholder" id="po-placeholder">
-              <div class="ph-icon">✦</div>
-              <p>Preencha os dados e clique em <strong>Gerar Plano de Ouro</strong> para iniciar os agentes.</p>
-            </div>
-
-            <div class="gen-progress" id="po-progress">
-              <div class="progress-bar-bg"><div class="progress-bar-fill" id="po-fill"></div></div>
-              <div class="progress-steps">
-                <div class="progress-step" data-step="1"><span class="step-dot"></span> Analisando dados da cliente</div>
-                <div class="progress-step" data-step="2"><span class="step-dot"></span> Agente Copywriter escrevendo</div>
-                <div class="progress-step" data-step="3"><span class="step-dot"></span> Revisando tom de voz da marca</div>
-                <div class="progress-step" data-step="4"><span class="step-dot"></span> Agente Diagramador montando PDF</div>
-                <div class="progress-step" data-step="5"><span class="step-dot"></span> Finalizando Plano de Ouro</div>
-              </div>
-            </div>
-
-            <div class="result-container" id="po-result">
-              <div class="result-content" id="po-result-content"></div>
-              <div class="result-actions">
-                <button class="btn-titanium" onclick="downloadPDF()">📥 Baixar PDF Estilizado</button>
-                <button class="btn-ghost" onclick="resetGeneration()">↻ Novo Plano</button>
-              </div>
+          <!-- Preview area: same slide canvas as template editor -->
+          <div class="ed-prev">
+            <div class="prev-hd"><h3>Preview do E-book</h3><div class="sn"><button onclick="gpS()">◂</button><span id="gscnt">01 / 08</span><button onclick="gnS()">▸</button></div></div>
+            <div id="gph" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;color:var(--mirror);"><div style="font-size:36px;margin-bottom:10px;opacity:.4;">✦</div><p style="font-size:13px;max-width:240px;line-height:1.8;font-weight:400;">Preencha e clique em <strong>Gerar</strong>.</p></div>
+            <div id="gen-prev" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+              <div class="sc-wrap"><div class="sc" id="gsc"></div></div>
+              <div id="gthumbs" style="display:flex;justify-content:center;gap:6px;margin-top:12px;"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- CONTEÚDO ALTO ALCANCE -->
-      <div class="page" id="page-conteudo-alcance">
-        <div class="page-header">
-          <span class="sec-num">Criação de Conteúdo</span>
-          <h1>Conteúdo de <em>Alto Alcance</em></h1>
-          <p>Ferramentas para criar posts, carrosséis e conteúdos de alto impacto para redes sociais.</p>
-        </div>
-        <div class="tool-cards">
-          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">📱</div><h3>Carrossel Instagram</h3><p>Gerador de carrosséis editoriais com textos e estrutura visual.</p><span class="tool-card-tag status-soon">Em breve</span></div>
-          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">✍️</div><h3>Legendas de Alto Impacto</h3><p>Copy para posts que conectam e convertem, no tom da marca.</p><span class="tool-card-tag status-soon">Em breve</span></div>
-          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">🎬</div><h3>Roteiros de Reels</h3><p>Scripts curtos para vídeos com gancho, desenvolvimento e CTA.</p><span class="tool-card-tag status-soon">Em breve</span></div>
+      <!-- CONTEÚDO -->
+      <div class="pg" id="pg-ca-home">
+        <div style="margin-bottom:28px;">
+          <span class="label" style="font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--titanium);display:block;margin-bottom:14px;">Criação de Conteúdo</span>
+          <h1 style="font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.0;letter-spacing:-1.5px;">Conteúdo de <em style="font-family:var(--serif);font-style:italic;font-weight:400;color:var(--titanium);">Alto Alcance</em></h1>
+          <p style="font-size:15px;color:var(--cacao-70);margin-top:10px;font-weight:400;">Em breve.</p>
         </div>
       </div>
 
       <!-- INTEGRAÇÕES -->
-      <div class="page" id="page-integracoes">
-        <div class="page-header">
-          <span class="sec-num">Configurações</span>
-          <h1>Integra<em>ções</em></h1>
-          <p>Configure as chaves de API necessárias para os agentes funcionarem. As chaves ficam salvas apenas no seu navegador.</p>
+      <div class="pg" id="pg-integ">
+        <div style="margin-bottom:28px;">
+          <span style="font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--titanium);display:block;margin-bottom:14px;">Configurações</span>
+          <h1 style="font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.0;letter-spacing:-1.5px;">Integra<em style="font-family:var(--serif);font-style:italic;font-weight:400;color:var(--titanium);">ções</em></h1>
         </div>
-
-        <div style="max-width:600px;">
-          <!-- Anthropic API Key -->
-          <div style="background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:32px;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-              <div style="width:42px;height:42px;border-radius:var(--radius-md);background:rgba(186,167,140,.1);border:1px solid rgba(186,167,140,.2);display:flex;align-items:center;justify-content:center;font-size:18px;">🔑</div>
-              <div>
-                <h3 style="font-weight:800;font-size:15px;letter-spacing:-.2px;">Anthropic (Claude API)</h3>
-                <p style="font-family:var(--mono);font-size:10px;color:var(--mirror);letter-spacing:.5px;">Agente Copywriter · Obrigatório</p>
-              </div>
-              <div id="api-status" style="margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:var(--radius-full);"></div>
-            </div>
-
-            <div class="field">
-              <label>Chave de API</label>
-              <div style="position:relative;">
-                <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="padding-right:80px;">
-                <button onclick="toggleKeyVisibility()" id="toggle-key-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:1px solid var(--cacao-10);border-radius:var(--radius-sm);padding:4px 10px;font-family:var(--mono);font-size:10px;font-weight:800;color:var(--mirror);cursor:pointer;letter-spacing:.5px;">MOSTRAR</button>
-              </div>
-              <p class="field-hint">Sua chave da Anthropic. Começa com <code style="background:var(--cacao-05);padding:1px 5px;border-radius:3px;font-size:11px;">sk-ant-</code>. Obtenha em <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--titanium);text-decoration:underline;">console.anthropic.com</a></p>
-            </div>
-
-            <div class="field">
-              <label>Modelo</label>
-              <select id="api-model">
-                <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (recomendado)</option>
-                <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (mais rápido)</option>
-              </select>
-              <p class="field-hint">Sonnet é melhor para textos longos e personalizados. Haiku é mais rápido e mais barato.</p>
-            </div>
-
-            <div style="display:flex;gap:10px;margin-top:20px;">
-              <button class="btn-primary" onclick="saveApiKey()">💾 Salvar Chave</button>
-              <button class="btn-ghost" style="color:var(--mirror);border-color:var(--cacao-10);" onclick="testApiKey()">⚡ Testar Conexão</button>
-            </div>
-
-            <div id="api-test-result" style="margin-top:14px;font-size:13px;min-height:20px;"></div>
-          </div>
-
-          <!-- Info card -->
+        <div style="max-width:500px;">
           <div style="background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:28px;">
-            <h3 style="font-weight:800;font-size:15px;margin-bottom:8px;">🔒 Segurança</h3>
-            <p style="font-size:13px;color:var(--cacao-70);line-height:1.8;">
-              A chave fica salva <strong>apenas no localStorage do seu navegador</strong>. Ela nunca é enviada para o nosso servidor — sai direto do seu navegador para a API da Anthropic. Se limpar os dados do navegador, precisará inserir novamente.
-            </p>
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;">
+              <div style="width:32px;height:32px;border-radius:var(--radius-md);background:rgba(186,167,140,.1);border:1px solid rgba(186,167,140,.2);display:flex;align-items:center;justify-content:center;font-size:14px;">🔑</div>
+              <div><h3 style="font-weight:900;font-size:14px;">Anthropic (Claude API)</h3><p style="font-family:var(--mono);font-size:9px;color:var(--mirror);letter-spacing:1px;">Agente Copywriter</p></div>
+              <div id="api-st" style="margin-left:auto;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:var(--radius-full);"></div>
+            </div>
+            <div class="fd"><label>Chave de API</label><div style="position:relative;"><input type="password" id="aki" placeholder="sk-ant-api03-..." style="padding-right:65px;"><button onclick="togKey()" id="tkb" style="position:absolute;right:5px;top:50%;transform:translateY(-50%);background:none;border:1px solid var(--cacao-10);border-radius:var(--radius-sm);padding:2px 7px;font-family:var(--mono);font-size:9px;font-weight:800;color:var(--mirror);cursor:pointer;">MOSTRAR</button></div><p class="fd-hint"><a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--titanium);">Obter chave →</a></p></div>
+            <div class="fd"><label>Modelo</label><select id="amod"><option value="claude-sonnet-4-20250514">Claude Sonnet 4</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option></select></div>
+            <div class="br"><button class="btn-p" onclick="saveKey()">💾 Salvar</button><button class="btn-g" onclick="testKey()">⚡ Testar</button></div>
+            <div id="atr" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
           </div>
         </div>
       </div>
@@ -416,529 +269,805 @@ Ex:
 </div>
 
 <script>
-// ═══════════════ AUTH ═══════════════
-const VALID_EMAIL = 'contato@isismoreira.com.br';
-const VALID_PASS = 'time123';
+// AUTH
+const VE='contato@isismoreira.com.br',VP='time123';
+function $(id){return document.getElementById(id)}
+$('ls').onclick=doL;$('lp').onkeydown=e=>{if(e.key==='Enter')doL()};$('le').onkeydown=e=>{if(e.key==='Enter')$('lp').focus()};
+function doL(){const e=$('le').value.trim().toLowerCase(),p=$('lp').value;if(!e||!p){$('lerr').textContent='Preencha tudo.';return}if(e===VE&&p===VP){$('lerr').textContent='';$('login-screen').classList.add('hidden');$('app').classList.add('active');sessionStorage.setItem('aa','1')}else $('lerr').textContent='Credenciais incorretas.'}
+if(sessionStorage.getItem('aa')==='1'){$('login-screen').classList.add('hidden');$('app').classList.add('active')}
+$('lo').onclick=()=>{sessionStorage.removeItem('aa');location.reload()};
 
-document.getElementById('login-submit').addEventListener('click', doLogin);
-document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-password').focus(); });
-
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass = document.getElementById('login-password').value;
-  const err = document.getElementById('login-error');
-  if (!email || !pass) { err.textContent = 'Preencha todos os campos.'; return; }
-  if (email === VALID_EMAIL && pass === VALID_PASS) {
-    err.textContent = '';
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app').classList.add('active');
-    sessionStorage.setItem('agencia_auth','1');
-  } else { err.textContent = 'E-mail ou senha incorretos.'; }
+// NAV
+function toggleSub(id){$('sub-'+id).classList.toggle('open');$('arr-'+id).classList.toggle('open')}
+function goP(id,title){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));
+  $('pg-'+id).classList.add('act');$('tbt').textContent=title;
+  document.querySelectorAll('.si,.ni').forEach(s=>s.classList.remove('act'));
+  const el=document.querySelector(`[onclick*="'${id}'"]`);if(el)el.classList.add('act');
+  if(id==='po-tpl')R();
+  if(id==='brand'){const f=$('brand-iframe');if(!f.src||f.src==='about:blank')f.src='/uploads/branding.html';}
 }
-if (sessionStorage.getItem('agencia_auth')==='1') { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app').classList.add('active'); }
-document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('agencia_auth'); location.reload(); });
 
-// ═══════════════ NAV ═══════════════
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-'+item.dataset.page).classList.add('active');
-    document.getElementById('topbar-title').textContent = { 'plano-ouro':'Plano de Ouro', 'conteudo-alcance':'Conteúdo de Alto Alcance', 'integracoes':'Integrações' }[item.dataset.page];
+// PAGES (no dashes anywhere)
+const PAGES=[
+  {id:'capa',name:'Capa',bg:'dark',fields:[
+    {id:'capa_titulo',fix:'Plano de Ouro',label:'Título'},
+    {id:'capa_subtitulo',fix:'do posicionamento aos 7 dígitos',label:'Subtítulo'},
+    {id:'cliente_nome',fix:null,label:'Nome da cliente',ph:'[Nome da Cliente]'}
+  ]},
+  {id:'boas',name:'Boas-vindas',bg:'light',fields:[
+    {id:'boasvindas_titulo',fix:'Acesse o seu plano',label:'Título'},
+    {id:'boasvindas_texto',fix:'Neste material você vai encontrar seu posicionamento, sua estratégia de produtos, a construção do seu funil e uma checklist para você começar.',label:'Texto'},
+    {id:'boasvindas_assinatura',fix:'Por Isis Moreira',label:'Assinatura'}
+  ]},
+  {id:'posic',name:'Posicionamento',bg:'light',fields:[
+    {id:'posicionamento_titulo',fix:'Como as pessoas vão te conhecer no seu mercado?',label:'Título'},
+    {id:'clienteideal_titulo',fix:'Seu perfil de cliente ideal',label:'Sub cliente ideal'},
+    {id:'clienteideal_descricao',fix:null,label:'Descrição cliente ideal',ph:'[Gerado pelo agente]'},
+    {id:'problema_titulo',fix:'O problema que você resolve',label:'Sub problema'},
+    {id:'problema_descricao',fix:null,label:'Descrição do problema',ph:'[Gerado]'},
+    {id:'solucao_titulo',fix:'A solução que você entrega',label:'Sub solução'},
+    {id:'solucao_descricao',fix:null,label:'Descrição da solução',ph:'[Gerado]'},
+    {id:'diferencial_titulo',fix:'Seu diferencial de mercado',label:'Sub diferencial'},
+    {id:'diferencial_descricao',fix:null,label:'Descrição do diferencial',ph:'[Gerado]'}
+  ]},
+  {id:'prod',name:'Produto Principal',bg:'dark',fields:[
+    {id:'produto_principal_intro',fix:'Essa é a minha sugestão de produto principal para você.',label:'Intro'},
+    {id:'produto_principal_nome',fix:null,label:'Nome do produto',ph:'[Gerado]'},
+    {id:'produto_principal_promessa',fix:null,label:'Promessa',ph:'[Gerado]'},
+    {id:'produto_principal_preco',fix:null,label:'Preço sugerido',ph:'[Gerado]'},
+    {id:'produto_principal_entregaveis',fix:null,label:'Entregáveis',ph:'[Gerado]'},
+    {id:'produto_principal_bonus',fix:null,label:'Bônus',ph:'[Gerado]'}
+  ]},
+  {id:'funil',name:'Funil DONA',bg:'light',fields:[
+    {id:'funil_intro',fix:'Assim eu desenhei o seu funil baseado no seu posicionamento. Ele é composto de três iscas digitais, um produto principal e uma mentoria, um produto de nível.',label:'Intro'},
+    {id:'funil_isca_1',fix:null,label:'D · Isca 1 (Direto)',ph:'[Gerado]'},
+    {id:'funil_isca_2',fix:null,label:'D · Isca 2 (Direto)',ph:'[Gerado]'},
+    {id:'funil_isca_3',fix:null,label:'D · Isca 3 (Direto)',ph:'[Gerado]'},
+    {id:'funil_produto_principal',fix:null,label:'O · Produto (Oportunidade)',ph:'[Gerado]'},
+    {id:'funil_produto_nivel',fix:null,label:'N · Nível (Mentoria)',ph:'[Gerado]'},
+    {id:'funil_mentoria_high_ticket',fix:null,label:'A · Ascensão (High Ticket)',ph:'[Gerado]'}
+  ]},
+  {id:'iscas',name:'Iscas Diretas',bg:'dark',fields:[
+    {id:'iscas_intro',fix:'Aqui estão as minhas sugestões de iscas do seu funil.',label:'Intro'},
+    {id:'isca1_nome',fix:null,label:'Nome Isca 1',ph:'[Gerado]'},{id:'isca1_promessa',fix:null,label:'Promessa Isca 1',ph:'[Gerado]'},{id:'isca1_preco',fix:null,label:'Preço Isca 1',ph:'[Gerado]'},
+    {id:'isca2_nome',fix:null,label:'Nome Isca 2',ph:'[Gerado]'},{id:'isca2_promessa',fix:null,label:'Promessa Isca 2',ph:'[Gerado]'},{id:'isca2_preco',fix:null,label:'Preço Isca 2',ph:'[Gerado]'},
+    {id:'isca3_nome',fix:null,label:'Nome Isca 3',ph:'[Gerado]'},{id:'isca3_promessa',fix:null,label:'Promessa Isca 3',ph:'[Gerado]'},{id:'isca3_preco',fix:null,label:'Preço Isca 3',ph:'[Gerado]'}
+  ]},
+  {id:'acoes',name:'Próximas Ações',bg:'light',fields:[
+    {id:'acoes_intro',fix:'A seguir, vai uma descrição das suas próximas ações.',label:'Intro'},
+    {id:'checklist_plano_acao',fix:'Definir posicionamento e nicho com clareza\nCriar perfil profissional alinhado (bio, foto, destaque)\nEstruturar a isca direta principal e publicar\nConfigurar checkout e página de vendas da isca\nCriar sequência de e-mails/mensagens pós-compra da isca\nEstruturar e gravar o produto principal\nMontar página de vendas do produto principal\nCriar ponte da isca para o produto principal\nDefinir proposta e estrutura do high ticket\nIniciar produção de conteúdo estratégico (3x por semana)',label:'Checklist'}
+  ]},
+  {id:'final',name:'Página Final',bg:'dark',fields:[
+    {id:'final_mensagem',fix:'Que o seu produto, a sua mensagem, o seu trabalho sejam o remédio que muitas pessoas precisam.',label:'Mensagem final'},
+    {id:'final_assinatura',fix:'Por Isis Moreira',label:'Assinatura'}
+  ]}
+];
+
+let cSlide=0;
+const ISIS_PHOTO='data:image/jpeg;base64,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';
+function colors(){return{cacao:$('cc').value,marfim:$('cm').value,titanium:$('ct').value,creme:$('ce').value,mirror:$('ci').value}}
+function layout(){return{m:+$('lm').value,mt:+$('lmt').value,ts:+$('lts').value,bs:+$('lbs').value,ls:+$('lls').value,fs:+$('lfs').value}}
+function syncC(id,v){if(/^#[0-9A-Fa-f]{6}$/.test(v)){$(id).value=v;U()}}
+function sTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('act'));document.querySelectorAll('.tc').forEach(t=>t.classList.remove('act'));document.querySelector(`[onclick*="${id}"]`).classList.add('act');$(id).classList.add('act');if(id==='t-textos')renderTxtFields();}
+function U(){R()}
+
+function renderTxtFields(){
+  const p=PAGES[cSlide];
+  let h='<p style="font-family:var(--mono);font-size:11px;color:var(--titanium);margin-bottom:10px;letter-spacing:2px;font-weight:800;">'+p.name.toUpperCase()+'</p>';
+  p.fields.forEach(f=>{
+    const isFix=f.fix!==null;const val=isFix?f.fix:(f.ph||'');
+    h+=`<div class="fd"><label>${f.label} ${isFix?'<span style="color:var(--mirror);font-weight:400;">(fixo)</span>':''}</label>`;
+    if(val.length>80)h+=`<textarea id="tf-${f.id}" oninput="U()" style="min-height:60px;${isFix?'':'color:var(--mirror);font-style:italic;'}">${val}</textarea>`;
+    else h+=`<input type="text" id="tf-${f.id}" value="${val.replace(/"/g,'&quot;')}" oninput="U()" style="${isFix?'':'color:var(--mirror);font-style:italic;'}">`;
+    h+=`</div>`;
   });
-});
-
-// ═══════════════ PLANO DE OURO ENGINE ═══════════════
-let generatedData = null;
-
-const COPY_SYSTEM = `Você é o Agente Copywriter da marca Isis Moreira — Ecossistema Donas do Ouro.
-
-MISSÃO: Criar um "Plano de Ouro" personalizado para a cliente com base nas respostas do questionário.
-
-TOM DE VOZ:
-- Firme sem ser dura. Verdadeira sem ser rude. Leve sem ser superficial.
-- Didática sem ser condescendente. Frases limpas e objetivas.
-- Bordões: "Alinhada. Livre. Leve.", "Pense além. Seja dona.", "Quem se alinha, chega."
-
-Responda APENAS com JSON válido (sem markdown, sem backticks):
-
-{
-  "nome_cliente": "Nome",
-  "diagnostico": "3-5 linhas: diagnóstico personalizado da situação atual. Firme e verdadeira.",
-  "visao": "2-3 linhas: visão de futuro — onde ela pode chegar.",
-  "pilares": [
-    { "titulo": "Nome do Pilar", "descricao": "2-3 linhas aplicadas à realidade dela." },
-    { "titulo": "Segundo Pilar", "descricao": "2-3 linhas." },
-    { "titulo": "Terceiro Pilar", "descricao": "2-3 linhas." }
-  ],
-  "acoes": [
-    "Ação prática 1 — específica",
-    "Ação prática 2 — específica",
-    "Ação prática 3 — específica",
-    "Ação prática 4 — específica",
-    "Ação prática 5 — específica"
-  ],
-  "mensagem_final": "2-3 linhas de mensagem firme e pessoal, usando o nome da cliente."
+  $('txt-fields').innerHTML=h;
 }
 
-REGRAS:
-- Conteúdo 100% personalizado com dados reais
-- Use o nome da cliente no texto
-- Nada genérico. Máxima clareza, mínimo floreio
-- Pilares refletem os desafios reais
-- Ações práticas e executáveis
-- APENAS o JSON, nada mais`;
+function fv(fieldId){const el=$('tf-'+fieldId);if(el)return el.value;for(const p of PAGES)for(const f of p.fields)if(f.id===fieldId)return f.fix||f.ph||'';return '';}
 
-function setStep(num) {
-  const steps = document.querySelectorAll('#po-progress .progress-step');
-  steps.forEach((s, i) => {
-    s.classList.remove('done','current');
-    if (i+1 < num) s.classList.add('done');
-    else if (i+1 === num) s.classList.add('current');
+// SLIDE RENDERER — Branding Guide typography applied:
+// Display: DM Sans 900, Accent: DM Serif Display italic (Titanium), Body: DM Sans 400, Caption: Outfit 800
+function R(){
+  const c=colors(),l=layout(),p=PAGES[cSlide];
+  const m=l.m,mt=l.mt,mp=m+'px',mtp=mt+'px';
+  let h='';
+  // Footer: Outfit 800, uppercase, letter-spacing 3px
+  const ftr=(light)=>`<div style="position:absolute;bottom:0;left:0;right:0;padding:0 ${mp};"><div style="height:1px;background:${light?c.cacao+'08':c.titanium+'25'};"></div><div style="display:flex;justify-content:space-between;padding:8px 0;font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${light?c.cacao+'44':c.mirror};"><span>ISIS MOREIRA</span><span>${String(cSlide+1).padStart(2,'0')} / ${String(PAGES.length).padStart(2,'0')}</span></div></div>`;
+  // Label: Outfit 800, 11px, letter-spacing 3px, Titanium
+  const lbl=(text)=>`<div style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${c.titanium};margin-bottom:14px;">${text}</div>`;
+
+  if(p.id==='capa'){
+    h=`<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,${c.titanium}06,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:20px;height:1px;background:${c.titanium};"></div>
+          <span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.mirror};">ISIS MOREIRA</span>
+        </div>
+        <div style="margin:auto 0;padding:${mt*.5}px 0;">
+          <div style="font-family:var(--sans);font-size:${l.ts*1.15}px;font-weight:900;color:${c.marfim};line-height:.92;letter-spacing:-2.5px;">${fv('capa_titulo')}</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:${l.ts*.38}px;color:${c.titanium};margin-top:6px;">${fv('capa_subtitulo')}</div>
+          <div style="width:100%;height:1px;background:${c.titanium}40;margin:${mt*.6}px 0 ${mt*.45}px;"></div>
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.mirror};letter-spacing:3px;text-transform:uppercase;">Preparado para</span>
+            <span style="font-family:var(--sans);font-size:${l.bs+10}px;font-weight:900;color:${c.marfim};letter-spacing:-.5px;">${fv('cliente_nome')||'[Nome da Cliente]'}</span>
+          </div>
+        </div>
+        <div style="width:24px;height:2px;background:${c.titanium};"></div>
+      </div>
+    </div>`;
+  }
+  else if(p.id==='boas'){
+    h=`<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,${c.titanium}00,${c.titanium},${c.titanium}00);"></div>
+      <div style="position:absolute;bottom:0;right:0;width:38%;height:100%;overflow:hidden;">
+        <img src="${ISIS_PHOTO}" style="width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.92;mix-blend-mode:multiply;" />
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,${c.marfim} 0%,${c.marfim}00 30%);"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,${c.marfim}40 0%,transparent 20%,transparent 80%,${c.marfim}60 100%);"></div>
+      </div>
+      <div style="position:relative;padding:${mtp} ${mp};padding-left:${m+14}px;height:100%;display:flex;flex-direction:column;justify-content:center;max-width:58%;">
+        ${lbl('BOAS-VINDAS')}
+        <div style="font-family:var(--sans);font-size:${l.ts*.75}px;font-weight:900;color:${c.cacao};line-height:1.0;letter-spacing:-1.5px;margin-bottom:${mt*.5}px;">${fv('boasvindas_titulo')}</div>
+        <div style="width:40px;height:2px;background:${c.titanium};margin-bottom:${mt*.5}px;"></div>
+        <div style="font-family:var(--sans);font-size:${l.bs}px;font-weight:400;color:${c.cacao}aa;max-width:85%;line-height:1.8;">${fv('boasvindas_texto')}</div>
+        <div style="margin-top:${mt*.7}px;display:flex;align-items:center;gap:10px;">
+          <div style="width:16px;height:1px;background:${c.titanium};"></div>
+          <span style="font-family:var(--serif);font-style:italic;font-size:${l.bs+3}px;color:${c.titanium};">${fv('boasvindas_assinatura')}</span>
+        </div>
+      </div>
+      ${ftr(true)}
+    </div>`;
+  }
+  else if(p.id==='posic'){
+    h=`<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
+        ${lbl('POSICIONAMENTO')}
+        <div style="font-family:var(--sans);font-size:${l.ts*.3}px;font-weight:900;color:${c.cacao};margin-bottom:${mt*.25}px;line-height:1.1;letter-spacing:-.5px;max-width:85%;">${fv('posicionamento_titulo')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;flex:1;min-height:0;">
+          ${[['clienteideal_titulo','clienteideal_descricao'],['problema_titulo','problema_descricao'],['solucao_titulo','solucao_descricao'],['diferencial_titulo','diferencial_descricao']].map(([t,d])=>`
+          <div style="background:${c.creme};border-radius:var(--radius-md);padding:10px 12px;border:1px solid ${c.cacao}05;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-shrink:0;">
+              <div style="width:3px;height:10px;background:${c.titanium};border-radius:2px;flex-shrink:0;"></div>
+              <span style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:800;color:${c.cacao};letter-spacing:-.2px;">${fv(t)}</span>
+            </div>
+            <div style="font-family:var(--sans);font-size:${l.bs-4}px;font-weight:400;color:${c.cacao}99;line-height:1.55;overflow:hidden;flex:1;">${fv(d)}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      ${ftr(true)}
+    </div>`;
+  }
+  else if(p.id==='prod'){
+    h=`<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 30%,${c.titanium}06,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:grid;grid-template-columns:.9fr 1.3fr;gap:${m*.5}px;">
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+          ${lbl('PRODUTO PRINCIPAL')}
+          <div style="font-family:var(--sans);font-size:${l.bs}px;font-weight:400;color:${c.creme};line-height:1.8;margin-bottom:${mt*.4}px;">${fv('produto_principal_intro')}</div>
+          <div style="width:32px;height:2px;background:${c.titanium};"></div>
+        </div>
+        <div style="background:rgba(245,240,230,.03);border:1px solid rgba(245,240,230,.06);border-radius:var(--radius-xl);padding:${mt*.5}px ${m*.4}px;display:flex;flex-direction:column;position:relative;">
+          <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,${c.titanium},${c.titanium}40);border-radius:var(--radius-xl) var(--radius-xl) 0 0;"></div>
+          <div style="font-family:var(--sans);font-size:${l.ts*.4}px;font-weight:900;color:${c.marfim};letter-spacing:-.5px;margin:4px 0 4px;">${fv('produto_principal_nome')||'[Nome do Produto]'}</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs}px;color:${c.titanium};margin-bottom:${mt*.3}px;">${fv('produto_principal_promessa')||'[Promessa]'}</div>
+          <div style="display:inline-flex;align-self:flex-start;background:${c.titanium};color:${c.cacao};padding:5px 18px;border-radius:var(--radius-full);font-weight:800;font-size:${l.bs-1}px;margin-bottom:${mt*.3}px;">${fv('produto_principal_preco')||'[Preço]'}</div>
+          <div style="height:1px;background:rgba(245,240,230,.06);margin-bottom:${mt*.2}px;"></div>
+          <div style="font-family:var(--sans);font-size:${l.bs-5}px;font-weight:400;color:${c.creme};line-height:1.6;flex:1;overflow-y:auto;">
+            ${(fv('produto_principal_entregaveis')||'').split('. ').filter(s=>s.trim()).map(s=>'<div style="display:flex;gap:6px;margin-bottom:3px;"><span style="color:'+c.titanium+';flex-shrink:0;">·</span><span>'+s.trim().replace(/\.$/,'')+'</span></div>').join('')}
+          </div>
+
+        </div>
+      </div>
+      ${ftr(false)}
+    </div>`;
+  }
+  else if(p.id==='funil'){
+    const arw='<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px;"><svg width="24" height="18" viewBox="0 0 24 18" fill="none"><path d="M0 9h20M16 3l6 6-6 6" stroke="'+c.titanium+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    const card=(letter,name,type,isHigh)=>{
+      const bg=isHigh?'linear-gradient(135deg,'+c.titanium+'cc,'+c.titanium+'77)':c.creme;
+      return '<div style="flex:1;background:'+bg+';border-radius:var(--radius-md);padding:12px 14px;border:1px solid '+(isHigh?c.titanium+'30':c.cacao+'08')+';display:flex;flex-direction:column;justify-content:center;min-width:0;">'
+        +'<div style="font-family:var(--sans);font-size:22px;font-weight:900;color:'+(isHigh?c.cacao+'50':c.titanium)+';opacity:.35;line-height:1;">'+letter+'</div>'
+        +'<div style="font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:'+(isHigh?c.cacao+'cc':c.titanium)+';margin-top:4px;">'+name+'</div>'
+        +'<div style="font-family:var(--mono);font-size:7px;font-weight:500;color:'+(isHigh?c.cacao+'77':c.cacao+'55')+';margin-top:2px;">'+type+'</div>'
+        +'</div>';
+    };
+    h=`<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
+          ${lbl('FUNIL DONA')}
+          <div style="display:flex;gap:3px;">${['D','O','N','A'].map(lt=>'<span style="font-family:var(--sans);font-size:'+l.ts*.35+'px;font-weight:900;color:'+c.titanium+';letter-spacing:1px;">'+lt+'</span>').join('<span style="color:'+c.cacao+'15;padding:0 1px;">·</span>')}</div>
+        </div>
+        <div style="font-family:var(--sans);font-size:${l.bs-2}px;font-weight:400;color:${c.cacao}99;margin-bottom:${mt*.3}px;max-width:72%;line-height:1.6;">${fv('funil_intro')}</div>
+        <div style="flex:1;display:flex;align-items:stretch;gap:0;min-height:0;">
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1.2;">
+            ${card('D','Isca 1','Direto',false)}
+            ${card('D','Isca 2','Direto',false)}
+            ${card('D','Isca 3','Direto',false)}
+          </div>
+          ${arw}
+          <div style="display:flex;flex-direction:column;flex:1.5;">
+            ${card('O','Produto Principal','Oportunidade',true)}
+          </div>
+          ${arw}
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1.2;">
+            ${card('N','Produto de Nível','Mentoria',true)}
+            ${card('A','Ascensão','High Ticket',true)}
+          </div>
+        </div>
+      </div>
+      ${ftr(true)}
+    </div>`;
+  }
+  else if(p.id==='iscas'){
+    h=`<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,${c.titanium}05,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:flex;flex-direction:column;">
+        ${lbl('SUAS ISCAS DIRETAS')}
+        <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:400;color:${c.creme};margin-bottom:${mt*.4}px;">${fv('iscas_intro')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1;">
+          ${[1,2,3].map(i=>`<div style="background:rgba(245,240,230,.025);border:1px solid rgba(245,240,230,.06);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;width:100%;height:2px;background:${c.titanium}${['88','55','33'][i-1]};"></div>
+            <div style="font-family:var(--mono);font-size:${l.ls-1}px;font-weight:800;letter-spacing:3px;color:${c.titanium};margin-bottom:10px;margin-top:4px;">ISCA ${String(i).padStart(2,'0')}</div>
+            <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:800;color:${c.marfim};margin-bottom:3px;">${fv(`isca${i}_nome`)||'[Nome]'}</div>
+            <div style="font-family:var(--sans);font-size:${l.bs-5}px;font-weight:400;color:${c.creme}cc;line-height:1.5;flex:1;margin-bottom:6px;">${fv(`isca${i}_promessa`)||'[Promessa]'}</div>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:4px;">
+              <div><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.titanium};letter-spacing:1px;text-transform:uppercase;">Valor sugerido:</span> <span style="font-family:var(--sans);font-size:${l.bs-3}px;font-weight:700;color:${c.marfim};">${fv(`isca${i}_preco`)||'[Preço]'}</span></div>
+              <div><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.titanium};letter-spacing:1px;text-transform:uppercase;">Tipo de produto:</span> <span style="font-family:var(--sans);font-size:${l.bs-3}px;font-weight:700;color:${c.marfim};">${['E-book','Workshop','Template'][i-1]||'Digital'}</span></div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+      ${ftr(false)}
+    </div>`;
+  }
+  else if(p.id==='acoes'){
+    const items=fv('checklist_plano_acao').split('\n').filter(Boolean);
+    h=`<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;width:2px;height:100%;background:linear-gradient(180deg,${c.titanium}00,${c.titanium},${c.titanium}00);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};padding-right:${m+10}px;height:100%;display:flex;flex-direction:column;">
+        ${lbl('PRÓXIMAS AÇÕES')}
+        <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:400;color:${c.cacao}99;margin-bottom:${mt*.35}px;">${fv('acoes_intro')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;flex:1;align-content:start;">
+          ${items.map((item,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid ${c.cacao}06;">
+            <div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${c.titanium};flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              <span style="font-family:var(--mono);font-size:7px;font-weight:800;color:${c.titanium};opacity:.6;">${String(i+1).padStart(2,'0')}</span>
+            </div>
+            <span style="font-family:var(--sans);font-size:${l.bs-4}px;font-weight:500;color:${c.cacao}cc;line-height:1.35;">${item}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      ${ftr(true)}
+    </div>`;
+  }
+  else if(p.id==='final'){
+    // No "MENSAGEM FINAL" title — just the quote
+    h=`<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,${c.titanium}08,transparent 55%);"></div>
+      <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:${mp};">
+        <div style="width:50px;height:1px;background:${c.titanium};margin-bottom:${mt*.7}px;"></div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs+4}px;color:${c.marfim};max-width:62%;line-height:2.1;">${fv('final_mensagem')}</div>
+        <div style="width:24px;height:1px;background:${c.titanium};margin:${mt*.7}px 0 ${mt*.4}px;"></div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs+2}px;color:${c.titanium};">${fv('final_assinatura')}</div>
+      </div>
+      ${ftr(false)}
+    </div>`;
+  }
+
+  $('sc').innerHTML=h;
+  $('scnt').textContent=`${String(cSlide+1).padStart(2,'0')} / ${String(PAGES.length).padStart(2,'0')}`;
+  renderThumbs();
+}
+
+function renderThumbs(){
+  const c=colors();
+  $('thumbs').innerHTML=PAGES.map((p,i)=>{
+    const bg=p.bg==='dark'?c.cacao:c.marfim;const tc=p.bg==='dark'?c.marfim:c.cacao;
+    return `<div class="thumb ${i===cSlide?'act':''}" onclick="cSlide=${i};R();renderTxtFields();" style="background:${bg};"><div style="padding:3px;color:${tc};font-weight:900;font-size:5px;font-family:var(--sans);">${p.name}</div><div class="thumb-lbl">${String(i+1).padStart(2,'0')}</div></div>`;
+  }).join('');
+}
+
+function pS(){cSlide=Math.max(0,cSlide-1);R();renderTxtFields();}
+function nS(){cSlide=Math.min(PAGES.length-1,cSlide+1);R();renderTxtFields();}
+
+function saveTpl(){const tpl={colors:colors(),layout:layout(),texts:{}};PAGES.forEach(p=>p.fields.forEach(f=>{const el=$('tf-'+f.id);if(el)tpl.texts[f.id]=el.value;}));localStorage.setItem('po_tpl',JSON.stringify(tpl));alert('Template salvo!');}
+function loadTpl(){const s=localStorage.getItem('po_tpl');if(!s)return;try{const t=JSON.parse(s);if(t.colors){if(t.colors.cacao)$('cc').value=t.colors.cacao;if(t.colors.marfim)$('cm').value=t.colors.marfim;if(t.colors.titanium)$('ct').value=t.colors.titanium;if(t.colors.creme)$('ce').value=t.colors.creme;if(t.colors.mirror)$('ci').value=t.colors.mirror;}if(t.layout){if(t.layout.m)$('lm').value=t.layout.m;if(t.layout.mt)$('lmt').value=t.layout.mt;if(t.layout.ts)$('lts').value=t.layout.ts;if(t.layout.bs)$('lbs').value=t.layout.bs;if(t.layout.ls)$('lls').value=t.layout.ls;if(t.layout.fs)$('lfs').value=t.layout.fs;}}catch(e){}}
+function resetTpl(){localStorage.removeItem('po_tpl');location.reload();}
+
+document.addEventListener('DOMContentLoaded',()=>{loadTpl();R();renderTxtFields();loadApiSt();});
+
+// INTEGRAÇÕES
+function loadApiSt(){const k=localStorage.getItem('ak'),s=$('api-st'),i=$('aki');if(k){s.textContent='OK';s.style.cssText+='color:#4CAF50;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);';i.value=k;}else{s.textContent='Pendente';s.style.cssText+='color:#E8614D;background:rgba(232,97,77,.08);border:1px solid rgba(232,97,77,.2);';}const sv=localStorage.getItem('amod');if(sv)$('amod').value=sv;}
+function saveKey(){const k=$('aki').value.trim(),m=$('amod').value;if(!k||!k.startsWith('sk-ant-')){$('atr').innerHTML='<span style="color:#E8614D;">Chave inválida.</span>';return;}localStorage.setItem('ak',k);localStorage.setItem('amod',m);loadApiSt();$('atr').innerHTML='<span style="color:#4CAF50;">✓ Salvo!</span>';}
+async function testKey(){const k=$('aki').value.trim(),r=$('atr');if(!k){r.innerHTML='<span style="color:#E8614D;">Preencha.</span>';return;}r.innerHTML='<span style="color:var(--titanium);">Testando...</span>';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:30,messages:[{role:'user',content:'Diga OK'}]})});if(res.ok)r.innerHTML='<span style="color:#4CAF50;">✓ OK!</span>';else{const e=await res.json();r.innerHTML=`<span style="color:#E8614D;">${e.error?.message||'Erro'}</span>`;}}catch(e){r.innerHTML=`<span style="color:#E8614D;">${e.message}</span>`;}}
+function togKey(){const i=$('aki'),b=$('tkb');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'MOSTRAR':'OCULTAR';}
+
+// GENERATION
+let genData=null;
+
+const CSYS=`Você é um AGENTE COPYWRITER para preencher o template "Plano de Ouro" usando como base fixa o Método Funil DONA e o próprio template abaixo. Você atua como estrategista sênior e copywriter sênior com referência de David Ogilvy: clareza acima de tudo, benefício concreto, linguagem específica, estrutura lógica e escrita que vende sem exagero.
+
+REGRAS DE SAÍDA
+
+Seu output deve ser SOMENTE o preenchimento dos campos [VARIÁVEL] do template, no formato exigido em "FORMATO DE SAÍDA".
+
+Sem explicações, sem comentários, sem texto fora do formato.
+
+TOM DE VOZ FIXO (OBRIGATÓRIO)
+
+Português do Brasil.
+
+Linguagem humana, simples, direta, específica e cirúrgica.
+
+Didático sem ser prolixo.
+
+Sem emojis.
+
+Sem travessões (— ou –).
+
+Sem antíteses (proibido: "não é X, é Y", "não isso, mas aquilo", "não apenas, mas também").
+
+Sem floreios e sem frases vazias.
+
+Frases curtas e concretas.
+
+MÉTODO FIXO (BASE ESTRATÉGICA OBRIGATÓRIA)
+Você deve usar esta lógica como esqueleto de estratégia e oferta:
+Funil DONA = funil de escala para vender todo dia, inclusive para público frio, com 4 etapas de compra:
+
+D Direto (isca direta): produto barato e rápido de consumir, com micro-resultado imediato e ponte para o produto principal. Faixa sugerida: R$19 a R$199. Formatos: workshop curto, e-book, template, planilha, diagnóstico/teste, desafio, pack de áudios, Google Doc.
+
+O Oportunidade (produto principal): produto que mais vende no funil, com promessa desejada e demanda alta. Faixa sugerida: R$200 a R$2.000. Formatos: curso/treinamento/formação, templates robustos, app, serviço estruturado, evento.
+
+N Nível (high ticket): acompanhamento e implementação para elevar resultado e consciência. Preço acima de R$2.000.
+
+A Ascensão (premium máximo): oferta mais exclusiva e cara (30k a 50k+ como referência), para poucos.
+
+Regras do método:
+
+A isca sempre empurra para o produto principal (ponte explícita).
+
+Quem quer mais suporte sobe para Nível.
+
+Um grupo menor sobe para Ascensão.
+
+Você pode sugerir 2 a 3 iscas (uma principal + outras como order bump), sem inventar números de conversão.
+
+Criativos simples para testar promessa são recomendados, mas sem afirmar resultados.
+
+INPUTS DO USUÁRIO (VIRÃO EM QUALQUER ORDEM)
+O usuário pode mandar dados soltos e incompletos. Você deve extrair, organizar e melhorar clareza internamente.
+Tipos de dados possíveis:
+
+Nome da cliente
+
+Nicho/mercado
+
+Público-alvo
+
+Produto/serviço atual (se houver)
+
+Dores, desejos, contexto
+
+Promessa desejada
+
+Mecanismo/diferencial (se houver)
+
+Objeções
+
+Restrições (palavras proibidas, tom, nichos sensíveis)
+
+Produtos atuais (D/O/N/A) e preços (se houver)
+
+REGRAS DE VERDADE E SEGURANÇA (NÃO NEGOCIÁVEIS)
+
+Você pode criar estrutura, nomes, formatos e sugestões quando faltarem dados.
+
+Você nunca inventa fatos específicos atribuídos ao negócio da cliente: números, faturamento, cases, depoimentos, métricas, prazos já atingidos, garantias, certificações, parcerias, tempo de mercado, estatísticas.
+
+Promessas podem ser SMART como objetivo de plano, sem prometer dinheiro e sem garantir resultado.
+
+Se o nicho for sensível (saúde, finanças, jurídico), seja ainda mais conservador: sem promessas absolutas e sem linguagem de cura/garantia.
+
+REGRAS DE NAMING (OBRIGATÓRIAS)
+Quando precisar criar nomes:
+
+1 a 4 palavras, fácil de falar e escrever.
+
+Indicar resultado, mecanismo ou categoria.
+
+Evitar palavras vazias: premium, master, definitivo, completo, revolucionário.
+
+Evitar absolutos: garantido, sem esforço, nunca mais.
+
+Consistência: os nomes devem parecer da mesma família.
+
+REGRAS DE PROMESSA SMART (OBRIGATÓRIAS)
+Quando precisar criar promessas:
+
+Específicas, mensuráveis, alcançáveis, realistas e temporais.
+
+Use métricas de execução (ex: "1 isca", "1 ponte", "1 página", "3 ofertas"), sem prometer faturamento.
+
+Estrutura recomendada: Verbo + Resultado + Contexto + Prazo sugerido.
+
+Se o usuário não der prazo, sugira um prazo conservador (7, 14 ou 30 dias) como meta do plano, não como garantia.
+
+VALIDAÇÃO OBRIGATÓRIA ANTES DE ENTREGAR (CHECKLIST INTERNO, NÃO MOSTRAR)
+
+Preenchi todos os campos [VARIÁVEL] na ordem
+
+Cada texto está dentro do limite de caracteres
+
+Não usei emojis, travessões, antíteses
+
+Não inventei fatos específicos do negócio
+
+Mantive coerência com o Funil DONA
+
+Não criei campos/páginas extras
+
+TEMPLATE FIXO (MAPEAMENTO DOS CAMPOS VARIÁVEIS)
+Você deve preencher apenas estes IDs, nesta ordem, respeitando os limites:
+
+cliente_nome (até 40)
+
+clienteideal_descricao (350 a 450)
+
+problema_descricao (280 a 380)
+
+solucao_descricao (300 a 420)
+
+diferencial_descricao (240 a 320)
+
+produto_principal_nome (até 55)
+
+produto_principal_promessa (120 a 170)
+
+produto_principal_preco (até 30)
+
+produto_principal_entregaveis (300 a 420)
+
+produto_principal_bonus (180 a 260)
+
+funil_isca_1 (90 a 120)
+
+funil_isca_2 (90 a 120)
+
+funil_isca_3 (90 a 120)
+
+funil_produto_principal (90 a 130)
+
+funil_produto_nivel (90 a 130)
+
+funil_mentoria_high_ticket (90 a 140)
+
+isca1_nome (até 60)
+
+isca1_promessa (120 a 170)
+
+isca1_preco (até 30)
+
+isca2_nome (até 60)
+
+isca2_promessa (120 a 170)
+
+isca2_preco (até 30)
+
+isca3_nome (até 60)
+
+isca3_promessa (120 a 170)
+
+isca3_preco (até 30)
+
+FORMATO DE SAÍDA (OBRIGATÓRIO)
+Responda exatamente assim, sem explicações, sem comentários, sem textos extras:
+
+CAMPO 1
+
+ID: <id_do_campo>
+
+Texto: <conteúdo_final>
+
+CAMPO 2
+
+ID: <id_do_campo>
+
+Texto: <conteúdo_final>
+
+(repita até o CAMPO 25, sempre na ordem)`;
+
+// Parse CAMPO format → object
+function parseCampos(raw){
+  const obj={};
+  const blocks=raw.split(/CAMPO\s+\d+/i).filter(b=>b.trim());
+  blocks.forEach(block=>{
+    const idMatch=block.match(/ID:\s*(.+)/i);
+    const txtMatch=block.match(/Texto:\s*([\s\S]*?)(?=\n\s*$|$)/i);
+    if(idMatch&&txtMatch){
+      const id=idMatch[1].trim();
+      const txt=txtMatch[1].trim();
+      if(id&&txt)obj[id]=txt;
+    }
   });
-  document.getElementById('po-fill').style.width = (num/5*100)+'%';
+  return obj;
 }
 
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+function setSt(n){document.querySelectorAll('#gpr .pst').forEach((s,i)=>{s.classList.remove('done','cur');if(i+1<n)s.classList.add('done');else if(i+1===n)s.classList.add('cur');});$('gfl').style.width=(n/5*100)+'%';}
+function wt(ms){return new Promise(r=>setTimeout(r,ms));}
 
-async function startGeneration() {
-  const nome = document.getElementById('po-nome').value.trim();
-  const dados = document.getElementById('po-dados').value.trim();
-  if (!nome) { alert('Preencha o nome da cliente.'); return; }
-  if (!dados) { alert('Cole os dados do questionário.'); return; }
+async function startGen(){
+  const nome=$('gn').value.trim(),dados=$('gd').value.trim();
+  if(!nome){alert('Nome da cliente.');return;}if(!dados){alert('Cole os dados.');return;}
+  $('gph').style.display='none';$('gen-prev').style.display='none';$('gen-actions').style.display='none';$('gpr').classList.add('act');$('gbtn').disabled=true;$('gfl').style.width='0%';
+  setSt(1);await wt(700);setSt(2);
+  try{
+    const ak=localStorage.getItem('ak'),am=localStorage.getItem('amod')||'claude-sonnet-4-20250514';
+    if(!ak)throw new Error('Chave não configurada. Vá em Integrações.');
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:am,max_tokens:6000,system:CSYS,messages:[{role:'user',content:`NOME DA CLIENTE: ${nome}\n\nDADOS DO QUESTIONÁRIO:\n${dados}`}]})});
+    const data=await res.json();if(!res.ok)throw new Error(data.error?.message||'Erro');
+    const rawText=data.content.map(c=>c.text||'').join('');
+    genData=parseCampos(rawText);
+    genData.cliente_nome=nome;
+    // Validate we got enough fields
+    const expectedIds=['clienteideal_descricao','problema_descricao','solucao_descricao','produto_principal_nome'];
+    const missing=expectedIds.filter(id=>!genData[id]);
+    if(missing.length>0)throw new Error('Resposta incompleta. Campos ausentes: '+missing.join(', '));
+    setSt(3);await wt(800);setSt(4);await wt(1000);setSt(5);await wt(400);
+    $('gpr').classList.remove('act');showRes(genData);
+  }catch(err){$('gpr').classList.remove('act');$('gph').style.display='flex';$('gph').querySelector('p').innerHTML=`<span style="color:#E8614D;">Erro: ${err.message}</span>`;}
+  $('gbtn').disabled=false;
+}
 
-  // Reset UI
-  document.getElementById('po-placeholder').style.display = 'none';
-  document.getElementById('po-result').classList.remove('active');
-  document.getElementById('po-progress').classList.add('active');
-  document.getElementById('btn-generate').disabled = true;
-  document.getElementById('po-fill').style.width = '0%';
+// Generation preview: renders slides using same design as template editor
+let gSlide=0;
 
-  // Step 1
-  setStep(1);
-  await wait(900);
+function gfv(id){return genData&&genData[id]?genData[id]:'';}
 
-  // Step 2 — call Copywriter
-  setStep(2);
+// Render a single slide HTML for generation preview — reuses exact same design as R()
+function renderGenSlide(slideIdx){
+  const c=colors(),l=layout(),p=PAGES[slideIdx];
+  const m=l.m,mt=l.mt,mp=m+'px',mtp=mt+'px';
+  const ftr=(light)=>`<div style="position:absolute;bottom:0;left:0;right:0;padding:0 ${mp};"><div style="height:1px;background:${light?c.cacao+'08':c.titanium+'25'};"></div><div style="display:flex;justify-content:space-between;padding:8px 0;font-family:var(--mono);font-size:${l.fs}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${light?c.cacao+'44':c.mirror};"><span>ISIS MOREIRA</span><span>${String(slideIdx+1).padStart(2,'0')} / ${String(PAGES.length).padStart(2,'0')}</span></div></div>`;
+  const lbl=(text)=>`<div style="font-family:var(--mono);font-size:${l.ls}px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:${c.titanium};margin-bottom:14px;">${text}</div>`;
+  // Use genData values for variable fields, fixed values for fixed
+  const v=(id)=>{
+    if(genData&&genData[id])return genData[id];
+    for(const pg of PAGES)for(const f of pg.fields)if(f.id===id)return f.fix||'';
+    return '';
+  };
 
-  try {
-    const apiKey = localStorage.getItem('agencia_api_key');
-    const apiModel = localStorage.getItem('agencia_api_model') || 'claude-sonnet-4-20250514';
+  if(p.id==='capa'){
+    return `<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,${c.titanium}06,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:1px;background:${c.titanium};"></div><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:${c.mirror};">ISIS MOREIRA</span></div>
+        <div style="margin:auto 0;padding:${mt*.5}px 0;">
+          <div style="font-family:var(--sans);font-size:${l.ts*1.15}px;font-weight:900;color:${c.marfim};line-height:.92;letter-spacing:-2.5px;">Plano de Ouro</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:${l.ts*.38}px;color:${c.titanium};margin-top:6px;">do posicionamento aos 7 dígitos</div>
+          <div style="width:100%;height:1px;background:${c.titanium}40;margin:${mt*.6}px 0 ${mt*.45}px;"></div>
+          <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.mirror};letter-spacing:3px;text-transform:uppercase;">Preparado para</span><span style="font-family:var(--sans);font-size:${l.bs+10}px;font-weight:900;color:${c.marfim};letter-spacing:-.5px;">${v('cliente_nome')}</span></div>
+        </div>
+        <div style="width:24px;height:2px;background:${c.titanium};"></div>
+      </div></div>`;
+  }
+  if(p.id==='boas'){
+    return `<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,${c.titanium}00,${c.titanium},${c.titanium}00);"></div>
+      <div style="position:absolute;bottom:0;right:0;width:38%;height:100%;overflow:hidden;">
+        <img src="${ISIS_PHOTO}" style="width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.92;mix-blend-mode:multiply;" />
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,${c.marfim} 0%,${c.marfim}00 30%);"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,${c.marfim}40 0%,transparent 20%,transparent 80%,${c.marfim}60 100%);"></div>
+      </div>
+      <div style="position:relative;padding:${mtp} ${mp};padding-left:${m+14}px;height:100%;display:flex;flex-direction:column;justify-content:center;max-width:58%;">
+        ${lbl('BOAS-VINDAS')}
+        <div style="font-family:var(--sans);font-size:${l.ts*.75}px;font-weight:900;color:${c.cacao};line-height:1.0;letter-spacing:-1.5px;margin-bottom:${mt*.5}px;">Acesse o seu plano</div>
+        <div style="width:40px;height:2px;background:${c.titanium};margin-bottom:${mt*.5}px;"></div>
+        <div style="font-family:var(--sans);font-size:${l.bs}px;font-weight:400;color:${c.cacao}aa;max-width:85%;line-height:1.8;">Neste material você vai encontrar seu posicionamento, sua estratégia de produtos, a construção do seu funil e uma checklist para você começar.</div>
+        <div style="margin-top:${mt*.7}px;display:flex;align-items:center;gap:10px;"><div style="width:16px;height:1px;background:${c.titanium};"></div><span style="font-family:var(--serif);font-style:italic;font-size:${l.bs+3}px;color:${c.titanium};">Por Isis Moreira</span></div>
+      </div>${ftr(true)}</div>`;
+  }
+  if(p.id==='posic'){
+    return `<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
+        ${lbl('POSICIONAMENTO')}
+        <div style="font-family:var(--sans);font-size:${l.ts*.3}px;font-weight:900;color:${c.cacao};margin-bottom:${mt*.25}px;line-height:1.1;letter-spacing:-.5px;max-width:85%;">Como as pessoas vão te conhecer no seu mercado?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;flex:1;min-height:0;">
+          ${[['Seu perfil de cliente ideal','clienteideal_descricao'],['O problema que você resolve','problema_descricao'],['A solução que você entrega','solucao_descricao'],['Seu diferencial de mercado','diferencial_descricao']].map(([t,d])=>`
+          <div style="background:${c.creme};border-radius:var(--radius-md);padding:10px 12px;border:1px solid ${c.cacao}05;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;flex-shrink:0;">
+              <div style="width:3px;height:10px;background:${c.titanium};border-radius:2px;flex-shrink:0;"></div>
+              <span style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:800;color:${c.cacao};">${t}</span>
+            </div>
+            <div style="font-family:var(--sans);font-size:${l.bs-4}px;font-weight:400;color:${c.cacao}99;line-height:1.55;overflow:hidden;flex:1;">${v(d)}</div>
+          </div>`).join('')}
+        </div>
+      </div>${ftr(true)}</div>`;
+  }
+  if(p.id==='prod'){
+    return `<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 80% 30%,${c.titanium}06,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:grid;grid-template-columns:.9fr 1.3fr;gap:${m*.5}px;">
+        <div style="display:flex;flex-direction:column;justify-content:center;">${lbl('PRODUTO PRINCIPAL')}<div style="font-family:var(--sans);font-size:${l.bs}px;font-weight:400;color:${c.creme};line-height:1.8;margin-bottom:${mt*.4}px;">Essa é a minha sugestão de produto principal para você.</div><div style="width:32px;height:2px;background:${c.titanium};"></div></div>
+        <div style="background:rgba(245,240,230,.03);border:1px solid rgba(245,240,230,.06);border-radius:var(--radius-xl);padding:${mt*.5}px ${m*.4}px;display:flex;flex-direction:column;position:relative;">
+          <div style="position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,${c.titanium},${c.titanium}40);border-radius:var(--radius-xl) var(--radius-xl) 0 0;"></div>
+          <div style="font-family:var(--sans);font-size:${l.ts*.4}px;font-weight:900;color:${c.marfim};letter-spacing:-.5px;margin:4px 0 4px;">${v('produto_principal_nome')}</div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs}px;color:${c.titanium};margin-bottom:${mt*.3}px;">${v('produto_principal_promessa')}</div>
+          <div style="display:inline-flex;align-self:flex-start;background:${c.titanium};color:${c.cacao};padding:5px 18px;border-radius:var(--radius-full);font-weight:800;font-size:${l.bs-1}px;margin-bottom:${mt*.3}px;">${v('produto_principal_preco')}</div>
+          <div style="height:1px;background:rgba(245,240,230,.06);margin-bottom:${mt*.2}px;"></div>
+          <div style="font-family:var(--sans);font-size:${l.bs-5}px;font-weight:400;color:${c.creme};line-height:1.6;flex:1;overflow-y:auto;">
+            ${(v('produto_principal_entregaveis')||'').split('. ').filter(s=>s.trim()).map(s=>'<div style="display:flex;gap:6px;margin-bottom:3px;"><span style="color:'+c.titanium+';flex-shrink:0;">·</span><span>'+s.trim().replace(/\.$/,'')+'</span></div>').join('')}
+          </div>
 
-    if (!apiKey) {
-      throw new Error('Chave de API não configurada. Vá em Integrações e salve sua chave da Anthropic.');
+        </div>
+      </div>${ftr(false)}</div>`;
+  }
+  if(p.id==='funil'){
+
+    const arw='<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px;"><svg width="24" height="18" viewBox="0 0 24 18" fill="none"><path d="M0 9h20M16 3l6 6-6 6" stroke="'+c.titanium+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    const card=(letter,name,type,isHigh)=>{
+      const bg=isHigh?'linear-gradient(135deg,'+c.titanium+'cc,'+c.titanium+'77)':c.creme;
+      return '<div style="flex:1;background:'+bg+';border-radius:var(--radius-md);padding:12px 14px;border:1px solid '+(isHigh?c.titanium+'30':c.cacao+'08')+';display:flex;flex-direction:column;justify-content:center;min-width:0;">'
+        +'<div style="font-family:var(--sans);font-size:22px;font-weight:900;color:'+(isHigh?c.cacao+'50':c.titanium)+';opacity:.35;line-height:1;">'+letter+'</div>'
+        +'<div style="font-family:var(--mono);font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:'+(isHigh?c.cacao+'cc':c.titanium)+';margin-top:4px;">'+name+'</div>'
+        +'<div style="font-family:var(--mono);font-size:7px;font-weight:500;color:'+(isHigh?c.cacao+'77':c.cacao+'55')+';margin-top:2px;">'+type+'</div>'
+        +'</div>';
+    };
+    return `<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
+          ${lbl('FUNIL DONA')}
+          <div style="display:flex;gap:3px;">${['D','O','N','A'].map(lt=>'<span style="font-family:var(--sans);font-size:'+l.ts*.35+'px;font-weight:900;color:'+c.titanium+';letter-spacing:1px;">'+lt+'</span>').join('<span style="color:'+c.cacao+'15;padding:0 1px;">·</span>')}</div>
+        </div>
+        <div style="font-family:var(--sans);font-size:${l.bs-2}px;font-weight:400;color:${c.cacao}99;margin-bottom:${mt*.3}px;max-width:72%;line-height:1.6;">${v('funil_intro')}</div>
+        <div style="flex:1;display:flex;align-items:stretch;gap:0;min-height:0;">
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1.2;">
+            ${card('D','Isca 1','Direto',false)}
+            ${card('D','Isca 2','Direto',false)}
+            ${card('D','Isca 3','Direto',false)}
+          </div>
+          ${arw}
+          <div style="display:flex;flex-direction:column;flex:1.5;">
+            ${card('O','Produto Principal','Oportunidade',true)}
+          </div>
+          ${arw}
+          <div style="display:flex;flex-direction:column;gap:5px;flex:1.2;">
+            ${card('N','Produto de Nível','Mentoria',true)}
+            ${card('A','Ascensão','High Ticket',true)}
+          </div>
+        </div>
+      </div>${ftr(true)}</div>`;
+  }
+  if(p.id==='iscas'){
+    return `<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,${c.titanium}05,transparent 50%);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};height:100%;display:flex;flex-direction:column;">
+        ${lbl('SUAS ISCAS DIRETAS')}
+        <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:400;color:${c.creme};margin-bottom:${mt*.4}px;">Aqui estão as minhas sugestões de iscas do seu funil.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1;">
+          ${[1,2,3].map(i=>`<div style="background:rgba(245,240,230,.025);border:1px solid rgba(245,240,230,.06);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;width:100%;height:2px;background:${c.titanium}${['88','55','33'][i-1]};"></div>
+            <div style="font-family:var(--mono);font-size:${l.ls-1}px;font-weight:800;letter-spacing:3px;color:${c.titanium};margin-bottom:10px;margin-top:4px;">ISCA ${String(i).padStart(2,'0')}</div>
+            <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:800;color:${c.marfim};margin-bottom:3px;">${v('isca'+i+'_nome')}</div>
+            <div style="font-family:var(--sans);font-size:${l.bs-5}px;font-weight:400;color:${c.creme}cc;line-height:1.5;flex:1;margin-bottom:6px;">${v('isca'+i+'_promessa')}</div>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:4px;">
+              <div><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.titanium};letter-spacing:1px;text-transform:uppercase;">Valor sugerido:</span> <span style="font-family:var(--sans);font-size:${l.bs-3}px;font-weight:700;color:${c.marfim};">${v('isca'+i+'_preco')}</span></div>
+              <div><span style="font-family:var(--mono);font-size:${l.ls-2}px;font-weight:800;color:${c.titanium};letter-spacing:1px;text-transform:uppercase;">Tipo de produto:</span> <span style="font-family:var(--sans);font-size:${l.bs-3}px;font-weight:700;color:${c.marfim};">${['E-book','Workshop','Template'][i-1]||'Digital'}</span></div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>${ftr(false)}</div>`;
+  }
+  if(p.id==='acoes'){
+    const items='Definir posicionamento e nicho com clareza\nCriar perfil profissional alinhado (bio, foto, destaque)\nEstruturar a isca direta principal e publicar\nConfigurar checkout e página de vendas da isca\nCriar sequência de e-mails/mensagens pós-compra da isca\nEstruturar e gravar o produto principal\nMontar página de vendas do produto principal\nCriar ponte da isca para o produto principal\nDefinir proposta e estrutura do high ticket\nIniciar produção de conteúdo estratégico (3x por semana)'.split('\n');
+    return `<div style="background:${c.marfim};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;right:0;width:2px;height:100%;background:linear-gradient(180deg,${c.titanium}00,${c.titanium},${c.titanium}00);"></div>
+      <div style="position:relative;padding:${mtp} ${mp};padding-right:${m+10}px;height:100%;display:flex;flex-direction:column;">
+        ${lbl('PRÓXIMAS AÇÕES')}
+        <div style="font-family:var(--sans);font-size:${l.bs-1}px;font-weight:400;color:${c.cacao}99;margin-bottom:${mt*.35}px;">A seguir, vai uma descrição das suas próximas ações.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;flex:1;align-content:start;">
+          ${items.map((item,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid ${c.cacao}06;"><div style="width:18px;height:18px;border-radius:5px;border:1.5px solid ${c.titanium};flex-shrink:0;display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--mono);font-size:7px;font-weight:800;color:${c.titanium};opacity:.6;">${String(i+1).padStart(2,'0')}</span></div><span style="font-family:var(--sans);font-size:${l.bs-4}px;font-weight:500;color:${c.cacao}cc;line-height:1.35;">${item}</span></div>`).join('')}
+        </div>
+      </div>${ftr(true)}</div>`;
+  }
+  if(p.id==='final'){
+    return `<div style="background:${c.cacao};width:100%;height:100%;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,${c.titanium}08,transparent 55%);"></div>
+      <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:${mp};">
+        <div style="width:50px;height:1px;background:${c.titanium};margin-bottom:${mt*.7}px;"></div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs+4}px;color:${c.marfim};max-width:62%;line-height:2.1;">Que o seu produto, a sua mensagem, o seu trabalho sejam o remédio que muitas pessoas precisam.</div>
+        <div style="width:24px;height:1px;background:${c.titanium};margin:${mt*.7}px 0 ${mt*.4}px;"></div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:${l.bs+2}px;color:${c.titanium};">Por Isis Moreira</div>
+      </div>${ftr(false)}</div>`;
+  }
+  return '';
+}
+
+function renderGenPreview(){
+  if(!genData)return;
+  $('gsc').innerHTML=renderGenSlide(gSlide);
+  $('gscnt').textContent=`${String(gSlide+1).padStart(2,'0')} / ${String(PAGES.length).padStart(2,'0')}`;
+  const c=colors();
+  $('gthumbs').innerHTML=PAGES.map((p,i)=>{
+    const isAct=i===gSlide;
+    return `<div onclick="gSlide=${i};renderGenPreview();" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:0;transition:all .15s;${isAct?'background:var(--titanium);color:var(--cacao);box-shadow:0 0 0 3px rgba(186,167,140,.3);':'background:rgba(245,240,230,.08);color:var(--mirror);border:1px solid rgba(245,240,230,.1);'}" title="${p.name}">${i+1}</div>`;
+  }).join('');
+}
+function gpS(){gSlide=Math.max(0,gSlide-1);renderGenPreview();}
+function gnS(){gSlide=Math.min(PAGES.length-1,gSlide+1);renderGenPreview();}
+
+function showRes(d){
+  $('gph').style.display='none';
+  $('gen-prev').style.display='flex';
+  $('gen-actions').style.display='block';
+  const filled=Object.keys(d).filter(k=>k!=='cliente_nome'&&d[k]).length;
+  $('gen-count').textContent=filled+' / 25 campos preenchidos';
+  gSlide=0;
+  renderGenPreview();
+}
+function resetGen(){
+  $('gn').value='';$('gd').value='';
+  $('gen-prev').style.display='none';$('gen-actions').style.display='none';
+  $('gph').style.display='flex';$('gph').querySelector('p').innerHTML='Preencha e clique em <strong>Gerar</strong>.';
+  genData=null;gSlide=0;
+}
+
+// PDF — captures the actual preview canvas (gsc) for pixel-perfect output
+async function dlPDF(){
+  if(!genData)return;
+  const btn=document.querySelector('[onclick="dlPDF()"]');
+  const origText=btn.textContent;
+  btn.disabled=true;btn.textContent='⏳ Gerando PDF...';
+
+  const savedSlide=gSlide;
+
+  try{
+    const {jsPDF}=window.jspdf;
+    const W=338.67,H=190.5;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:[W,H]});
+    const target=$('gsc');
+
+    for(let i=0;i<PAGES.length;i++){
+      if(i>0)doc.addPage([W,H],'landscape');
+
+      // Navigate to slide i using the actual preview renderer
+      gSlide=i;
+      target.innerHTML=renderGenSlide(i);
+
+      // Wait for fonts + rendering
+      await new Promise(r=>setTimeout(r,300));
+
+      btn.textContent=`⏳ Slide ${i+1} / ${PAGES.length}...`;
+
+      // Capture the actual visible element
+      const canvas=await html2canvas(target,{
+        scale:2,
+        useCORS:true,
+        allowTaint:true,
+        backgroundColor:null,
+        logging:false
+      });
+
+      const imgData=canvas.toDataURL('image/jpeg',0.95);
+      doc.addImage(imgData,'JPEG',0,0,W,H);
     }
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: apiModel,
-        max_tokens: 2000,
-        system: COPY_SYSTEM,
-        messages: [{ role: 'user', content: `NOME DA CLIENTE: ${nome}\n\nDADOS DO QUESTIONÁRIO:\n${dados}` }]
-      })
-    });
+    // Restore original slide
+    gSlide=savedSlide;
+    renderGenPreview();
 
-    const data = await res.json();
-    const raw = data.content.map(c => c.text || '').join('');
-    generatedData = JSON.parse(raw.replace(/```json|```/g,'').trim());
-
-    // Step 3 — review
-    setStep(3);
-    await wait(1000);
-
-    // Step 4 — PDF layout
-    setStep(4);
-    await wait(1200);
-
-    // Step 5 — done
-    setStep(5);
-    await wait(600);
-
-    document.getElementById('po-progress').classList.remove('active');
-    showResult(generatedData);
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('po-progress').classList.remove('active');
-    document.getElementById('po-placeholder').style.display = 'flex';
-    const isKeyMissing = err.message.includes('Chave de API');
-    document.getElementById('po-placeholder').querySelector('p').innerHTML = isKeyMissing
-      ? `<span style="color:#E8614D;">⚠ ${err.message}</span><br><br><button onclick="document.querySelector('[data-page=integracoes]').click()" style="background:var(--titanium);color:var(--cacao);border:none;padding:10px 20px;border-radius:var(--radius-md);font-family:var(--sans);font-weight:700;font-size:13px;cursor:pointer;">Ir para Integrações →</button>`
-      : `<span style="color:#E8614D;">⚠ Erro: ${err.message}</span><br>Verifique a conexão e tente novamente.`;
+    doc.save('Plano_de_Ouro_'+(genData.cliente_nome||'Cliente').replace(/\s+/g,'_')+'.pdf');
+  }catch(err){
+    console.error('PDF error:',err);
+    alert('Erro ao gerar PDF: '+err.message);
+    gSlide=savedSlide;
+    renderGenPreview();
   }
 
-  document.getElementById('btn-generate').disabled = false;
+  btn.disabled=false;btn.textContent=origText;
 }
 
-function showResult(d) {
-  const el = document.getElementById('po-result-content');
-  el.innerHTML = `
-    <h4>Plano de Ouro — ${d.nome_cliente}</h4>
-    <div class="rc-sub">Ecossistema Donas do Ouro · Isis Moreira</div>
-    <div class="rc-section"><h5>Diagnóstico</h5><p>${d.diagnostico}</p></div>
-    <div class="rc-section"><h5>Visão de Futuro</h5><p>${d.visao}</p></div>
-    ${d.pilares.map((p,i) => `<div class="rc-section"><h5>✦ Pilar ${i+1}: ${p.titulo}</h5><p>${p.descricao}</p></div>`).join('')}
-    <div class="rc-section"><h5>Ações Práticas</h5>${d.acoes.map((a,i) => `<p><strong>${i+1}.</strong> ${a}</p>`).join('')}</div>
-    <div class="rc-section"><h5>Mensagem Final</h5><p style="font-style:italic;color:var(--titanium);">${d.mensagem_final}</p></div>
-  `;
-  document.getElementById('po-result').classList.add('active');
-}
-
-function resetGeneration() {
-  document.getElementById('po-nome').value = '';
-  document.getElementById('po-dados').value = '';
-  document.getElementById('po-result').classList.remove('active');
-  document.getElementById('po-placeholder').style.display = 'flex';
-  document.getElementById('po-placeholder').querySelector('p').innerHTML = 'Preencha os dados e clique em <strong>Gerar Plano de Ouro</strong> para iniciar os agentes.';
-  generatedData = null;
-}
-
-// ═══════════════ INTEGRAÇÕES — API KEY MANAGEMENT ═══════════════
-
-function loadApiKeyStatus() {
-  const key = localStorage.getItem('agencia_api_key');
-  const statusEl = document.getElementById('api-status');
-  const inputEl = document.getElementById('api-key-input');
-  const modelEl = document.getElementById('api-model');
-
-  if (key) {
-    statusEl.textContent = 'Conectado';
-    statusEl.style.cssText += 'color:#4CAF50;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);';
-    inputEl.value = key;
-  } else {
-    statusEl.textContent = 'Não configurado';
-    statusEl.style.cssText += 'color:#E8614D;background:rgba(232,97,77,.08);border:1px solid rgba(232,97,77,.2);';
-  }
-
-  const savedModel = localStorage.getItem('agencia_api_model');
-  if (savedModel && modelEl) modelEl.value = savedModel;
-}
-
-function saveApiKey() {
-  const key = document.getElementById('api-key-input').value.trim();
-  const model = document.getElementById('api-model').value;
-
-  if (!key) {
-    document.getElementById('api-test-result').innerHTML = '<span style="color:#E8614D;">Preencha a chave de API.</span>';
-    return;
-  }
-
-  if (!key.startsWith('sk-ant-')) {
-    document.getElementById('api-test-result').innerHTML = '<span style="color:#E8614D;">A chave deve começar com sk-ant-</span>';
-    return;
-  }
-
-  localStorage.setItem('agencia_api_key', key);
-  localStorage.setItem('agencia_api_model', model);
-  loadApiKeyStatus();
-  document.getElementById('api-test-result').innerHTML = '<span style="color:#4CAF50;">✓ Chave salva com sucesso!</span>';
-}
-
-async function testApiKey() {
-  const key = document.getElementById('api-key-input').value.trim();
-  const resultEl = document.getElementById('api-test-result');
-
-  if (!key) {
-    resultEl.innerHTML = '<span style="color:#E8614D;">Preencha a chave primeiro.</span>';
-    return;
-  }
-
-  resultEl.innerHTML = '<span style="color:var(--titanium);">⏳ Testando conexão...</span>';
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 50,
-        messages: [{ role: 'user', content: 'Responda apenas: OK' }]
-      })
-    });
-
-    if (res.ok) {
-      resultEl.innerHTML = '<span style="color:#4CAF50;">✓ Conexão funcionando! API respondeu com sucesso.</span>';
-    } else {
-      const err = await res.json();
-      resultEl.innerHTML = `<span style="color:#E8614D;">✕ Erro ${res.status}: ${err.error?.message || 'Chave inválida ou sem créditos.'}</span>`;
-    }
-  } catch (e) {
-    resultEl.innerHTML = `<span style="color:#E8614D;">✕ Erro de conexão: ${e.message}</span>`;
-  }
-}
-
-function toggleKeyVisibility() {
-  const input = document.getElementById('api-key-input');
-  const btn = document.getElementById('toggle-key-btn');
-  if (input.type === 'password') {
-    input.type = 'text';
-    btn.textContent = 'OCULTAR';
-  } else {
-    input.type = 'password';
-    btn.textContent = 'MOSTRAR';
-  }
-}
-
-// Load saved key on page load
-document.addEventListener('DOMContentLoaded', loadApiKeyStatus);
-
-// ═══════════════ PDF GENERATOR — DIAGRAMADOR 16:9 LANDSCAPE ═══════════════
-function downloadPDF() {
-  if (!generatedData) return;
-  const d = generatedData;
-  const { jsPDF } = window.jspdf;
-
-  // 16:9 landscape — 338.67mm x 190.5mm (same ratio as 1920x1080)
-  const W = 338.67, H = 190.5;
-  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:[W, H] });
-
-  const mL = 32, mR = 32, mT = 28, cW = W - mL - mR;
-  const MARF=[245,240,230], CAC=[35,23,16], TIT=[186,167,140], CRE=[237,230,216], MIR=[147,151,155], DARK=[40,30,22];
-
-  const sc = c => doc.setTextColor(c[0],c[1],c[2]);
-  const sf = c => doc.setFillColor(c[0],c[1],c[2]);
-  const sd = c => doc.setDrawColor(c[0],c[1],c[2]);
-
-  // ── FOOTER (every slide) ──
-  function footer(n) {
-    // Bottom line
-    sf(TIT); doc.rect(mL, H-18, cW, .3, 'F');
-    // Left: brand
-    sc(MIR); doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
-    doc.text('ISIS MOREIRA  ·  PLANO DE OURO  ·  ECOSSISTEMA DONAS DO OURO', mL, H-11);
-    // Right: page number
-    doc.text(String(n).padStart(2,'0') + ' / 07', W-mR, H-11, {align:'right'});
-  }
-
-  // ── HELPER: wrapped text that stays in slide ──
-  function wt(text, x, y, maxW, size, font, style, color, lh) {
-    doc.setFont(font||'helvetica', style||'normal');
-    doc.setFontSize(size||10);
-    sc(color||CAC);
-    const lines = doc.splitTextToSize(text, maxW||cW);
-    const step = lh || size * 0.5;
-    lines.forEach(line => { doc.text(line, x, y); y += step; });
-    return y;
-  }
-
-  // ════════════════════════════════════════════
-  // SLIDE 1 — CAPA
-  // ════════════════════════════════════════════
-  sf(CAC); doc.rect(0,0,W,H,'F');
-
-  // Decorative accent line top-left
-  sf(TIT); doc.rect(mL, mT, 50, 1, 'F');
-
-  // Label
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); sc(MIR);
-  doc.text('ECOSSISTEMA DONAS DO OURO', mL, mT + 16);
-
-  // Main title
-  doc.setFont('helvetica','bold'); doc.setFontSize(54); sc(MARF);
-  doc.text('Plano de', mL, mT + 48);
-  doc.setFont('helvetica','italic'); doc.setFontSize(54); sc(TIT);
-  doc.text('Ouro', mL, mT + 68);
-
-  // Divider
-  sf(TIT); doc.rect(mL, mT + 80, cW * 0.4, .3, 'F');
-
-  // Client name
-  doc.setFont('helvetica','normal'); doc.setFontSize(13); sc(CRE);
-  doc.text('Preparado exclusivamente para', mL, mT + 96);
-  doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(MARF);
-  doc.text(d.nome_cliente, mL, mT + 112);
-
-  // Bottom right brand
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(MIR);
-  doc.text('ISIS MOREIRA', W - mR, H - 28, {align:'right'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(7); sc(MIR);
-  doc.text('Mentora de Negócios e Mentalidade', W - mR, H - 22, {align:'right'});
-
-  // Accent bar bottom
-  sf(TIT); doc.rect(W - mR - 30, H - 16, 30, .5, 'F');
-
-  // ════════════════════════════════════════════
-  // SLIDE 2 — DIAGNÓSTICO
-  // ════════════════════════════════════════════
-  doc.addPage([W,H],'landscape');
-  sf(MARF); doc.rect(0,0,W,H,'F');
-
-  // Left column: title
-  const col1W = cW * 0.35;
-  const col2X = mL + col1W + 20;
-  const col2W = cW - col1W - 20;
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('01 · DIAGNÓSTICO', mL, mT + 4);
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(32); sc(CAC);
-  doc.text('Onde você', mL, mT + 28);
-  doc.text('está', mL, mT + 42);
-  doc.setFont('helvetica','italic'); doc.setFontSize(32); sc(TIT);
-  doc.text('hoje', mL + doc.getTextWidth('está '), mT + 42);
-
-  // Left decorative line
-  sf(TIT); doc.rect(mL, mT + 50, 40, .5, 'F');
-
-  // Right column: content
-  sf(CRE); doc.roundedRect(col2X - 10, mT - 4, col2W + 20, H - mT - 26, 4, 4, 'F');
-  wt(d.diagnostico, col2X, mT + 16, col2W, 11.5, 'helvetica','normal', CAC, 6.5);
-
-  footer(2);
-
-  // ════════════════════════════════════════════
-  // SLIDE 3 — VISÃO DE FUTURO
-  // ════════════════════════════════════════════
-  doc.addPage([W,H],'landscape');
-  sf(CAC); doc.rect(0,0,W,H,'F');
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('02 · VISÃO DE FUTURO', mL, mT + 4);
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(32); sc(MARF);
-  doc.text('Onde você', mL, mT + 28);
-  doc.text('pode', mL, mT + 42);
-  doc.setFont('helvetica','italic'); doc.setFontSize(32); sc(TIT);
-  doc.text('chegar', mL + doc.getTextWidth('pode '), mT + 42);
-
-  sf(TIT); doc.rect(mL, mT + 50, 40, .5, 'F');
-
-  // Right content card
-  sf(DARK); doc.roundedRect(col2X - 10, mT - 4, col2W + 20, H - mT - 26, 4, 4, 'F');
-  wt(d.visao, col2X, mT + 16, col2W, 11.5, 'helvetica','normal', CRE, 6.5);
-
-  footer(3);
-
-  // ════════════════════════════════════════════
-  // SLIDES 4-6 — PILARES (one per slide)
-  // ════════════════════════════════════════════
-  d.pilares.forEach((pilar, idx) => {
-    doc.addPage([W,H],'landscape');
-    const isEven = idx % 2 === 0;
-
-    if (isEven) {
-      sf(MARF); doc.rect(0,0,W,H,'F');
-    } else {
-      sf(CAC); doc.rect(0,0,W,H,'F');
-    }
-
-    // Section label
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-    doc.text(`03 · PILAR ${String(idx+1).padStart(2,'0')}`, mL, mT + 4);
-
-    // Big number
-    doc.setFont('helvetica','bold'); doc.setFontSize(100);
-    if (isEven) { sc([235,230,220]); } else { sc(DARK); }
-    doc.text(String(idx+1).padStart(2,'0'), W - mR - 10, mT + 55, {align:'right'});
-
-    // Title
-    doc.setFont('helvetica','bold'); doc.setFontSize(30);
-    sc(isEven ? CAC : MARF);
-    doc.text(pilar.titulo, mL, mT + 40);
-
-    // Accent line
-    sf(TIT); doc.rect(mL, mT + 48, 50, .5, 'F');
-
-    // Description
-    wt(pilar.descricao, mL, mT + 64, cW * 0.6, 12, 'helvetica','normal', isEven ? CAC : CRE, 7);
-
-    footer(3 + idx + 1);
-  });
-
-  // ════════════════════════════════════════════
-  // SLIDE 7 — AÇÕES PRÁTICAS
-  // ════════════════════════════════════════════
-  doc.addPage([W,H],'landscape');
-  sf(MARF); doc.rect(0,0,W,H,'F');
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('04 · AÇÕES PRÁTICAS', mL, mT + 4);
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(CAC);
-  doc.text('O que fazer', mL, mT + 28);
-  doc.setFont('helvetica','italic'); doc.setFontSize(28); sc(TIT);
-  doc.text('agora', mL + doc.getTextWidth('O que fazer '), mT + 28);
-
-  sf(TIT); doc.rect(mL, mT + 35, 40, .5, 'F');
-
-  // Action items in 2 columns
-  const aColW = (cW - 16) / 2;
-  d.acoes.forEach((acao, idx) => {
-    const isLeft = idx < 3;
-    const ax = isLeft ? mL : mL + aColW + 16;
-    const row = isLeft ? idx : idx - 3;
-    const ay = mT + 52 + row * 28;
-
-    // Number circle
-    sf(TIT); doc.circle(ax + 5, ay - 1, 5, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); sc(MARF);
-    doc.text(String(idx+1), ax + 5, ay + 1, {align:'center'});
-
-    // Text
-    doc.setFont('helvetica','normal'); doc.setFontSize(10.5); sc(CAC);
-    const lines = doc.splitTextToSize(acao, aColW - 20);
-    lines.forEach((l,i) => doc.text(l, ax + 16, ay + (i * 5)));
-  });
-
-  footer(7);
-
-  // ════════════════════════════════════════════
-  // SLIDE 8 — MENSAGEM FINAL
-  // ════════════════════════════════════════════
-  doc.addPage([W,H],'landscape');
-  sf(CAC); doc.rect(0,0,W,H,'F');
-
-  // Centered content
-  const cx = W / 2;
-
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('MENSAGEM FINAL', cx, mT + 10, {align:'center'});
-
-  // Accent line
-  sf(TIT); doc.rect(cx - 25, mT + 16, 50, .5, 'F');
-
-  // Large quote marks
-  doc.setFont('helvetica','bold'); doc.setFontSize(60); sc(DARK);
-  doc.text('"', cx - 5, mT + 46, {align:'center'});
-
-  // Message text
-  doc.setFont('helvetica','italic'); doc.setFontSize(14); sc(MARF);
-  const msgLines = doc.splitTextToSize(d.mensagem_final, cW * 0.65);
-  let my = mT + 60;
-  msgLines.forEach(l => { doc.text(l, cx, my, {align:'center'}); my += 7.5; });
-
-  // Closing quote
-  doc.setFont('helvetica','bold'); doc.setFontSize(60); sc(DARK);
-  doc.text('"', cx + 5, my + 10, {align:'center'});
-
-  // Signature
-  sf(TIT); doc.rect(cx - 20, my + 22, 40, .5, 'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); sc(MARF);
-  doc.text('ISIS MOREIRA', cx, my + 34, {align:'center'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
-  doc.text('Mentora de Negócios e Mentalidade', cx, my + 41, {align:'center'});
-  sc(TIT); doc.setFont('helvetica','italic'); doc.setFontSize(9);
-  doc.text('Alinhada. Livre. Leve.', cx, my + 49, {align:'center'});
-
-  footer(8);
-
-  // ── SAVE ──
-  doc.save(`Plano_de_Ouro_${d.nome_cliente.replace(/\s+/g,'_')}.pdf`);
-}
 </script>
 </body>
 </html>
