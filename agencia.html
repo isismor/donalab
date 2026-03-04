@@ -1215,10 +1215,9 @@ async function exportDrive(){
 
     // Send to n8n webhook
     try{
-      await fetch('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',{
+      const whRes=await fetch('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        mode:'no-cors',
         body:JSON.stringify({
           nome:genData.cliente_nome||'Cliente',
           email:$('gem').value.trim()||'',
@@ -1226,7 +1225,12 @@ async function exportDrive(){
           link:link
         })
       });
-    }catch(e){console.log('Webhook n8n:',e);}
+      console.log('Webhook status:',whRes.status);
+      dr.innerHTML+=` <span style="color:#4CAF50;font-size:11px;">· n8n ✓</span>`;
+    }catch(e){
+      console.error('Webhook error:',e);
+      dr.innerHTML+=` <span style="color:#E8614D;font-size:11px;">· n8n: ${e.message}</span>`;
+    }
 
   }catch(err){
     console.error('Drive export error:',err);
