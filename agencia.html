@@ -1147,7 +1147,8 @@ async function appendToSheet(clientName,driveLink){
   const today=new Date().toLocaleDateString('pt-BR');
   // Append: A=Nome, B=Data, C=(vazio), D=Link
   const body={values:[[clientName,today,'',driveLink]]};
-  const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:D:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{
+  const range=encodeURIComponent('Página1!A:D');
+  const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,{
     method:'POST',
     headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},
     body:JSON.stringify(body)
@@ -1220,10 +1221,16 @@ async function exportDrive(){
     const sheetId=localStorage.getItem('gsi');
     if(sheetId){
       dr.innerHTML='<span style="color:var(--titanium);">⏳ Registrando na planilha...</span>';
-      await appendToSheet(genData.cliente_nome||'Cliente',link);
+      try{
+        await appendToSheet(genData.cliente_nome||'Cliente',link);
+        dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive + Planilha!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
+      }catch(shErr){
+        console.error('Sheet error:',shErr);
+        dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <span style="color:#E8614D;">(Planilha: ${shErr.message})</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
+      }
+    }else{
+      dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
     }
-
-    dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive + Planilha!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
 
   }catch(err){
     console.error('Drive export error:',err);
