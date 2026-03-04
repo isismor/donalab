@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agência | Isis Moreira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400;1,9..40,500;1,9..40,700&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --marfim: #F5F0E6;
+  --creme: #EDE6D8;
+  --titanium: #BAA78C;
+  --cacao: #231710;
+  --mirror: #93979B;
+  --mirror-10: rgba(147,151,155,.06);
+  --mirror-20: rgba(147,151,155,.10);
+  --mirror-30: rgba(147,151,155,.18);
+  --cacao-70: rgba(35,23,16,.70);
+  --cacao-20: rgba(35,23,16,.20);
+  --cacao-10: rgba(35,23,16,.10);
+  --cacao-05: rgba(35,23,16,.05);
+  --marfim-20: rgba(245,240,230,.20);
+  --marfim-10: rgba(245,240,230,.10);
+  --marfim-05: rgba(245,240,230,.04);
+  --shadow-sm: 0 1px 2px rgba(35,23,16,.06);
+  --shadow-md: 0 2px 6px rgba(35,23,16,.08);
+  --shadow-precision: 0 1px 3px rgba(35,23,16,.12), 0 0 0 1px rgba(35,23,16,.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 100px;
+  --sans: 'DM Sans', sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --mono: 'Outfit', sans-serif;
+  --sidebar-w: 280px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--marfim);
+  color: var(--cacao);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+}
+::selection { background: var(--titanium); color: var(--marfim); }
+
+/* ═══════════════ LOGIN ═══════════════ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--cacao);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .5s, visibility .5s;
+}
+#login-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.login-container { width: 100%; max-width: 420px; padding: 0 24px; text-align: center; }
+.login-brand { font-weight: 900; font-size: 14px; letter-spacing: 6px; text-transform: uppercase; color: var(--marfim); margin-bottom: 6px; }
+.login-sub { font-family: var(--serif); font-style: italic; font-size: 28px; color: var(--titanium); margin-bottom: 48px; }
+
+.login-card {
+  background: var(--marfim-05); border: 1px solid var(--marfim-10);
+  border-radius: var(--radius-xl); padding: 40px 32px;
+}
+.login-card h2 { font-weight: 800; font-size: 22px; color: var(--marfim); margin-bottom: 6px; }
+.login-card p { font-size: 13px; color: var(--mirror); margin-bottom: 28px; }
+
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-group label { display: block; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--titanium); margin-bottom: 8px; }
+.form-group input { width: 100%; padding: 14px 18px; background: rgba(245,240,230,.06); border: 1px solid var(--marfim-10); border-radius: var(--radius-md); color: var(--marfim); font-family: var(--sans); font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
+.form-group input::placeholder { color: var(--mirror); opacity: .5; }
+.form-group input:focus { border-color: var(--titanium); box-shadow: 0 0 0 3px rgba(186,167,140,.15); }
+
+.login-btn { width: 100%; padding: 15px; background: var(--titanium); color: var(--cacao); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; margin-top: 8px; }
+.login-btn:hover { background: #C4B39A; }
+.login-error { color: #E8614D; font-size: 13px; margin-top: 14px; min-height: 20px; }
+.login-footer { margin-top: 40px; font-family: var(--mono); font-size: 11px; color: var(--mirror); letter-spacing: 1px; }
+
+/* ═══════════════ LAYOUT ═══════════════ */
+#app { display: none; height: 100vh; width: 100vw; }
+#app.active { display: flex; }
+
+.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--cacao); display: flex; flex-direction: column; border-right: 1px solid var(--marfim-10); }
+.sidebar-header { padding: 28px 24px 20px; border-bottom: 1px solid var(--marfim-10); }
+.sidebar-brand { font-weight: 900; font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--marfim); margin-bottom: 2px; }
+.sidebar-label { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--titanium); }
+.sidebar-section-label { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mirror); padding: 24px 24px 10px; }
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 0 12px; }
+
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-md); cursor: pointer; transition: background .15s; color: var(--creme); font-size: 14px; font-weight: 500; margin-bottom: 2px; border: 1px solid transparent; }
+.nav-item:hover { background: var(--marfim-05); border-color: var(--marfim-10); }
+.nav-item.active { background: rgba(186,167,140,.08); border-color: rgba(186,167,140,.15); color: var(--marfim); }
+.nav-item.active .nav-icon { color: var(--titanium); background: rgba(186,167,140,.1); border-color: rgba(186,167,140,.2); }
+
+.nav-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; background: var(--marfim-05); border: 1px solid var(--marfim-10); color: var(--mirror); transition: all .15s; }
+.nav-text { display: flex; flex-direction: column; }
+.nav-text span:first-child { font-weight: 700; font-size: 13.5px; }
+.nav-text span:last-child { font-family: var(--mono); font-size: 10px; color: var(--mirror); margin-top: 1px; }
+
+.sidebar-footer { padding: 16px 24px; border-top: 1px solid var(--marfim-10); display: flex; align-items: center; justify-content: space-between; }
+.sidebar-user { display: flex; align-items: center; gap: 10px; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--titanium); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: var(--cacao); }
+.user-info span:first-child { font-size: 12px; font-weight: 700; color: var(--marfim); display: block; }
+.user-info span:last-child { font-family: var(--mono); font-size: 10px; color: var(--mirror); }
+
+.logout-btn { background: none; border: 1px solid var(--marfim-10); border-radius: var(--radius-sm); color: var(--mirror); padding: 6px 8px; cursor: pointer; font-size: 14px; transition: all .15s; }
+.logout-btn:hover { border-color: rgba(232,97,77,.3); color: #E8614D; background: rgba(232,97,77,.06); }
+
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--marfim); }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 1px solid var(--creme); min-height: 60px; }
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-title { font-weight: 800; font-size: 18px; letter-spacing: -.2px; }
+.topbar-badge { font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--titanium); background: rgba(186,167,140,.1); border: 1px solid rgba(186,167,140,.2); padding: 4px 10px; border-radius: var(--radius-full); }
+
+.content-area { flex: 1; overflow-y: auto; padding: 40px 32px; }
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .35s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-header { margin-bottom: 40px; }
+.page-header .sec-num { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--titanium); display: block; margin-bottom: 12px; }
+.page-header h1 { font-weight: 900; font-size: clamp(32px, 4vw, 48px); line-height: 1.05; letter-spacing: -1px; margin-bottom: 12px; }
+.page-header h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--titanium); }
+.page-header p { font-size: 15px; color: var(--cacao-70); max-width: 560px; line-height: 1.8; }
+
+/* ─── PLANO DE OURO ─── */
+.po-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: calc(100vh - 260px); }
+.po-panel { border-radius: var(--radius-xl); padding: 32px; overflow-y: auto; max-height: calc(100vh - 240px); }
+.po-panel-input { background: var(--creme); border: 1px solid var(--cacao-05); }
+.po-panel-preview { background: var(--cacao); border: 1px solid var(--marfim-10); color: var(--marfim); }
+.po-panel h3 { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+.po-panel-preview h3 { color: var(--marfim); }
+.panel-sub { font-family: var(--mono); font-size: 11px; color: var(--mirror); margin-bottom: 24px; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-family: var(--mono); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--cacao); margin-bottom: 8px; }
+.field input, .field textarea, .field select { width: 100%; padding: 12px 16px; background: var(--marfim); border: 1px solid var(--cacao-10); border-radius: var(--radius-md); color: var(--cacao); font-family: var(--sans); font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--titanium); box-shadow: 0 0 0 3px rgba(186,167,140,.12); }
+.field textarea { resize: vertical; min-height: 200px; line-height: 1.7; }
+.field .field-hint { font-size: 12px; color: var(--mirror); margin-top: 6px; }
+
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--cacao); color: var(--marfim); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.btn-primary:hover { background: #3a2a1d; box-shadow: var(--shadow-md); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-titanium { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--titanium); color: var(--cacao); border: none; border-radius: var(--radius-md); font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.btn-titanium:hover { background: #C4B39A; }
+.btn-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: transparent; color: var(--creme); border: 1px solid var(--marfim-10); border-radius: var(--radius-md); font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn-ghost:hover { border-color: var(--marfim-20); background: var(--marfim-05); }
+.btn-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+
+.preview-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; text-align: center; color: var(--mirror); }
+.preview-placeholder .ph-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.preview-placeholder p { font-size: 14px; max-width: 280px; line-height: 1.7; }
+
+.gen-progress { display: none; margin-top: 20px; }
+.gen-progress.active { display: block; }
+.progress-bar-bg { width: 100%; height: 4px; background: var(--marfim-10); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 16px; }
+.progress-bar-fill { height: 100%; background: var(--titanium); border-radius: var(--radius-full); width: 0%; transition: width .6s ease; }
+.progress-steps { display: flex; flex-direction: column; gap: 10px; }
+.progress-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--mirror); transition: color .3s; }
+.progress-step.done { color: var(--creme); }
+.progress-step.current { color: var(--titanium); }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mirror); flex-shrink: 0; transition: all .3s; }
+.progress-step.done .step-dot { background: var(--titanium); }
+.progress-step.current .step-dot { background: var(--titanium); box-shadow: 0 0 0 4px rgba(186,167,140,.2); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 4px rgba(186,167,140,.15); } 50% { box-shadow: 0 0 0 8px rgba(186,167,140,.05); } }
+
+.result-container { display: none; margin-top: 20px; }
+.result-container.active { display: block; }
+.result-content { background: var(--marfim); border-radius: var(--radius-lg); padding: 28px; color: var(--cacao); max-height: 420px; overflow-y: auto; margin-bottom: 16px; }
+.result-content h4 { font-weight: 900; font-size: 20px; margin-bottom: 2px; }
+.result-content .rc-sub { font-family: var(--serif); font-style: italic; color: var(--titanium); font-size: 14px; margin-bottom: 18px; }
+.result-content .rc-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--creme); }
+.result-content .rc-section h5 { font-weight: 800; font-size: 13px; margin-bottom: 4px; letter-spacing: -.1px; }
+.result-content .rc-section p { font-size: 13px; line-height: 1.8; color: var(--cacao-70); }
+.result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ─── CONTEUDO ALCANCE ─── */
+.tool-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 32px; }
+.tool-card { background: var(--creme); border: 1px solid var(--cacao-05); border-radius: var(--radius-lg); padding: 28px; }
+.tool-card-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(186,167,140,.1); border: 1px solid rgba(186,167,140,.2); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 18px; }
+.tool-card h3 { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+.tool-card p { font-size: 13.5px; color: var(--cacao-70); line-height: 1.7; }
+.tool-card-tag { display: inline-block; margin-top: 14px; font-family: var(--mono); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: var(--radius-full); }
+.status-soon { color: var(--mirror); background: var(--mirror-10); border: 1px solid var(--mirror-20); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--cacao-10); border-radius: 3px; }
+.sidebar ::-webkit-scrollbar-thumb, .po-panel-preview ::-webkit-scrollbar-thumb { background: var(--marfim-10); }
+
+@media (max-width: 1024px) { .po-layout { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .sidebar { display: none; } :root { --sidebar-w: 0px; } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-container">
+    <div class="login-brand">ISIS MOREIRA</div>
+    <div class="login-sub">Agência</div>
+    <div class="login-card">
+      <h2>Acesse o sistema</h2>
+      <p>Área interna de criação de conteúdo</p>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="login-btn" id="login-submit">Entrar</button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+    <div class="login-footer">Ecossistema Donas do Ouro</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">ISIS MOREIRA</div>
+      <div class="sidebar-label">Agência</div>
+    </div>
+    <div class="sidebar-section-label">Geradores</div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="plano-ouro">
+        <div class="nav-icon">✦</div>
+        <div class="nav-text"><span>Plano de Ouro</span><span>Gerador de e-book</span></div>
+      </div>
+      <div class="nav-item" data-page="conteudo-alcance">
+        <div class="nav-icon">◎</div>
+        <div class="nav-text"><span>Conteúdo de Alto Alcance</span><span>Posts e carrosséis</span></div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">IM</div>
+        <div class="user-info"><span>Isis Moreira</span><span>Admin</span></div>
+      </div>
+      <button class="logout-btn" id="logout-btn" title="Sair">⏻</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title" id="topbar-title">Plano de Ouro</span>
+        <span class="topbar-badge">GERADOR</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--mirror);letter-spacing:1px;">v1.0</div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- PLANO DE OURO -->
+      <div class="page active" id="page-plano-ouro">
+        <div class="page-header">
+          <span class="sec-num">Gerador Automático</span>
+          <h1>Plano de <em>Ouro</em></h1>
+          <p>Cole os dados do questionário da cliente. O agente copywriter cria o conteúdo personalizado e o diagramador gera o PDF estilizado.</p>
+        </div>
+
+        <div class="po-layout">
+          <div class="po-panel po-panel-input">
+            <h3>Dados da Cliente</h3>
+            <p class="panel-sub">Cole o nome e as respostas do questionário</p>
+
+            <div class="field">
+              <label>Nome da Cliente</label>
+              <input type="text" id="po-nome" placeholder="Ex: Maria Clara">
+            </div>
+
+            <div class="field">
+              <label>Dados do Questionário</label>
+              <textarea id="po-dados" placeholder="Cole aqui todas as respostas do questionário da cliente...
+
+Ex:
+1. Qual seu nicho? Moda feminina
+2. Há quanto tempo empreende? 3 anos
+3. Principal desafio? Não consigo escalar
+4. Faturamento atual? R$ 15.000/mês
+5. Onde quer chegar? R$ 50.000/mês
+6. O que já tentou? Tráfego pago, mentorias
+7. Como se sente? Cansada e desalinhada
+..."></textarea>
+              <p class="field-hint">Cole texto livre. O agente interpreta e estrutura automaticamente.</p>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" id="btn-generate" onclick="startGeneration()">✦ Gerar Plano de Ouro</button>
+            </div>
+          </div>
+
+          <div class="po-panel po-panel-preview">
+            <h3>Resultado</h3>
+            <p class="panel-sub">Agentes: Copywriter → Diagramador</p>
+
+            <div class="preview-placeholder" id="po-placeholder">
+              <div class="ph-icon">✦</div>
+              <p>Preencha os dados e clique em <strong>Gerar Plano de Ouro</strong> para iniciar os agentes.</p>
+            </div>
+
+            <div class="gen-progress" id="po-progress">
+              <div class="progress-bar-bg"><div class="progress-bar-fill" id="po-fill"></div></div>
+              <div class="progress-steps">
+                <div class="progress-step" data-step="1"><span class="step-dot"></span> Analisando dados da cliente</div>
+                <div class="progress-step" data-step="2"><span class="step-dot"></span> Agente Copywriter escrevendo</div>
+                <div class="progress-step" data-step="3"><span class="step-dot"></span> Revisando tom de voz da marca</div>
+                <div class="progress-step" data-step="4"><span class="step-dot"></span> Agente Diagramador montando PDF</div>
+                <div class="progress-step" data-step="5"><span class="step-dot"></span> Finalizando Plano de Ouro</div>
+              </div>
+            </div>
+
+            <div class="result-container" id="po-result">
+              <div class="result-content" id="po-result-content"></div>
+              <div class="result-actions">
+                <button class="btn-titanium" onclick="downloadPDF()">📥 Baixar PDF Estilizado</button>
+                <button class="btn-ghost" onclick="resetGeneration()">↻ Novo Plano</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTEÚDO ALTO ALCANCE -->
+      <div class="page" id="page-conteudo-alcance">
+        <div class="page-header">
+          <span class="sec-num">Criação de Conteúdo</span>
+          <h1>Conteúdo de <em>Alto Alcance</em></h1>
+          <p>Ferramentas para criar posts, carrosséis e conteúdos de alto impacto para redes sociais.</p>
+        </div>
+        <div class="tool-cards">
+          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">📱</div><h3>Carrossel Instagram</h3><p>Gerador de carrosséis editoriais com textos e estrutura visual.</p><span class="tool-card-tag status-soon">Em breve</span></div>
+          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">✍️</div><h3>Legendas de Alto Impacto</h3><p>Copy para posts que conectam e convertem, no tom da marca.</p><span class="tool-card-tag status-soon">Em breve</span></div>
+          <div class="tool-card" style="opacity:.5;cursor:default;"><div class="tool-card-icon">🎬</div><h3>Roteiros de Reels</h3><p>Scripts curtos para vídeos com gancho, desenvolvimento e CTA.</p><span class="tool-card-tag status-soon">Em breve</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════ AUTH ═══════════════
+const VALID_EMAIL = 'contato@isismoreira.com.br';
+const VALID_PASS = 'time123';
+
+document.getElementById('login-submit').addEventListener('click', doLogin);
+document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-password').focus(); });
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  if (!email || !pass) { err.textContent = 'Preencha todos os campos.'; return; }
+  if (email === VALID_EMAIL && pass === VALID_PASS) {
+    err.textContent = '';
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+    sessionStorage.setItem('agencia_auth','1');
+  } else { err.textContent = 'E-mail ou senha incorretos.'; }
+}
+if (sessionStorage.getItem('agencia_auth')==='1') { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('app').classList.add('active'); }
+document.getElementById('logout-btn').addEventListener('click', () => { sessionStorage.removeItem('agencia_auth'); location.reload(); });
+
+// ═══════════════ NAV ═══════════════
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+item.dataset.page).classList.add('active');
+    document.getElementById('topbar-title').textContent = { 'plano-ouro':'Plano de Ouro', 'conteudo-alcance':'Conteúdo de Alto Alcance' }[item.dataset.page];
+  });
+});
+
+// ═══════════════ PLANO DE OURO ENGINE ═══════════════
+let generatedData = null;
+
+const COPY_SYSTEM = `Você é o Agente Copywriter da marca Isis Moreira — Ecossistema Donas do Ouro.
+
+MISSÃO: Criar um "Plano de Ouro" personalizado para a cliente com base nas respostas do questionário.
+
+TOM DE VOZ:
+- Firme sem ser dura. Verdadeira sem ser rude. Leve sem ser superficial.
+- Didática sem ser condescendente. Frases limpas e objetivas.
+- Bordões: "Alinhada. Livre. Leve.", "Pense além. Seja dona.", "Quem se alinha, chega."
+
+Responda APENAS com JSON válido (sem markdown, sem backticks):
+
+{
+  "nome_cliente": "Nome",
+  "diagnostico": "3-5 linhas: diagnóstico personalizado da situação atual. Firme e verdadeira.",
+  "visao": "2-3 linhas: visão de futuro — onde ela pode chegar.",
+  "pilares": [
+    { "titulo": "Nome do Pilar", "descricao": "2-3 linhas aplicadas à realidade dela." },
+    { "titulo": "Segundo Pilar", "descricao": "2-3 linhas." },
+    { "titulo": "Terceiro Pilar", "descricao": "2-3 linhas." }
+  ],
+  "acoes": [
+    "Ação prática 1 — específica",
+    "Ação prática 2 — específica",
+    "Ação prática 3 — específica",
+    "Ação prática 4 — específica",
+    "Ação prática 5 — específica"
+  ],
+  "mensagem_final": "2-3 linhas de mensagem firme e pessoal, usando o nome da cliente."
+}
+
+REGRAS:
+- Conteúdo 100% personalizado com dados reais
+- Use o nome da cliente no texto
+- Nada genérico. Máxima clareza, mínimo floreio
+- Pilares refletem os desafios reais
+- Ações práticas e executáveis
+- APENAS o JSON, nada mais`;
+
+function setStep(num) {
+  const steps = document.querySelectorAll('#po-progress .progress-step');
+  steps.forEach((s, i) => {
+    s.classList.remove('done','current');
+    if (i+1 < num) s.classList.add('done');
+    else if (i+1 === num) s.classList.add('current');
+  });
+  document.getElementById('po-fill').style.width = (num/5*100)+'%';
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function startGeneration() {
+  const nome = document.getElementById('po-nome').value.trim();
+  const dados = document.getElementById('po-dados').value.trim();
+  if (!nome) { alert('Preencha o nome da cliente.'); return; }
+  if (!dados) { alert('Cole os dados do questionário.'); return; }
+
+  // Reset UI
+  document.getElementById('po-placeholder').style.display = 'none';
+  document.getElementById('po-result').classList.remove('active');
+  document.getElementById('po-progress').classList.add('active');
+  document.getElementById('btn-generate').disabled = true;
+  document.getElementById('po-fill').style.width = '0%';
+
+  // Step 1
+  setStep(1);
+  await wait(900);
+
+  // Step 2 — call Copywriter
+  setStep(2);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: COPY_SYSTEM,
+        messages: [{ role: 'user', content: `NOME DA CLIENTE: ${nome}\n\nDADOS DO QUESTIONÁRIO:\n${dados}` }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content.map(c => c.text || '').join('');
+    generatedData = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    // Step 3 — review
+    setStep(3);
+    await wait(1000);
+
+    // Step 4 — PDF layout
+    setStep(4);
+    await wait(1200);
+
+    // Step 5 — done
+    setStep(5);
+    await wait(600);
+
+    document.getElementById('po-progress').classList.remove('active');
+    showResult(generatedData);
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('po-progress').classList.remove('active');
+    document.getElementById('po-placeholder').style.display = 'flex';
+    document.getElementById('po-placeholder').querySelector('p').innerHTML = `<span style="color:#E8614D;">⚠ Erro: ${err.message}</span><br>Verifique a conexão e tente novamente.`;
+  }
+
+  document.getElementById('btn-generate').disabled = false;
+}
+
+function showResult(d) {
+  const el = document.getElementById('po-result-content');
+  el.innerHTML = `
+    <h4>Plano de Ouro — ${d.nome_cliente}</h4>
+    <div class="rc-sub">Ecossistema Donas do Ouro · Isis Moreira</div>
+    <div class="rc-section"><h5>Diagnóstico</h5><p>${d.diagnostico}</p></div>
+    <div class="rc-section"><h5>Visão de Futuro</h5><p>${d.visao}</p></div>
+    ${d.pilares.map((p,i) => `<div class="rc-section"><h5>✦ Pilar ${i+1}: ${p.titulo}</h5><p>${p.descricao}</p></div>`).join('')}
+    <div class="rc-section"><h5>Ações Práticas</h5>${d.acoes.map((a,i) => `<p><strong>${i+1}.</strong> ${a}</p>`).join('')}</div>
+    <div class="rc-section"><h5>Mensagem Final</h5><p style="font-style:italic;color:var(--titanium);">${d.mensagem_final}</p></div>
+  `;
+  document.getElementById('po-result').classList.add('active');
+}
+
+function resetGeneration() {
+  document.getElementById('po-nome').value = '';
+  document.getElementById('po-dados').value = '';
+  document.getElementById('po-result').classList.remove('active');
+  document.getElementById('po-placeholder').style.display = 'flex';
+  document.getElementById('po-placeholder').querySelector('p').innerHTML = 'Preencha os dados e clique em <strong>Gerar Plano de Ouro</strong> para iniciar os agentes.';
+  generatedData = null;
+}
+
+// ═══════════════ PDF GENERATOR (DIAGRAMADOR) ═══════════════
+function downloadPDF() {
+  if (!generatedData) return;
+  const d = generatedData;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('portrait','mm','a4');
+
+  const W=210, H=297, mL=28, mR=28, cW=W-mL-mR;
+  const MARF=[245,240,230], CAC=[35,23,16], TIT=[186,167,140], CRE=[237,230,216], MIR=[147,151,155];
+
+  const sc = (c) => doc.setTextColor(c[0],c[1],c[2]);
+  const sf = (c) => doc.setFillColor(c[0],c[1],c[2]);
+
+  function footer(n) {
+    sc(MIR); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text('ISIS MOREIRA  ·  PLANO DE OURO  ·  ECOSSISTEMA DONAS DO OURO', W/2, H-12, {align:'center'});
+    doc.text(String(n).padStart(2,'0'), W-mR, H-12, {align:'right'});
+  }
+
+  function wrapText(text, x, startY, maxW, size, font, style, color, lh) {
+    doc.setFont(font||'helvetica', style||'normal');
+    doc.setFontSize(size||10);
+    sc(color||CAC);
+    const lines = doc.splitTextToSize(text, maxW||cW);
+    const step = lh || size*0.48;
+    let y = startY;
+    lines.forEach(line => {
+      if (y+step > H-20) { footer(doc.internal.getNumberOfPages()); doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F'); y=35; }
+      doc.text(line, x, y); y+=step;
+    });
+    return y;
+  }
+
+  // ── CAPA ──
+  sf(CAC); doc.rect(0,0,W,H,'F');
+  sf(TIT); doc.rect(mL,40,40,.8,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
+  doc.text('ECOSSISTEMA DONAS DO OURO', mL, 52);
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(42); sc(MARF);
+  doc.text('Plano de', mL, 90);
+  sc(TIT); doc.setFont('helvetica','italic'); doc.text('Ouro', mL, 108);
+
+  sf(TIT); doc.rect(mL,128,cW,.3,'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(14); sc(CRE);
+  doc.text('Preparado exclusivamente para', mL, 146);
+  doc.setFont('helvetica','bold'); doc.setFontSize(24); sc(MARF);
+  doc.text(d.nome_cliente, mL, 162);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
+  doc.text('ISIS MOREIRA', mL, H-30);
+  doc.text('Mentora de Negócios e Mentalidade', mL, H-24);
+  sf(TIT); doc.rect(mL,H-16,20,.5,'F');
+
+  // ── DIAGNÓSTICO + VISÃO ──
+  doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F');
+  let y = 35;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('DIAGNÓSTICO', mL, y); y+=14;
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
+  doc.text('Onde você está', mL, y); y+=10;
+  doc.setFont('helvetica','italic'); sc(TIT); doc.text('hoje', mL, y); y+=16;
+  sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=12;
+  y = wrapText(d.diagnostico, mL, y, cW, 11, 'helvetica','normal', CAC, 5.5);
+  y += 24;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('VISÃO DE FUTURO', mL, y); y+=14;
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
+  doc.text('Onde você pode', mL, y); y+=10;
+  doc.setFont('helvetica','italic'); sc(TIT); doc.text('chegar', mL, y); y+=16;
+  sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=12;
+  y = wrapText(d.visao, mL, y, cW, 11, 'helvetica','normal', CAC, 5.5);
+  footer(2);
+
+  // ── PILARES ──
+  doc.addPage(); sf(CAC); doc.rect(0,0,W,H,'F');
+  y = 35;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('PILARES DO PLANO', mL, y); y+=14;
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(MARF);
+  doc.text('Seus pilares de', mL, y); y+=10;
+  doc.setFont('helvetica','italic'); sc(TIT); doc.text('transformação', mL, y); y+=22;
+
+  d.pilares.forEach((p, idx) => {
+    sf([40,30,22]); doc.roundedRect(mL, y, cW, 44, 3, 3, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(TIT);
+    doc.text(String(idx+1).padStart(2,'0'), mL+8, y+17);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); sc(MARF);
+    doc.text(p.titulo, mL+30, y+14);
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); sc(CRE);
+    const dl = doc.splitTextToSize(p.descricao, cW-38);
+    dl.slice(0,3).forEach((l,i) => doc.text(l, mL+30, y+23+i*4.5));
+    y += 52;
+  });
+  footer(3);
+
+  // ── AÇÕES ──
+  doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F');
+  y = 35;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('AÇÕES PRÁTICAS', mL, y); y+=14;
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
+  doc.text('O que fazer', mL, y); y+=10;
+  doc.setFont('helvetica','italic'); sc(TIT); doc.text('agora', mL, y); y+=20;
+
+  d.acoes.forEach((a, idx) => {
+    sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=10;
+    sf(TIT); doc.circle(mL+5, y-2, 4, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); sc(MARF);
+    doc.text(String(idx+1), mL+5, y-.5, {align:'center'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(10.5); sc(CAC);
+    const al = doc.splitTextToSize(a, cW-20);
+    al.forEach((l,i) => doc.text(l, mL+16, y+i*5));
+    y += al.length*5+10;
+  });
+  footer(4);
+
+  // ── MENSAGEM FINAL ──
+  doc.addPage(); sf(CAC); doc.rect(0,0,W,H,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('MENSAGEM FINAL', W/2, 60, {align:'center'});
+  sf(TIT); doc.rect(W/2-20, 68, 40, .5, 'F');
+
+  doc.setFont('helvetica','italic'); doc.setFontSize(15); sc(MARF);
+  const ml = doc.splitTextToSize(d.mensagem_final, cW-20);
+  let my = 90;
+  ml.forEach(l => { doc.text(l, W/2, my, {align:'center'}); my+=8; });
+
+  sf(TIT); doc.rect(W/2-15, my+16, 30, .5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); sc(MARF);
+  doc.text('ISIS MOREIRA', W/2, my+30, {align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
+  doc.text('Mentora de Negócios e Mentalidade', W/2, my+37, {align:'center'});
+  doc.text('Alinhada. Livre. Leve.', W/2, my+44, {align:'center'});
+  footer(5);
+
+  doc.save(`Plano_de_Ouro_${d.nome_cliente.replace(/\s+/g,'_')}.pdf`);
+}
+</script>
+</body>
+</html>
