@@ -1183,7 +1183,10 @@ async function uploadToDrive(pdfBlob,fileName){
     body:form
   });
   if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Erro no upload');}
-  return await res.json();
+  const fileData=await res.json();
+  // Make file public (anyone with link can view)
+  try{await fetch('https://www.googleapis.com/drive/v3/files/'+fileData.id+'/permissions',{method:'POST',headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},body:JSON.stringify({role:'reader',type:'anyone'})});}catch(e){console.log('Permission:',e);}
+  return fileData;
 }
 
 async function exportDrive(){
@@ -1395,12 +1398,12 @@ function caRenderSlide(idx,vFn){
         <div style="background:${c.creme};border:1px solid ${c.cacao}08;border-radius:${parseInt(l.bs)}px;padding:18px;display:flex;flex-direction:column;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:3px;height:14px;background:${c.titanium};border-radius:2px;"></div><h3 style="font-weight:900;font-size:${l.bs}px;">${vFn('ca_tom_titulo')}</h3></div>
           <p style="color:${c.cacao}77;margin-bottom:8px;font-family:var(--mono);font-size:${l.ls-1}px;letter-spacing:1px;text-transform:uppercase;">${vFn('ca_tom_sub')}</p>
-          <p style="font-size:${Math.round((l.bs-1)*0.85)}px;color:${c.cacao}cc;line-height:1.5;flex:1;">${tomTxt}</p>
+          <p style="font-size:${Math.round((l.bs-1)*0.935)}px;color:${c.cacao}cc;line-height:1.5;flex:1;">${tomTxt}</p>
         </div>
         <div style="background:${c.creme};border:1px solid ${c.cacao}08;border-radius:${parseInt(l.bs)}px;padding:18px;display:flex;flex-direction:column;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:3px;height:14px;background:${c.titanium};border-radius:2px;"></div><h3 style="font-weight:900;font-size:${l.bs}px;">${vFn('ca_val_titulo')}</h3></div>
           <p style="color:${c.cacao}77;margin-bottom:8px;font-family:var(--mono);font-size:${l.ls-1}px;letter-spacing:1px;text-transform:uppercase;">${vFn('ca_val_sub')}</p>
-          <div style="font-size:${Math.round((l.bs-1)*0.82)}px;color:${c.cacao}cc;line-height:1.45;flex:1;">${valTxt.split('\n').filter(s=>s.trim()).map(v=>{const clean=v.replace(/^[-–•]\s*/,'');const parts=clean.split(':');return parts.length>1?'<div style="margin-bottom:1px;"><span style="font-weight:700;">· '+parts[0].trim()+':</span> '+parts.slice(1).join(':').trim()+'</div>':'<div style="margin-bottom:1px;">· '+clean+'</div>';}).join('')}</div>
+          <div style="font-size:${Math.round((l.bs-1)*0.902)}px;color:${c.cacao}cc;line-height:1.45;flex:1;">${valTxt.split('\n').filter(s=>s.trim()).map(v=>{const clean=v.replace(/^[-–•]\s*/,'');const parts=clean.split(':');return parts.length>1?'<div style="margin-bottom:1px;"><span style="font-weight:700;">· '+parts[0].trim()+':</span> '+parts.slice(1).join(':').trim()+'</div>':'<div style="margin-bottom:1px;">· '+clean+'</div>';}).join('')}</div>
         </div>
       </div>
       ${footer}
