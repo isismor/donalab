@@ -1213,19 +1213,19 @@ async function exportDrive(){
 
     dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
 
-    // Send to n8n webhook
+    // Send to n8n webhook via hidden iframe form (bypasses CORS)
     try{
-      const whData=JSON.stringify({
-        nome:genData.cliente_nome||'Cliente',
-        email:$('gem').value.trim()||'',
-        whatsapp:$('gwh').value.trim()||'',
-        link:link
-      });
-      const blob=new Blob([whData],{type:'application/json'});
-      const sent=navigator.sendBeacon('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',blob);
-      console.log('Beacon sent:',sent);
-      if(sent) dr.innerHTML+=` <span style="color:#4CAF50;font-size:11px;">· n8n ✓</span>`;
-      else dr.innerHTML+=` <span style="color:#E8614D;font-size:11px;">· n8n falhou</span>`;
+      const whUrl='https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779';
+      let ifr=document.getElementById('wh-frame');
+      if(!ifr){ifr=document.createElement('iframe');ifr.id='wh-frame';ifr.name='wh-frame';ifr.style.display='none';document.body.appendChild(ifr);}
+      const f=document.createElement('form');
+      f.method='POST';f.action=whUrl;f.target='wh-frame';f.style.display='none';
+      const fields={nome:genData.cliente_nome||'Cliente',email:$('gem').value.trim()||'',whatsapp:$('gwh').value.trim()||'',link:link};
+      Object.entries(fields).forEach(([k,v])=>{const inp=document.createElement('input');inp.type='hidden';inp.name=k;inp.value=v;f.appendChild(inp);});
+      document.body.appendChild(f);
+      f.submit();
+      f.remove();
+      dr.innerHTML+=` <span style="color:#4CAF50;font-size:11px;">· n8n ✓</span>`;
     }catch(e){
       console.error('Webhook error:',e);
       dr.innerHTML+=` <span style="color:#E8614D;font-size:11px;">· n8n: ${e.message}</span>`;
