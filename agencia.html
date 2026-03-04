@@ -245,6 +245,11 @@ body {
         <div class="nav-icon">◎</div>
         <div class="nav-text"><span>Conteúdo de Alto Alcance</span><span>Posts e carrosséis</span></div>
       </div>
+      <div style="font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--mirror);padding:20px 14px 8px;">Sistema</div>
+      <div class="nav-item" data-page="integracoes">
+        <div class="nav-icon">⚙</div>
+        <div class="nav-text"><span>Integrações</span><span>Chaves de API</span></div>
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
@@ -350,6 +355,62 @@ Ex:
         </div>
       </div>
 
+      <!-- INTEGRAÇÕES -->
+      <div class="page" id="page-integracoes">
+        <div class="page-header">
+          <span class="sec-num">Configurações</span>
+          <h1>Integra<em>ções</em></h1>
+          <p>Configure as chaves de API necessárias para os agentes funcionarem. As chaves ficam salvas apenas no seu navegador.</p>
+        </div>
+
+        <div style="max-width:600px;">
+          <!-- Anthropic API Key -->
+          <div style="background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:32px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+              <div style="width:42px;height:42px;border-radius:var(--radius-md);background:rgba(186,167,140,.1);border:1px solid rgba(186,167,140,.2);display:flex;align-items:center;justify-content:center;font-size:18px;">🔑</div>
+              <div>
+                <h3 style="font-weight:800;font-size:15px;letter-spacing:-.2px;">Anthropic (Claude API)</h3>
+                <p style="font-family:var(--mono);font-size:10px;color:var(--mirror);letter-spacing:.5px;">Agente Copywriter · Obrigatório</p>
+              </div>
+              <div id="api-status" style="margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:var(--radius-full);"></div>
+            </div>
+
+            <div class="field">
+              <label>Chave de API</label>
+              <div style="position:relative;">
+                <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="padding-right:80px;">
+                <button onclick="toggleKeyVisibility()" id="toggle-key-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:1px solid var(--cacao-10);border-radius:var(--radius-sm);padding:4px 10px;font-family:var(--mono);font-size:10px;font-weight:800;color:var(--mirror);cursor:pointer;letter-spacing:.5px;">MOSTRAR</button>
+              </div>
+              <p class="field-hint">Sua chave da Anthropic. Começa com <code style="background:var(--cacao-05);padding:1px 5px;border-radius:3px;font-size:11px;">sk-ant-</code>. Obtenha em <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--titanium);text-decoration:underline;">console.anthropic.com</a></p>
+            </div>
+
+            <div class="field">
+              <label>Modelo</label>
+              <select id="api-model">
+                <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (recomendado)</option>
+                <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (mais rápido)</option>
+              </select>
+              <p class="field-hint">Sonnet é melhor para textos longos e personalizados. Haiku é mais rápido e mais barato.</p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:20px;">
+              <button class="btn-primary" onclick="saveApiKey()">💾 Salvar Chave</button>
+              <button class="btn-ghost" style="color:var(--mirror);border-color:var(--cacao-10);" onclick="testApiKey()">⚡ Testar Conexão</button>
+            </div>
+
+            <div id="api-test-result" style="margin-top:14px;font-size:13px;min-height:20px;"></div>
+          </div>
+
+          <!-- Info card -->
+          <div style="background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:28px;">
+            <h3 style="font-weight:800;font-size:15px;margin-bottom:8px;">🔒 Segurança</h3>
+            <p style="font-size:13px;color:var(--cacao-70);line-height:1.8;">
+              A chave fica salva <strong>apenas no localStorage do seu navegador</strong>. Ela nunca é enviada para o nosso servidor — sai direto do seu navegador para a API da Anthropic. Se limpar os dados do navegador, precisará inserir novamente.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -385,7 +446,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.add('active');
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-'+item.dataset.page).classList.add('active');
-    document.getElementById('topbar-title').textContent = { 'plano-ouro':'Plano de Ouro', 'conteudo-alcance':'Conteúdo de Alto Alcance' }[item.dataset.page];
+    document.getElementById('topbar-title').textContent = { 'plano-ouro':'Plano de Ouro', 'conteudo-alcance':'Conteúdo de Alto Alcance', 'integracoes':'Integrações' }[item.dataset.page];
   });
 });
 
@@ -463,11 +524,23 @@ async function startGeneration() {
   setStep(2);
 
   try {
+    const apiKey = localStorage.getItem('agencia_api_key');
+    const apiModel = localStorage.getItem('agencia_api_model') || 'claude-sonnet-4-20250514';
+
+    if (!apiKey) {
+      throw new Error('Chave de API não configurada. Vá em Integrações e salve sua chave da Anthropic.');
+    }
+
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: apiModel,
         max_tokens: 2000,
         system: COPY_SYSTEM,
         messages: [{ role: 'user', content: `NOME DA CLIENTE: ${nome}\n\nDADOS DO QUESTIONÁRIO:\n${dados}` }]
@@ -497,7 +570,10 @@ async function startGeneration() {
     console.error(err);
     document.getElementById('po-progress').classList.remove('active');
     document.getElementById('po-placeholder').style.display = 'flex';
-    document.getElementById('po-placeholder').querySelector('p').innerHTML = `<span style="color:#E8614D;">⚠ Erro: ${err.message}</span><br>Verifique a conexão e tente novamente.`;
+    const isKeyMissing = err.message.includes('Chave de API');
+    document.getElementById('po-placeholder').querySelector('p').innerHTML = isKeyMissing
+      ? `<span style="color:#E8614D;">⚠ ${err.message}</span><br><br><button onclick="document.querySelector('[data-page=integracoes]').click()" style="background:var(--titanium);color:var(--cacao);border:none;padding:10px 20px;border-radius:var(--radius-md);font-family:var(--sans);font-weight:700;font-size:13px;cursor:pointer;">Ir para Integrações →</button>`
+      : `<span style="color:#E8614D;">⚠ Erro: ${err.message}</span><br>Verifique a conexão e tente novamente.`;
   }
 
   document.getElementById('btn-generate').disabled = false;
@@ -526,143 +602,341 @@ function resetGeneration() {
   generatedData = null;
 }
 
-// ═══════════════ PDF GENERATOR (DIAGRAMADOR) ═══════════════
+// ═══════════════ INTEGRAÇÕES — API KEY MANAGEMENT ═══════════════
+
+function loadApiKeyStatus() {
+  const key = localStorage.getItem('agencia_api_key');
+  const statusEl = document.getElementById('api-status');
+  const inputEl = document.getElementById('api-key-input');
+  const modelEl = document.getElementById('api-model');
+
+  if (key) {
+    statusEl.textContent = 'Conectado';
+    statusEl.style.cssText += 'color:#4CAF50;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);';
+    inputEl.value = key;
+  } else {
+    statusEl.textContent = 'Não configurado';
+    statusEl.style.cssText += 'color:#E8614D;background:rgba(232,97,77,.08);border:1px solid rgba(232,97,77,.2);';
+  }
+
+  const savedModel = localStorage.getItem('agencia_api_model');
+  if (savedModel && modelEl) modelEl.value = savedModel;
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const model = document.getElementById('api-model').value;
+
+  if (!key) {
+    document.getElementById('api-test-result').innerHTML = '<span style="color:#E8614D;">Preencha a chave de API.</span>';
+    return;
+  }
+
+  if (!key.startsWith('sk-ant-')) {
+    document.getElementById('api-test-result').innerHTML = '<span style="color:#E8614D;">A chave deve começar com sk-ant-</span>';
+    return;
+  }
+
+  localStorage.setItem('agencia_api_key', key);
+  localStorage.setItem('agencia_api_model', model);
+  loadApiKeyStatus();
+  document.getElementById('api-test-result').innerHTML = '<span style="color:#4CAF50;">✓ Chave salva com sucesso!</span>';
+}
+
+async function testApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const resultEl = document.getElementById('api-test-result');
+
+  if (!key) {
+    resultEl.innerHTML = '<span style="color:#E8614D;">Preencha a chave primeiro.</span>';
+    return;
+  }
+
+  resultEl.innerHTML = '<span style="color:var(--titanium);">⏳ Testando conexão...</span>';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 50,
+        messages: [{ role: 'user', content: 'Responda apenas: OK' }]
+      })
+    });
+
+    if (res.ok) {
+      resultEl.innerHTML = '<span style="color:#4CAF50;">✓ Conexão funcionando! API respondeu com sucesso.</span>';
+    } else {
+      const err = await res.json();
+      resultEl.innerHTML = `<span style="color:#E8614D;">✕ Erro ${res.status}: ${err.error?.message || 'Chave inválida ou sem créditos.'}</span>`;
+    }
+  } catch (e) {
+    resultEl.innerHTML = `<span style="color:#E8614D;">✕ Erro de conexão: ${e.message}</span>`;
+  }
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('api-key-input');
+  const btn = document.getElementById('toggle-key-btn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'OCULTAR';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'MOSTRAR';
+  }
+}
+
+// Load saved key on page load
+document.addEventListener('DOMContentLoaded', loadApiKeyStatus);
+
+// ═══════════════ PDF GENERATOR — DIAGRAMADOR 16:9 LANDSCAPE ═══════════════
 function downloadPDF() {
   if (!generatedData) return;
   const d = generatedData;
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('portrait','mm','a4');
 
-  const W=210, H=297, mL=28, mR=28, cW=W-mL-mR;
-  const MARF=[245,240,230], CAC=[35,23,16], TIT=[186,167,140], CRE=[237,230,216], MIR=[147,151,155];
+  // 16:9 landscape — 338.67mm x 190.5mm (same ratio as 1920x1080)
+  const W = 338.67, H = 190.5;
+  const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:[W, H] });
 
-  const sc = (c) => doc.setTextColor(c[0],c[1],c[2]);
-  const sf = (c) => doc.setFillColor(c[0],c[1],c[2]);
+  const mL = 32, mR = 32, mT = 28, cW = W - mL - mR;
+  const MARF=[245,240,230], CAC=[35,23,16], TIT=[186,167,140], CRE=[237,230,216], MIR=[147,151,155], DARK=[40,30,22];
 
+  const sc = c => doc.setTextColor(c[0],c[1],c[2]);
+  const sf = c => doc.setFillColor(c[0],c[1],c[2]);
+  const sd = c => doc.setDrawColor(c[0],c[1],c[2]);
+
+  // ── FOOTER (every slide) ──
   function footer(n) {
-    sc(MIR); doc.setFont('helvetica','normal'); doc.setFontSize(7);
-    doc.text('ISIS MOREIRA  ·  PLANO DE OURO  ·  ECOSSISTEMA DONAS DO OURO', W/2, H-12, {align:'center'});
-    doc.text(String(n).padStart(2,'0'), W-mR, H-12, {align:'right'});
+    // Bottom line
+    sf(TIT); doc.rect(mL, H-18, cW, .3, 'F');
+    // Left: brand
+    sc(MIR); doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('ISIS MOREIRA  ·  PLANO DE OURO  ·  ECOSSISTEMA DONAS DO OURO', mL, H-11);
+    // Right: page number
+    doc.text(String(n).padStart(2,'0') + ' / 07', W-mR, H-11, {align:'right'});
   }
 
-  function wrapText(text, x, startY, maxW, size, font, style, color, lh) {
+  // ── HELPER: wrapped text that stays in slide ──
+  function wt(text, x, y, maxW, size, font, style, color, lh) {
     doc.setFont(font||'helvetica', style||'normal');
     doc.setFontSize(size||10);
     sc(color||CAC);
     const lines = doc.splitTextToSize(text, maxW||cW);
-    const step = lh || size*0.48;
-    let y = startY;
-    lines.forEach(line => {
-      if (y+step > H-20) { footer(doc.internal.getNumberOfPages()); doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F'); y=35; }
-      doc.text(line, x, y); y+=step;
-    });
+    const step = lh || size * 0.5;
+    lines.forEach(line => { doc.text(line, x, y); y += step; });
     return y;
   }
 
-  // ── CAPA ──
+  // ════════════════════════════════════════════
+  // SLIDE 1 — CAPA
+  // ════════════════════════════════════════════
   sf(CAC); doc.rect(0,0,W,H,'F');
-  sf(TIT); doc.rect(mL,40,40,.8,'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
-  doc.text('ECOSSISTEMA DONAS DO OURO', mL, 52);
 
-  doc.setFont('helvetica','bold'); doc.setFontSize(42); sc(MARF);
-  doc.text('Plano de', mL, 90);
-  sc(TIT); doc.setFont('helvetica','italic'); doc.text('Ouro', mL, 108);
+  // Decorative accent line top-left
+  sf(TIT); doc.rect(mL, mT, 50, 1, 'F');
 
-  sf(TIT); doc.rect(mL,128,cW,.3,'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(14); sc(CRE);
-  doc.text('Preparado exclusivamente para', mL, 146);
-  doc.setFont('helvetica','bold'); doc.setFontSize(24); sc(MARF);
-  doc.text(d.nome_cliente, mL, 162);
+  // Label
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); sc(MIR);
+  doc.text('ECOSSISTEMA DONAS DO OURO', mL, mT + 16);
 
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
-  doc.text('ISIS MOREIRA', mL, H-30);
-  doc.text('Mentora de Negócios e Mentalidade', mL, H-24);
-  sf(TIT); doc.rect(mL,H-16,20,.5,'F');
+  // Main title
+  doc.setFont('helvetica','bold'); doc.setFontSize(54); sc(MARF);
+  doc.text('Plano de', mL, mT + 48);
+  doc.setFont('helvetica','italic'); doc.setFontSize(54); sc(TIT);
+  doc.text('Ouro', mL, mT + 68);
 
-  // ── DIAGNÓSTICO + VISÃO ──
-  doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F');
-  let y = 35;
+  // Divider
+  sf(TIT); doc.rect(mL, mT + 80, cW * 0.4, .3, 'F');
+
+  // Client name
+  doc.setFont('helvetica','normal'); doc.setFontSize(13); sc(CRE);
+  doc.text('Preparado exclusivamente para', mL, mT + 96);
+  doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(MARF);
+  doc.text(d.nome_cliente, mL, mT + 112);
+
+  // Bottom right brand
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(MIR);
+  doc.text('ISIS MOREIRA', W - mR, H - 28, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); sc(MIR);
+  doc.text('Mentora de Negócios e Mentalidade', W - mR, H - 22, {align:'right'});
+
+  // Accent bar bottom
+  sf(TIT); doc.rect(W - mR - 30, H - 16, 30, .5, 'F');
+
+  // ════════════════════════════════════════════
+  // SLIDE 2 — DIAGNÓSTICO
+  // ════════════════════════════════════════════
+  doc.addPage([W,H],'landscape');
+  sf(MARF); doc.rect(0,0,W,H,'F');
+
+  // Left column: title
+  const col1W = cW * 0.35;
+  const col2X = mL + col1W + 20;
+  const col2W = cW - col1W - 20;
+
   doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('DIAGNÓSTICO', mL, y); y+=14;
-  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
-  doc.text('Onde você está', mL, y); y+=10;
-  doc.setFont('helvetica','italic'); sc(TIT); doc.text('hoje', mL, y); y+=16;
-  sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=12;
-  y = wrapText(d.diagnostico, mL, y, cW, 11, 'helvetica','normal', CAC, 5.5);
-  y += 24;
+  doc.text('01 · DIAGNÓSTICO', mL, mT + 4);
 
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('VISÃO DE FUTURO', mL, y); y+=14;
-  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
-  doc.text('Onde você pode', mL, y); y+=10;
-  doc.setFont('helvetica','italic'); sc(TIT); doc.text('chegar', mL, y); y+=16;
-  sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=12;
-  y = wrapText(d.visao, mL, y, cW, 11, 'helvetica','normal', CAC, 5.5);
+  doc.setFont('helvetica','bold'); doc.setFontSize(32); sc(CAC);
+  doc.text('Onde você', mL, mT + 28);
+  doc.text('está', mL, mT + 42);
+  doc.setFont('helvetica','italic'); doc.setFontSize(32); sc(TIT);
+  doc.text('hoje', mL + doc.getTextWidth('está '), mT + 42);
+
+  // Left decorative line
+  sf(TIT); doc.rect(mL, mT + 50, 40, .5, 'F');
+
+  // Right column: content
+  sf(CRE); doc.roundedRect(col2X - 10, mT - 4, col2W + 20, H - mT - 26, 4, 4, 'F');
+  wt(d.diagnostico, col2X, mT + 16, col2W, 11.5, 'helvetica','normal', CAC, 6.5);
+
   footer(2);
 
-  // ── PILARES ──
-  doc.addPage(); sf(CAC); doc.rect(0,0,W,H,'F');
-  y = 35;
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('PILARES DO PLANO', mL, y); y+=14;
-  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(MARF);
-  doc.text('Seus pilares de', mL, y); y+=10;
-  doc.setFont('helvetica','italic'); sc(TIT); doc.text('transformação', mL, y); y+=22;
+  // ════════════════════════════════════════════
+  // SLIDE 3 — VISÃO DE FUTURO
+  // ════════════════════════════════════════════
+  doc.addPage([W,H],'landscape');
+  sf(CAC); doc.rect(0,0,W,H,'F');
 
-  d.pilares.forEach((p, idx) => {
-    sf([40,30,22]); doc.roundedRect(mL, y, cW, 44, 3, 3, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(TIT);
-    doc.text(String(idx+1).padStart(2,'0'), mL+8, y+17);
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); sc(MARF);
-    doc.text(p.titulo, mL+30, y+14);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); sc(CRE);
-    const dl = doc.splitTextToSize(p.descricao, cW-38);
-    dl.slice(0,3).forEach((l,i) => doc.text(l, mL+30, y+23+i*4.5));
-    y += 52;
-  });
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('02 · VISÃO DE FUTURO', mL, mT + 4);
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(32); sc(MARF);
+  doc.text('Onde você', mL, mT + 28);
+  doc.text('pode', mL, mT + 42);
+  doc.setFont('helvetica','italic'); doc.setFontSize(32); sc(TIT);
+  doc.text('chegar', mL + doc.getTextWidth('pode '), mT + 42);
+
+  sf(TIT); doc.rect(mL, mT + 50, 40, .5, 'F');
+
+  // Right content card
+  sf(DARK); doc.roundedRect(col2X - 10, mT - 4, col2W + 20, H - mT - 26, 4, 4, 'F');
+  wt(d.visao, col2X, mT + 16, col2W, 11.5, 'helvetica','normal', CRE, 6.5);
+
   footer(3);
 
-  // ── AÇÕES ──
-  doc.addPage(); sf(MARF); doc.rect(0,0,W,H,'F');
-  y = 35;
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('AÇÕES PRÁTICAS', mL, y); y+=14;
-  doc.setFont('helvetica','bold'); doc.setFontSize(26); sc(CAC);
-  doc.text('O que fazer', mL, y); y+=10;
-  doc.setFont('helvetica','italic'); sc(TIT); doc.text('agora', mL, y); y+=20;
+  // ════════════════════════════════════════════
+  // SLIDES 4-6 — PILARES (one per slide)
+  // ════════════════════════════════════════════
+  d.pilares.forEach((pilar, idx) => {
+    doc.addPage([W,H],'landscape');
+    const isEven = idx % 2 === 0;
 
-  d.acoes.forEach((a, idx) => {
-    sf(CRE); doc.rect(mL,y,cW,.3,'F'); y+=10;
-    sf(TIT); doc.circle(mL+5, y-2, 4, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); sc(MARF);
-    doc.text(String(idx+1), mL+5, y-.5, {align:'center'});
-    doc.setFont('helvetica','normal'); doc.setFontSize(10.5); sc(CAC);
-    const al = doc.splitTextToSize(a, cW-20);
-    al.forEach((l,i) => doc.text(l, mL+16, y+i*5));
-    y += al.length*5+10;
+    if (isEven) {
+      sf(MARF); doc.rect(0,0,W,H,'F');
+    } else {
+      sf(CAC); doc.rect(0,0,W,H,'F');
+    }
+
+    // Section label
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+    doc.text(`03 · PILAR ${String(idx+1).padStart(2,'0')}`, mL, mT + 4);
+
+    // Big number
+    doc.setFont('helvetica','bold'); doc.setFontSize(100);
+    if (isEven) { sc([235,230,220]); } else { sc(DARK); }
+    doc.text(String(idx+1).padStart(2,'0'), W - mR - 10, mT + 55, {align:'right'});
+
+    // Title
+    doc.setFont('helvetica','bold'); doc.setFontSize(30);
+    sc(isEven ? CAC : MARF);
+    doc.text(pilar.titulo, mL, mT + 40);
+
+    // Accent line
+    sf(TIT); doc.rect(mL, mT + 48, 50, .5, 'F');
+
+    // Description
+    wt(pilar.descricao, mL, mT + 64, cW * 0.6, 12, 'helvetica','normal', isEven ? CAC : CRE, 7);
+
+    footer(3 + idx + 1);
   });
-  footer(4);
 
-  // ── MENSAGEM FINAL ──
-  doc.addPage(); sf(CAC); doc.rect(0,0,W,H,'F');
+  // ════════════════════════════════════════════
+  // SLIDE 7 — AÇÕES PRÁTICAS
+  // ════════════════════════════════════════════
+  doc.addPage([W,H],'landscape');
+  sf(MARF); doc.rect(0,0,W,H,'F');
+
   doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
-  doc.text('MENSAGEM FINAL', W/2, 60, {align:'center'});
-  sf(TIT); doc.rect(W/2-20, 68, 40, .5, 'F');
+  doc.text('04 · AÇÕES PRÁTICAS', mL, mT + 4);
 
-  doc.setFont('helvetica','italic'); doc.setFontSize(15); sc(MARF);
-  const ml = doc.splitTextToSize(d.mensagem_final, cW-20);
-  let my = 90;
-  ml.forEach(l => { doc.text(l, W/2, my, {align:'center'}); my+=8; });
+  doc.setFont('helvetica','bold'); doc.setFontSize(28); sc(CAC);
+  doc.text('O que fazer', mL, mT + 28);
+  doc.setFont('helvetica','italic'); doc.setFontSize(28); sc(TIT);
+  doc.text('agora', mL + doc.getTextWidth('O que fazer '), mT + 28);
 
-  sf(TIT); doc.rect(W/2-15, my+16, 30, .5, 'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(10); sc(MARF);
-  doc.text('ISIS MOREIRA', W/2, my+30, {align:'center'});
+  sf(TIT); doc.rect(mL, mT + 35, 40, .5, 'F');
+
+  // Action items in 2 columns
+  const aColW = (cW - 16) / 2;
+  d.acoes.forEach((acao, idx) => {
+    const isLeft = idx < 3;
+    const ax = isLeft ? mL : mL + aColW + 16;
+    const row = isLeft ? idx : idx - 3;
+    const ay = mT + 52 + row * 28;
+
+    // Number circle
+    sf(TIT); doc.circle(ax + 5, ay - 1, 5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); sc(MARF);
+    doc.text(String(idx+1), ax + 5, ay + 1, {align:'center'});
+
+    // Text
+    doc.setFont('helvetica','normal'); doc.setFontSize(10.5); sc(CAC);
+    const lines = doc.splitTextToSize(acao, aColW - 20);
+    lines.forEach((l,i) => doc.text(l, ax + 16, ay + (i * 5)));
+  });
+
+  footer(7);
+
+  // ════════════════════════════════════════════
+  // SLIDE 8 — MENSAGEM FINAL
+  // ════════════════════════════════════════════
+  doc.addPage([W,H],'landscape');
+  sf(CAC); doc.rect(0,0,W,H,'F');
+
+  // Centered content
+  const cx = W / 2;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); sc(TIT);
+  doc.text('MENSAGEM FINAL', cx, mT + 10, {align:'center'});
+
+  // Accent line
+  sf(TIT); doc.rect(cx - 25, mT + 16, 50, .5, 'F');
+
+  // Large quote marks
+  doc.setFont('helvetica','bold'); doc.setFontSize(60); sc(DARK);
+  doc.text('"', cx - 5, mT + 46, {align:'center'});
+
+  // Message text
+  doc.setFont('helvetica','italic'); doc.setFontSize(14); sc(MARF);
+  const msgLines = doc.splitTextToSize(d.mensagem_final, cW * 0.65);
+  let my = mT + 60;
+  msgLines.forEach(l => { doc.text(l, cx, my, {align:'center'}); my += 7.5; });
+
+  // Closing quote
+  doc.setFont('helvetica','bold'); doc.setFontSize(60); sc(DARK);
+  doc.text('"', cx + 5, my + 10, {align:'center'});
+
+  // Signature
+  sf(TIT); doc.rect(cx - 20, my + 22, 40, .5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); sc(MARF);
+  doc.text('ISIS MOREIRA', cx, my + 34, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(8); sc(MIR);
-  doc.text('Mentora de Negócios e Mentalidade', W/2, my+37, {align:'center'});
-  doc.text('Alinhada. Livre. Leve.', W/2, my+44, {align:'center'});
-  footer(5);
+  doc.text('Mentora de Negócios e Mentalidade', cx, my + 41, {align:'center'});
+  sc(TIT); doc.setFont('helvetica','italic'); doc.setFontSize(9);
+  doc.text('Alinhada. Livre. Leve.', cx, my + 49, {align:'center'});
 
+  footer(8);
+
+  // ── SAVE ──
   doc.save(`Plano_de_Ouro_${d.nome_cliente.replace(/\s+/g,'_')}.pdf`);
 }
 </script>
