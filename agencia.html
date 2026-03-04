@@ -1215,18 +1215,17 @@ async function exportDrive(){
 
     // Send to n8n webhook
     try{
-      const whRes=await fetch('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          nome:genData.cliente_nome||'Cliente',
-          email:$('gem').value.trim()||'',
-          whatsapp:$('gwh').value.trim()||'',
-          link:link
-        })
+      const whData=JSON.stringify({
+        nome:genData.cliente_nome||'Cliente',
+        email:$('gem').value.trim()||'',
+        whatsapp:$('gwh').value.trim()||'',
+        link:link
       });
-      console.log('Webhook status:',whRes.status);
-      dr.innerHTML+=` <span style="color:#4CAF50;font-size:11px;">· n8n ✓</span>`;
+      const blob=new Blob([whData],{type:'application/json'});
+      const sent=navigator.sendBeacon('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',blob);
+      console.log('Beacon sent:',sent);
+      if(sent) dr.innerHTML+=` <span style="color:#4CAF50;font-size:11px;">· n8n ✓</span>`;
+      else dr.innerHTML+=` <span style="color:#E8614D;font-size:11px;">· n8n falhou</span>`;
     }catch(e){
       console.error('Webhook error:',e);
       dr.innerHTML+=` <span style="color:#E8614D;font-size:11px;">· n8n: ${e.message}</span>`;
