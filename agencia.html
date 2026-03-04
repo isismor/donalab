@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400;1,9..40,500;1,9..40,700&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{--marfim:#F5F0E6;--creme:#EDE6D8;--titanium:#BAA78C;--cacao:#231710;--mirror:#93979B;--cacao-70:rgba(35,23,16,.70);--cacao-10:rgba(35,23,16,.10);--cacao-05:rgba(35,23,16,.05);--marfim-10:rgba(245,240,230,.10);--marfim-05:rgba(245,240,230,.04);--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:100px;--sans:'DM Sans',sans-serif;--serif:'DM Serif Display',serif;--mono:'Outfit',sans-serif;--sidebar-w:250px}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -219,7 +220,8 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
             <div id="gen-actions" style="display:none;margin-top:16px;">
               <div style="font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--titanium);margin-bottom:8px;">✓ GERADO COM SUCESSO</div>
               <div id="gen-count" style="font-family:var(--mono);font-size:11px;color:var(--mirror);margin-bottom:12px;"></div>
-              <div class="br" style="margin-top:0;"><button class="btn-t" onclick="dlPDF()">📥 Baixar PDF</button><button class="btn-g" onclick="resetGen()">↻ Novo</button></div>
+              <div class="br" style="margin-top:0;"><button class="btn-t" onclick="dlPDF()">📥 Baixar PDF</button><button class="btn-t" onclick="exportDrive()" style="background:rgba(186,167,140,.12);border:1px solid rgba(186,167,140,.3);">📁 Exportar p/ Drive</button><button class="btn-g" onclick="resetGen()">↻ Novo</button></div>
+              <div id="drive-result" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
             </div>
           </div>
           <!-- Preview area: same slide canvas as template editor -->
@@ -260,6 +262,18 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
             <div class="fd"><label>Modelo</label><select id="amod"><option value="claude-sonnet-4-20250514">Claude Sonnet 4</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option></select></div>
             <div class="br"><button class="btn-p" onclick="saveKey()">💾 Salvar</button><button class="btn-g" onclick="testKey()">⚡ Testar</button></div>
             <div id="atr" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
+          </div>
+          <!-- Google Drive -->
+          <div style="background:var(--creme);border:1px solid var(--cacao-05);border-radius:var(--radius-xl);padding:28px;margin-top:16px;">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;">
+              <div style="width:32px;height:32px;border-radius:var(--radius-md);background:rgba(186,167,140,.1);border:1px solid rgba(186,167,140,.2);display:flex;align-items:center;justify-content:center;font-size:14px;">📁</div>
+              <div><h3 style="font-weight:900;font-size:14px;">Google Drive</h3><p style="font-family:var(--mono);font-size:9px;color:var(--mirror);letter-spacing:1px;">Exportar PDFs</p></div>
+              <div id="gd-st" style="margin-left:auto;font-family:var(--mono);font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:var(--radius-full);"></div>
+            </div>
+            <div class="fd"><label>Google Client ID</label><input type="text" id="gci" placeholder="xxxxxx.apps.googleusercontent.com" value="209506360662-2ainj66gfka6lgi3g8rffsfur81csgou.apps.googleusercontent.com"></div>
+            <div class="fd"><label>ID da Pasta do Drive</label><input type="text" id="gfi" placeholder="1XpPCsbGfb2Kj..." value="1XpPCsbGfb2KjZyPUU7spna4PCyS-W_fT"></div>
+            <div class="br"><button class="btn-p" onclick="saveGD()">💾 Salvar</button><button class="btn-g" onclick="authGD()">🔗 Conectar Google</button></div>
+            <div id="gdr" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
           </div>
         </div>
       </div>
@@ -711,15 +725,18 @@ Não criei campos/páginas extras
 TEMPLATE FIXO (MAPEAMENTO DOS CAMPOS VARIÁVEIS)
 Você deve preencher apenas estes IDs, nesta ordem, respeitando os limites:
 
+REGRA CRÍTICA DE CARACTERES PARA A PÁGINA DE POSICIONAMENTO:
+Os 4 campos a seguir OBRIGATORIAMENTE devem ter entre 350 e 400 caracteres cada. Nem menos, nem mais. Conte os caracteres antes de entregar. Se um campo tiver menos de 350 caracteres, expanda com mais detalhes. Se tiver mais de 400, resuma. Isso é inegociável.
+
 cliente_nome (até 40)
 
-clienteideal_descricao (400 a 420)
+clienteideal_descricao (OBRIGATÓRIO: 350 a 400 caracteres)
 
-problema_descricao (400 a 420)
+problema_descricao (OBRIGATÓRIO: 350 a 400 caracteres)
 
-solucao_descricao (400 a 420)
+solucao_descricao (OBRIGATÓRIO: 350 a 400 caracteres)
 
-diferencial_descricao (400 a 420)
+diferencial_descricao (OBRIGATÓRIO: 350 a 400 caracteres)
 
 produto_principal_nome (até 55)
 
@@ -1067,6 +1084,131 @@ async function dlPDF(){
 
   btn.disabled=false;btn.textContent=origText;
 }
+
+// ============================================================
+// GOOGLE DRIVE INTEGRATION
+// ============================================================
+let gdToken=null;
+
+function loadGDSt(){
+  const c=localStorage.getItem('gci'),f=localStorage.getItem('gfi'),s=$('gd-st');
+  if($('gci'))$('gci').value=c||'';
+  if($('gfi'))$('gfi').value=f||'';
+  if(c&&f){s.textContent='OK';s.style.cssText+='color:#4CAF50;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);';}
+  else{s.textContent='Pendente';s.style.cssText+='color:#E8614D;background:rgba(232,97,77,.08);border:1px solid rgba(232,97,77,.2);';}
+}
+
+function saveGD(){
+  const c=$('gci').value.trim(),f=$('gfi').value.trim();
+  if(!c||!c.includes('.apps.googleusercontent.com')){$('gdr').innerHTML='<span style="color:#E8614D;">Client ID inválido.</span>';return;}
+  if(!f){$('gdr').innerHTML='<span style="color:#E8614D;">ID da pasta obrigatório.</span>';return;}
+  localStorage.setItem('gci',c);localStorage.setItem('gfi',f);
+  loadGDSt();
+  $('gdr').innerHTML='<span style="color:#4CAF50;">✓ Salvo!</span>';
+}
+
+function authGD(){
+  const clientId=localStorage.getItem('gci');
+  if(!clientId){$('gdr').innerHTML='<span style="color:#E8614D;">Salve o Client ID primeiro.</span>';return;}
+  $('gdr').innerHTML='<span style="color:var(--titanium);">Abrindo login Google...</span>';
+  const client=google.accounts.oauth2.initTokenClient({
+    client_id:clientId,
+    scope:'https://www.googleapis.com/auth/drive.file',
+    callback:(resp)=>{
+      if(resp.error){$('gdr').innerHTML=`<span style="color:#E8614D;">${resp.error}</span>`;return;}
+      gdToken=resp.access_token;
+      $('gdr').innerHTML='<span style="color:#4CAF50;">✓ Conectado ao Google Drive!</span>';
+    }
+  });
+  client.requestAccessToken();
+}
+
+async function uploadToDrive(pdfBlob,fileName){
+  const folderId=localStorage.getItem('gfi');
+  const metadata={name:fileName,mimeType:'application/pdf',parents:[folderId]};
+  const form=new FormData();
+  form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
+  form.append('file',pdfBlob);
+  const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+gdToken},
+    body:form
+  });
+  if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Erro no upload');}
+  return await res.json();
+}
+
+async function exportDrive(){
+  if(!genData){alert('Gere um plano primeiro.');return;}
+  const clientId=localStorage.getItem('gci'),folderId=localStorage.getItem('gfi');
+  if(!clientId||!folderId){alert('Configure o Google Drive em Integrações.');return;}
+
+  const dr=$('drive-result');
+  dr.innerHTML='<span style="color:var(--titanium);">⏳ Preparando...</span>';
+
+  // If no token, request auth first
+  if(!gdToken){
+    dr.innerHTML='<span style="color:var(--titanium);">🔗 Conectando ao Google...</span>';
+    try{
+      await new Promise((resolve,reject)=>{
+        const client=google.accounts.oauth2.initTokenClient({
+          client_id:clientId,
+          scope:'https://www.googleapis.com/auth/drive.file',
+          callback:(resp)=>{
+            if(resp.error){reject(new Error(resp.error));return;}
+            gdToken=resp.access_token;
+            resolve();
+          }
+        });
+        client.requestAccessToken();
+      });
+    }catch(err){dr.innerHTML=`<span style="color:#E8614D;">Erro: ${err.message}</span>`;return;}
+  }
+
+  // Generate PDF blob (same as dlPDF but returns blob)
+  dr.innerHTML='<span style="color:var(--titanium);">⏳ Gerando PDF...</span>';
+  const savedSlide=gSlide;
+  try{
+    const {jsPDF}=window.jspdf;
+    const W=338.67,H=190.5;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:[W,H]});
+    const target=$('gsc');
+
+    for(let i=0;i<PAGES.length;i++){
+      if(i>0)doc.addPage([W,H],'landscape');
+      gSlide=i;
+      target.innerHTML=renderGenSlide(i);
+      await new Promise(r=>setTimeout(r,300));
+      dr.innerHTML=`<span style="color:var(--titanium);">⏳ Slide ${i+1} / ${PAGES.length}...</span>`;
+      const canvas=await html2canvas(target,{scale:2,useCORS:true,allowTaint:true,backgroundColor:null,logging:false});
+      const imgData=canvas.toDataURL('image/jpeg',0.95);
+      doc.addImage(imgData,'JPEG',0,0,W,H);
+    }
+
+    gSlide=savedSlide;
+    renderGenPreview();
+
+    const fileName='Plano_de_Ouro_'+(genData.cliente_nome||'Cliente').replace(/\s+/g,'_')+'.pdf';
+    const pdfBlob=doc.output('blob');
+
+    // Upload to Drive
+    dr.innerHTML='<span style="color:var(--titanium);">⏳ Enviando para o Drive...</span>';
+    const result=await uploadToDrive(pdfBlob,fileName);
+
+    // Show link
+    const link=result.webViewLink||`https://drive.google.com/file/d/${result.id}/view`;
+    dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
+
+  }catch(err){
+    console.error('Drive export error:',err);
+    dr.innerHTML=`<span style="color:#E8614D;">Erro: ${err.message}</span>`;
+    gSlide=savedSlide;
+    renderGenPreview();
+  }
+}
+
+// Load GD settings on page load
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(loadGDSt,100);});
 
 </script>
 </body>
