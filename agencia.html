@@ -213,6 +213,8 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
             <h3>Dados da Cliente</h3>
             <p class="psub">Nome e respostas do questionário</p>
             <div class="fd"><label>Nome da Cliente</label><input type="text" id="gn" placeholder="Ex: Maria Clara" maxlength="40"></div>
+            <div class="fd"><label>E-mail</label><input type="email" id="gem" placeholder="cliente@email.com"></div>
+            <div class="fd"><label>WhatsApp</label><input type="tel" id="gwh" placeholder="(11) 99999-9999"></div>
             <div class="fd"><label>Dados do Questionário</label><textarea id="gd" placeholder="Cole aqui as respostas completas do questionário..." style="min-height:160px;"></textarea><p class="fd-hint">O agente interpreta e preenche todos os campos automaticamente.</p></div>
             <div class="br"><button class="btn-p" id="gbtn" onclick="startGen()">✦ Gerar Plano de Ouro</button></div>
             <div class="gp" id="gpr"><div class="pb-bg"><div class="pb-fill" id="gfl"></div></div><div style="display:flex;flex-direction:column;gap:4px;"><div class="pst" data-s="1"><span class="sd"></span>Analisando dados</div><div class="pst" data-s="2"><span class="sd"></span>Copywriter escrevendo</div><div class="pst" data-s="3"><span class="sd"></span>Revisando tom de voz</div><div class="pst" data-s="4"><span class="sd"></span>Montando slides</div><div class="pst" data-s="5"><span class="sd"></span>Finalizando</div></div></div>
@@ -272,7 +274,7 @@ body{font-family:var(--sans);background:var(--marfim);color:var(--cacao);font-si
             </div>
             <div class="fd"><label>Google Client ID</label><input type="text" id="gci" placeholder="xxxxxx.apps.googleusercontent.com" value="209506360662-2ainj66gfka6lgi3g8rffsfur81csgou.apps.googleusercontent.com"></div>
             <div class="fd"><label>ID da Pasta do Drive</label><input type="text" id="gfi" placeholder="1XpPCsbGfb2Kj..." value="1XpPCsbGfb2KjZyPUU7spna4PCyS-W_fT"></div>
-            <div class="fd"><label>ID da Planilha (Google Sheets)</label><input type="text" id="gsi" placeholder="1H8samsLT7Fb5..." value="1H8samsLT7Fb5GAOFeII3VVjVz6p7TunZ5sY1kPAa02g"></div>
+
             <div class="br"><button class="btn-p" onclick="saveGD()">💾 Salvar</button><button class="btn-g" onclick="authGD()">🔗 Conectar Google</button></div>
             <div id="gdr" style="margin-top:8px;font-size:12px;min-height:16px;"></div>
           </div>
@@ -1035,7 +1037,7 @@ function showRes(d){
   renderGenPreview();
 }
 function resetGen(){
-  $('gn').value='';$('gd').value='';
+  $('gn').value='';$('gem').value='';$('gwh').value='';$('gd').value='';
   $('gen-prev').style.display='none';$('gen-actions').style.display='none';
   $('gph').style.display='flex';$('gph').querySelector('p').innerHTML='Preencha e clique em <strong>Gerar</strong>.';
   genData=null;gSlide=0;
@@ -1102,20 +1104,18 @@ async function dlPDF(){
 let gdToken=null;
 
 function loadGDSt(){
-  const c=localStorage.getItem('gci'),f=localStorage.getItem('gfi'),sh=localStorage.getItem('gsi'),s=$('gd-st');
+  const c=localStorage.getItem('gci'),f=localStorage.getItem('gfi'),s=$('gd-st');
   if($('gci'))$('gci').value=c||'';
   if($('gfi'))$('gfi').value=f||'';
-  if($('gsi'))$('gsi').value=sh||'';
   if(c&&f){s.textContent='OK';s.style.cssText+='color:#4CAF50;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);';}
   else{s.textContent='Pendente';s.style.cssText+='color:#E8614D;background:rgba(232,97,77,.08);border:1px solid rgba(232,97,77,.2);';}
 }
 
 function saveGD(){
-  const c=$('gci').value.trim(),f=$('gfi').value.trim(),sh=$('gsi').value.trim();
+  const c=$('gci').value.trim(),f=$('gfi').value.trim();
   if(!c||!c.includes('.apps.googleusercontent.com')){$('gdr').innerHTML='<span style="color:#E8614D;">Client ID inválido.</span>';return;}
   if(!f){$('gdr').innerHTML='<span style="color:#E8614D;">ID da pasta obrigatório.</span>';return;}
   localStorage.setItem('gci',c);localStorage.setItem('gfi',f);
-  if(sh)localStorage.setItem('gsi',sh);
   loadGDSt();
   $('gdr').innerHTML='<span style="color:#4CAF50;">✓ Salvo!</span>';
 }
@@ -1126,7 +1126,7 @@ function authGD(){
   $('gdr').innerHTML='<span style="color:var(--titanium);">Abrindo login Google...</span>';
   const client=google.accounts.oauth2.initTokenClient({
     client_id:clientId,
-    scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+    scope:'https://www.googleapis.com/auth/drive.file',
     callback:(resp)=>{
       if(resp.error){$('gdr').innerHTML=`<span style="color:#E8614D;">${resp.error}</span>`;return;}
       gdToken=resp.access_token;
@@ -1151,24 +1151,6 @@ async function uploadToDrive(pdfBlob,fileName){
   return await res.json();
 }
 
-async function appendToSheet(clientName,driveLink){
-  const sheetId=localStorage.getItem('gsi');
-  if(!sheetId)return;
-  const today=new Date().toLocaleDateString('pt-BR');
-  // Append: A=Nome, B/C/D=(vazio), E=Link do Plano de Ouro
-  const body={values:[[clientName,'','','',driveLink]]};
-  const range=encodeURIComponent('A:E');
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
-  console.log('Sheets URL:',url,'Token:',gdToken?'yes':'NO');
-  const res=await fetch(url,{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+gdToken,'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if(!res.ok){const e=await res.json();console.error('Sheets error:',e);throw new Error(e.error?.message||'Erro ao gravar na planilha');}
-  return await res.json();
-}
-
 async function exportDrive(){
   if(!genData){alert('Gere um plano primeiro.');return;}
   const clientId=localStorage.getItem('gci'),folderId=localStorage.getItem('gfi');
@@ -1184,7 +1166,7 @@ async function exportDrive(){
       await new Promise((resolve,reject)=>{
         const client=google.accounts.oauth2.initTokenClient({
           client_id:clientId,
-          scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+          scope:'https://www.googleapis.com/auth/drive.file',
           callback:(resp)=>{
             if(resp.error){reject(new Error(resp.error));return;}
             gdToken=resp.access_token;
@@ -1229,21 +1211,22 @@ async function exportDrive(){
     // Show link
     const link=result.webViewLink||`https://drive.google.com/file/d/${result.id}/view`;
 
-    // Append to Google Sheet
-    const sheetId=localStorage.getItem('gsi');
-    console.log('Sheet ID from localStorage:',sheetId);
-    if(sheetId){
-      dr.innerHTML='<span style="color:var(--titanium);">⏳ Registrando na planilha...</span>';
-      try{
-        await appendToSheet(genData.cliente_nome||'Cliente',link);
-        dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive + Planilha!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
-      }catch(shErr){
-        console.error('Sheet error:',shErr);
-        dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <span style="color:#E8614D;">(Planilha: ${shErr.message})</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
-      }
-    }else{
-      dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
-    }
+    dr.innerHTML=`<span style="color:#4CAF50;">✓ Salvo no Drive!</span> <a href="${link}" target="_blank" style="color:var(--titanium);font-weight:700;text-decoration:underline;">Abrir no Drive →</a>`;
+
+    // Send to n8n webhook
+    try{
+      await fetch('https://isismalves.app.n8n.cloud/webhook/457aaac9-acfb-4366-8dff-16f60b14c779',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        mode:'no-cors',
+        body:JSON.stringify({
+          nome:genData.cliente_nome||'Cliente',
+          email:$('gem').value.trim()||'',
+          whatsapp:$('gwh').value.trim()||'',
+          link:link
+        })
+      });
+    }catch(e){console.log('Webhook n8n:',e);}
 
   }catch(err){
     console.error('Drive export error:',err);
