@@ -1533,35 +1533,35 @@ function caGenerate(){
   if(!nome){alert('Preencha o nome.');return;}
   if(!campos){alert('Cole os campos variáveis.');return;}
 
-  // Parse sections from pasted text
-  // Expects numbered sections: 1) Tom de voz 2) Valores 3) Assuntos 4) Hooks autoridade 5) Hooks engajamento 6) Hooks reels
-  const sections=campos.split(/\n(?=\d+\)|\d+\.?\s*(?:Seu tom|Tom de|Valores|Assuntos|Títulos|Título))/i);
-  
-  // Smarter parsing: split by section headers
-  let tomVoz='',valores='',assuntos='',hooksAut='',hooksEng='',hooksReels='';
-  
+  // Parse sections - supports both "1)" and "1." formats
   const lines=campos.split('\n');
   let current='';
   const data={tom:[],val:[],ass:[],haut:[],heng:[],hreels:[]};
   
   for(const line of lines){
-    const l=line.trim().toLowerCase();
+    const l=line.trim();
     if(!l)continue;
-    // Detect section headers by number prefix
-    if(l.match(/^1\)/)){current='tom';const rest=line.trim().replace(/^1\)\s*/,'');if(rest)data.tom.push(rest);continue;}
-    else if(l.match(/^2\)/)){current='val';const rest=line.trim().replace(/^2\)\s*/,'');if(rest&&!rest.toLowerCase().startsWith('valores'))data.val.push(rest);continue;}
-    else if(l.match(/^3\)/)){current='ass';const rest=line.trim().replace(/^3\)\s*/,'');if(rest&&!rest.toLowerCase().startsWith('assuntos'))data.ass.push(rest);continue;}
-    else if(l.match(/^4\)/)){current='haut';continue;}
-    else if(l.match(/^5\)/)){current='heng';continue;}
-    else if(l.match(/^6\)/)){current='hreels';continue;}
+    const lo=l.toLowerCase();
+    // Detect section by number: 1) or 1. at start of line
+    const numMatch=l.match(/^(\d+)[\.\)]\s*(.*)/);
+    if(numMatch){
+      const num=parseInt(numMatch[1]);
+      const rest=numMatch[2]?.trim()||'';
+      if(num===1){current='tom';if(rest)data.tom.push(rest);continue;}
+      if(num===2){current='val';if(rest&&!rest.toLowerCase().startsWith('valores'))data.val.push(rest);continue;}
+      if(num===3){current='ass';if(rest&&!rest.toLowerCase().startsWith('assuntos'))data.ass.push(rest);continue;}
+      if(num===4){current='haut';if(rest)data.haut.push(rest);continue;}
+      if(num===5){current='heng';if(rest)data.heng.push(rest);continue;}
+      if(num===6){current='hreels';if(rest)data.hreels.push(rest);continue;}
+    }
     // Also detect by keyword
-    else if(l.startsWith('seu tom')||l.startsWith('tom de voz')){current='tom';const rest=line.trim().replace(/^(seu tom de voz|tom de voz)[:\s]*/i,'');if(rest)data.tom.push(rest);continue;}
-    else if(l.startsWith('valores')){current='val';continue;}
-    else if(l.startsWith('assuntos')||l.startsWith('linhas')){current='ass';continue;}
-    else if(l.match(/carrossel\s*autorid|títulos\s*carrossel\s*autorid/i)){current='haut';continue;}
-    else if(l.match(/carrossel\s*engaj|títulos\s*carrossel\s*engaj/i)){current='heng';continue;}
-    else if(l.match(/reels|títulos\s*reels/i)){current='hreels';continue;}
-    if(current&&line.trim())data[current].push(line.trim());
+    if(lo.startsWith('seu tom')||lo.startsWith('tom de voz')){current='tom';continue;}
+    else if(lo.startsWith('valores')){current='val';continue;}
+    else if(lo.startsWith('assuntos')||lo.startsWith('linhas')){current='ass';continue;}
+    else if(lo.match(/carrossel\s*autorid|títulos\s*carrossel\s*autorid/)){current='haut';continue;}
+    else if(lo.match(/carrossel\s*engaj|títulos\s*carrossel\s*engaj/)){current='heng';continue;}
+    else if(lo.match(/reels|títulos\s*reels/)){current='hreels';continue;}
+    if(current&&l)data[current].push(l);
   }
 
   caGenData={
