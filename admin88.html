@@ -221,7 +221,7 @@
 <!-- LOGIN -->
 <div class="login-overlay" id="login-overlay">
   <div class="login-box">
-    <div class="login-logo">Dona Lab</div>
+    <div class="login-logo"><b style="font-weight:900;letter-spacing:-0.5px;">ISIS</b><span style="font-weight:300;">MOREIRA</span></div>
     <div class="login-sub">Painel Admin</div>
     <div class="login-group"><label class="login-label">Usuario</label><input class="login-input" type="text" id="login-user" placeholder="seu usuario"></div>
     <div class="login-group"><label class="login-label">Senha</label><input class="login-input" type="password" id="login-pass" placeholder="sua senha"></div>
@@ -233,7 +233,7 @@
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-name">Dona Lab</div>
+      <div class="logo-name"><b style="font-family:'DM Sans',sans-serif;font-style:normal;font-weight:900;letter-spacing:-0.5px;">ISIS</b><span style="font-family:'DM Sans',sans-serif;font-style:normal;font-weight:300;">MOREIRA</span></div>
       <div class="logo-sub">Painel Admin</div>
     </div>
     <nav class="nav">
@@ -1179,11 +1179,409 @@ C56: (texto de contato/suporte — opcional)"></textarea>
 
     <!-- METRICAS -->
     <div id="section-metricas" style="display:none">
-      <div class="topbar"><div class="page-title">Métricas</div></div>
-      <div class="empty-state" style="padding:80px 20px;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <p style="margin-top:16px;font-size:14px;color:var(--text-dim)">Em breve</p>
+      <div class="topbar" style="margin-bottom:0;">
+        <div class="page-title">Métricas</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select id="metricas-periodo" onchange="metricasChangePeriodo(this.value)" style="background:var(--surface);border:1px solid rgba(35,23,16,0.12);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);font-weight:700;letter-spacing:0.08em;outline:none;cursor:pointer;">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+          </select>
+        </div>
       </div>
+
+      <!-- KPI CARDS -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+        <div class="met-kpi-card" id="kpi-faturamento">
+          <div class="met-kpi-label">Faturamento</div>
+          <div class="met-kpi-value" id="kpi-fat-val">R$ 48.200</div>
+          <div class="met-kpi-delta positive">↑ 18% vs período anterior</div>
+          <div class="met-kpi-spark" id="spark-fat"></div>
+        </div>
+        <div class="met-kpi-card" id="kpi-clientes">
+          <div class="met-kpi-label">Clientes Ativos</div>
+          <div class="met-kpi-value" id="kpi-cli-val">34</div>
+          <div class="met-kpi-delta positive">↑ 6 novos este mês</div>
+          <div class="met-kpi-spark" id="spark-cli"></div>
+        </div>
+        <div class="met-kpi-card" id="kpi-ticket">
+          <div class="met-kpi-label">Ticket Médio</div>
+          <div class="met-kpi-value" id="kpi-tkt-val">R$ 1.417</div>
+          <div class="met-kpi-delta positive">↑ 11% vs período anterior</div>
+          <div class="met-kpi-spark" id="spark-tkt"></div>
+        </div>
+        <div class="met-kpi-card" id="kpi-churn">
+          <div class="met-kpi-label">Churn Rate</div>
+          <div class="met-kpi-value" id="kpi-chr-val">2,9%</div>
+          <div class="met-kpi-delta negative">↑ 0,4% vs período anterior</div>
+          <div class="met-kpi-spark" id="spark-chr"></div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+
+        <!-- Faturamento Mensal -->
+        <div class="met-chart-card">
+          <div class="met-chart-title">Faturamento Mensal</div>
+          <div class="met-chart-sub">Receita acumulada por mês</div>
+          <canvas id="chart-fat" height="180"></canvas>
+        </div>
+
+        <!-- Crescimento de Clientes -->
+        <div class="met-chart-card">
+          <div class="met-chart-title">Crescimento de Clientes</div>
+          <div class="met-chart-sub">Novos vs. perdidos por mês</div>
+          <canvas id="chart-cli" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+
+        <!-- Distribuição por Plano -->
+        <div class="met-chart-card">
+          <div class="met-chart-title">Distribuição por Plano</div>
+          <div class="met-chart-sub">Clientes por categoria</div>
+          <canvas id="chart-plano" height="190"></canvas>
+        </div>
+
+        <!-- Origem dos Clientes -->
+        <div class="met-chart-card">
+          <div class="met-chart-title">Origem dos Clientes</div>
+          <div class="met-chart-sub">Canal de aquisição</div>
+          <canvas id="chart-origem" height="190"></canvas>
+        </div>
+
+        <!-- NPS -->
+        <div class="met-chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+          <div class="met-chart-title" style="text-align:center;width:100%">NPS Score</div>
+          <div class="met-chart-sub" style="text-align:center;width:100%">Net Promoter Score · Jun 2025</div>
+          <div style="position:relative;width:160px;height:160px;margin:12px auto 0;">
+            <canvas id="chart-nps" width="160" height="160"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="font-family:var(--font-mono);font-size:36px;font-weight:900;color:var(--gold);line-height:1;">72</div>
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-family:var(--font-mono);font-weight:700;margin-top:4px;">Excelente</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <div style="text-align:center;"><div style="font-size:11px;color:#5db870;font-weight:800;font-family:var(--font-mono);">68%</div><div style="font-size:10px;color:var(--text-dim);">Promotores</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--text-dim);font-weight:800;font-family:var(--font-mono);">18%</div><div style="font-size:10px;color:var(--text-dim);">Neutros</div></div>
+            <div style="text-align:center;"><div style="font-size:11px;color:var(--danger);font-weight:800;font-family:var(--font-mono);">14%</div><div style="font-size:10px;color:var(--text-dim);">Detratores</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP CLIENTES TABLE -->
+      <div class="met-chart-card" style="margin-bottom:20px;">
+        <div class="met-chart-title">Top Clientes por Receita</div>
+        <div class="met-chart-sub">Ranking dos 5 maiores clientes no período</div>
+        <table style="width:100%;border-collapse:collapse;margin-top:16px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(35,23,16,0.07);">
+              <th style="text-align:left;padding:10px 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);">#</th>
+              <th style="text-align:left;padding:10px 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);">Cliente</th>
+              <th style="text-align:left;padding:10px 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);">Plano</th>
+              <th style="text-align:left;padding:10px 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);">Receita</th>
+              <th style="text-align:left;padding:10px 16px;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);">% Total</th>
+            </tr>
+          </thead>
+          <tbody id="met-top-clientes">
+            <tr style="border-bottom:1px solid rgba(35,23,16,0.04);">
+              <td style="padding:12px 16px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);font-weight:700;">01</td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:500;">Ana Paula Ferreira</td>
+              <td style="padding:12px 16px;"><span style="background:rgba(186,167,140,0.15);color:var(--gold);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:0.08em;">PREMIUM</span></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600;font-family:var(--font-mono);">R$ 4.800</td>
+              <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:4px;background:var(--surface2);border-radius:4px;max-width:80px;"><div style="width:62%;height:100%;background:var(--gold);border-radius:4px;"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">9.9%</span>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(35,23,16,0.04);">
+              <td style="padding:12px 16px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);font-weight:700;">02</td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:500;">Camila Rocha</td>
+              <td style="padding:12px 16px;"><span style="background:rgba(186,167,140,0.15);color:var(--gold);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:0.08em;">PREMIUM</span></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600;font-family:var(--font-mono);">R$ 4.200</td>
+              <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:4px;background:var(--surface2);border-radius:4px;max-width:80px;"><div style="width:54%;height:100%;background:var(--gold);border-radius:4px;"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">8.7%</span>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(35,23,16,0.04);">
+              <td style="padding:12px 16px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);font-weight:700;">03</td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:500;">Juliana Matos</td>
+              <td style="padding:12px 16px;"><span style="background:rgba(93,184,112,0.12);color:#5db870;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:0.08em;">STANDARD</span></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600;font-family:var(--font-mono);">R$ 3.100</td>
+              <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:4px;background:var(--surface2);border-radius:4px;max-width:80px;"><div style="width:40%;height:100%;background:#5db870;border-radius:4px;"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">6.4%</span>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(35,23,16,0.04);">
+              <td style="padding:12px 16px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);font-weight:700;">04</td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:500;">Fernanda Lima</td>
+              <td style="padding:12px 16px;"><span style="background:rgba(93,184,112,0.12);color:#5db870;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:0.08em;">STANDARD</span></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600;font-family:var(--font-mono);">R$ 2.800</td>
+              <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:4px;background:var(--surface2);border-radius:4px;max-width:80px;"><div style="width:36%;height:100%;background:#5db870;border-radius:4px;"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">5.8%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 16px;font-size:12px;color:var(--text-dim);font-family:var(--font-mono);font-weight:700;">05</td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:500;">Bianca Souza</td>
+              <td style="padding:12px 16px;"><span style="background:rgba(147,151,155,0.12);color:var(--text-muted);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;font-family:var(--font-mono);letter-spacing:0.08em;">BÁSICO</span></td>
+              <td style="padding:12px 16px;font-size:13px;font-weight:600;font-family:var(--font-mono);">R$ 1.900</td>
+              <td style="padding:12px 16px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:4px;background:var(--surface2);border-radius:4px;max-width:80px;"><div style="width:24%;height:100%;background:var(--text-dim);border-radius:4px;"></div></div>
+                  <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">3.9%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <style>
+        .met-kpi-card {
+          background:var(--surface);
+          border:1px solid rgba(35,23,16,0.07);
+          border-radius:16px;
+          padding:20px 22px;
+          position:relative;
+          overflow:hidden;
+          transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .met-kpi-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(35,23,16,0.08); }
+        .met-kpi-label { font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);font-weight:800;font-family:var(--font-mono);margin-bottom:10px; }
+        .met-kpi-value { font-family:var(--font-mono);font-size:26px;font-weight:900;color:var(--text);letter-spacing:-0.5px;line-height:1; }
+        .met-kpi-delta { font-size:11px;margin-top:6px;font-family:var(--font-mono);font-weight:700; }
+        .met-kpi-delta.positive { color:#5db870; }
+        .met-kpi-delta.negative { color:var(--danger); }
+        .met-kpi-spark { margin-top:14px;height:32px; }
+        .met-chart-card {
+          background:var(--surface);
+          border:1px solid rgba(35,23,16,0.07);
+          border-radius:16px;
+          padding:22px 24px;
+        }
+        .met-chart-title { font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px; }
+        .met-chart-sub { font-size:11px;color:var(--text-dim);margin-bottom:16px;font-family:var(--font-mono); }
+      </style>
+
+      <script>
+      (function() {
+        function waitForChartJS(cb) {
+          if (window.Chart) { cb(); return; }
+          var s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+          s.onload = cb;
+          document.head.appendChild(s);
+        }
+
+        var GOLD = '#BAA78C';
+        var GOLD_T = 'rgba(186,167,140,0.15)';
+        var GREEN = '#5db870';
+        var GREEN_T = 'rgba(93,184,112,0.15)';
+        var DANGER = '#e05555';
+        var TEXT_DIM = 'rgba(35,23,16,0.25)';
+
+        var DATA = {
+          '30': {
+            fat: { val: 'R$ 48.200', delta: '↑ 18% vs período anterior', months: ['Jan','Fev','Mar','Abr','Mai','Jun'], values: [28000,32000,35000,38500,43000,48200] },
+            cli: { val: '34', delta: '↑ 6 novos este mês', novos: [3,5,4,6,4,6], perdidos: [1,2,1,1,2,1] },
+            tkt: { val: 'R$ 1.417', delta: '↑ 11% vs período anterior' },
+            chr: { val: '2,9%', delta: '↑ 0,4% vs período anterior' }
+          },
+          '7': {
+            fat: { val: 'R$ 11.400', delta: '↑ 7% vs período anterior', months: ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], values: [1200,1800,1400,2100,1900,1600,1400] },
+            cli: { val: '28', delta: '↑ 2 novos esta semana', novos: [1,0,1,2,0,1,0], perdidos: [0,1,0,0,1,0,0] },
+            tkt: { val: 'R$ 1.285', delta: '↑ 3% vs período anterior' },
+            chr: { val: '2,1%', delta: '→ Estável' }
+          },
+          '90': {
+            fat: { val: 'R$ 138.700', delta: '↑ 24% vs período anterior', months: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Aug','Set'], values: [28000,32000,35000,38500,43000,48200,52000,55800,59400] },
+            cli: { val: '34', delta: '↑ 12 nos últimos 90 dias', novos: [3,5,4,6,4,6,5,4,7], perdidos: [1,2,1,1,2,1,2,1,1] },
+            tkt: { val: 'R$ 1.540', delta: '↑ 19% vs período anterior' },
+            chr: { val: '3,2%', delta: '↑ 0,7% vs período anterior' }
+          }
+        };
+
+        var charts = {};
+
+        function drawSparkline(canvasId, values, color) {
+          var el = document.getElementById(canvasId);
+          if (!el) return;
+          el.innerHTML = '';
+          var canvas = document.createElement('canvas');
+          canvas.height = 32;
+          el.appendChild(canvas);
+          var ctx = canvas.getContext('2d');
+          canvas.width = el.offsetWidth || 200;
+          var w = canvas.width, h = 32;
+          var min = Math.min.apply(null,values), max = Math.max.apply(null,values);
+          var step = w / (values.length - 1);
+          var grad = ctx.createLinearGradient(0,0,0,h);
+          grad.addColorStop(0, color.replace(')',',0.3)').replace('rgb','rgba'));
+          grad.addColorStop(1, color.replace(')',',0)').replace('rgb','rgba'));
+          ctx.beginPath();
+          values.forEach(function(v,i) {
+            var x = i*step, y = h - ((v-min)/(max-min||1))*(h-4)-2;
+            i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+          });
+          ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+          var lastX = values.length > 1 ? ctx.canvas.width : 0;
+          ctx.lineTo(lastX, h); ctx.lineTo(0,h); ctx.closePath();
+          ctx.fillStyle = grad; ctx.fill();
+        }
+
+        function buildCharts(periodo) {
+          var d = DATA[periodo] || DATA['30'];
+
+          // Update KPIs
+          document.getElementById('kpi-fat-val').textContent = d.fat.val;
+          document.getElementById('kpi-cli-val').textContent = d.cli.val;
+          document.getElementById('kpi-tkt-val').textContent = d.tkt.val;
+          document.getElementById('kpi-chr-val').textContent = d.chr.val;
+
+          setTimeout(function() {
+            drawSparkline('spark-fat', d.fat.values, GOLD);
+            drawSparkline('spark-cli', d.cli.novos, GREEN);
+            drawSparkline('spark-tkt', d.fat.values.map(function(v){return v/34;}), GOLD);
+            drawSparkline('spark-chr', [3.1,2.8,2.5,2.9,2.6,2.9], DANGER);
+          }, 50);
+
+          var defaults = {
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{display:false}, tooltip:{
+              backgroundColor:'rgba(35,23,16,0.92)', titleColor:'#F5F0E6', bodyColor:'#BAA78C',
+              padding:10, cornerRadius:8, titleFont:{family:'Outfit',weight:'800',size:11},
+              bodyFont:{family:'Outfit',size:12}
+            }},
+            scales:{
+              x:{grid:{color:'rgba(35,23,16,0.04)'},ticks:{color:'#93979B',font:{family:'Outfit',size:10,weight:'700'}}},
+              y:{grid:{color:'rgba(35,23,16,0.04)'},ticks:{color:'#93979B',font:{family:'Outfit',size:10,weight:'700'}}}
+            }
+          };
+
+          // Fat chart
+          if (charts.fat) charts.fat.destroy();
+          var ctxFat = document.getElementById('chart-fat').getContext('2d');
+          var gradFat = ctxFat.createLinearGradient(0,0,0,200);
+          gradFat.addColorStop(0,'rgba(186,167,140,0.25)');
+          gradFat.addColorStop(1,'rgba(186,167,140,0)');
+          charts.fat = new Chart(ctxFat, {
+            type:'line',
+            data:{ labels:d.fat.months, datasets:[{
+              data:d.fat.values, borderColor:GOLD, backgroundColor:gradFat,
+              borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:GOLD,
+              pointRadius:4, pointHoverRadius:6
+            }]},
+            options: JSON.parse(JSON.stringify(defaults))
+          });
+
+          // Clients chart
+          if (charts.cli) charts.cli.destroy();
+          var ctxCli = document.getElementById('chart-cli').getContext('2d');
+          charts.cli = new Chart(ctxCli, {
+            type:'bar',
+            data:{ labels:d.fat.months, datasets:[
+              { label:'Novos', data:d.cli.novos, backgroundColor:'rgba(93,184,112,0.7)', borderRadius:6, borderSkipped:false },
+              { label:'Perdidos', data:d.cli.perdidos.map(function(v){return -v;}), backgroundColor:'rgba(224,85,85,0.6)', borderRadius:6, borderSkipped:false }
+            ]},
+            options: Object.assign(JSON.parse(JSON.stringify(defaults)), {
+              plugins:{ legend:{display:true, position:'top', labels:{color:'#6B5C52',font:{family:'Outfit',size:11,weight:'700'},boxWidth:10,padding:14}} ,
+                tooltip:{backgroundColor:'rgba(35,23,16,0.92)',titleColor:'#F5F0E6',bodyColor:'#BAA78C',padding:10,cornerRadius:8}}
+            })
+          });
+
+          // Plano donut
+          if (charts.plano) charts.plano.destroy();
+          var ctxPlano = document.getElementById('chart-plano').getContext('2d');
+          charts.plano = new Chart(ctxPlano, {
+            type:'doughnut',
+            data:{ labels:['Premium','Standard','Básico'], datasets:[{
+              data:[12,14,8],
+              backgroundColor:['rgba(186,167,140,0.85)','rgba(93,184,112,0.75)','rgba(147,151,155,0.55)'],
+              borderWidth:0, hoverOffset:6
+            }]},
+            options:{
+              responsive:true, maintainAspectRatio:false, cutout:'68%',
+              plugins:{
+                legend:{ display:true, position:'bottom', labels:{color:'#6B5C52',font:{family:'Outfit',size:11,weight:'700'},boxWidth:10,padding:12}},
+                tooltip:{backgroundColor:'rgba(35,23,16,0.92)',titleColor:'#F5F0E6',bodyColor:'#BAA78C',padding:10,cornerRadius:8}
+              }
+            }
+          });
+
+          // Origem donut
+          if (charts.origem) charts.origem.destroy();
+          var ctxOrigem = document.getElementById('chart-origem').getContext('2d');
+          charts.origem = new Chart(ctxOrigem, {
+            type:'doughnut',
+            data:{ labels:['Instagram','Indicação','Google','WhatsApp','Outros'], datasets:[{
+              data:[38,28,14,12,8],
+              backgroundColor:['rgba(186,167,140,0.85)','rgba(93,184,112,0.75)','rgba(224,85,85,0.6)','rgba(147,151,155,0.5)','rgba(35,23,16,0.3)'],
+              borderWidth:0, hoverOffset:6
+            }]},
+            options:{
+              responsive:true, maintainAspectRatio:false, cutout:'68%',
+              plugins:{
+                legend:{ display:true, position:'bottom', labels:{color:'#6B5C52',font:{family:'Outfit',size:11,weight:'700'},boxWidth:10,padding:10}},
+                tooltip:{backgroundColor:'rgba(35,23,16,0.92)',titleColor:'#F5F0E6',bodyColor:'#BAA78C',padding:10,cornerRadius:8}
+              }
+            }
+          });
+
+          // NPS gauge
+          if (charts.nps) charts.nps.destroy();
+          var ctxNps = document.getElementById('chart-nps').getContext('2d');
+          charts.nps = new Chart(ctxNps, {
+            type:'doughnut',
+            data:{ labels:['Promotores','Neutros','Detratores'], datasets:[{
+              data:[68,18,14],
+              backgroundColor:['rgba(93,184,112,0.8)','rgba(186,167,140,0.5)','rgba(224,85,85,0.7)'],
+              borderWidth:0
+            }]},
+            options:{
+              responsive:false, cutout:'72%',
+              plugins:{legend:{display:false}, tooltip:{enabled:false}}
+            }
+          });
+        }
+
+        window.metricasChangePeriodo = function(val) { buildCharts(val); };
+
+        // Init when section becomes visible
+        var inited = false;
+        var origShow = window.showSection;
+        window.showSection = function(s) {
+          if (origShow) origShow(s);
+          if (s === 'metricas' && !inited) {
+            inited = true;
+            waitForChartJS(function() { buildCharts('30'); });
+          }
+        };
+
+        // Also try on DOM ready in case already visible
+        setTimeout(function() {
+          var sec = document.getElementById('section-metricas');
+          if (sec && sec.style.display !== 'none' && !inited) {
+            inited = true;
+            waitForChartJS(function() { buildCharts('30'); });
+          }
+        }, 300);
+      })();
+      </script>
     </div>
 
     <!-- TRAFEGO -->
@@ -1215,386 +1613,1906 @@ C56: (texto de contato/suporte — opcional)"></textarea>
     <!-- BRANDING -->
     <div id="section-branding" style="display:none">
       <div class="topbar"><div class="page-title">Branding Guidelines</div></div>
-      <div id="branding-content-wrap" style="height:calc(100vh - 80px);overflow-y:auto;border-radius:16px;background:#F5F0E6;border:1px solid rgba(35,23,16,0.07);">
-        <style id="branding-styles">
+      <div id="branding-content-wrap" style="height:calc(100vh - 80px);overflow-y:auto;border-radius:16px;border:1px solid rgba(35,23,16,0.07);">
+        <iframe id="branding-iframe" style="width:100%;height:100%;border:none;border-radius:16px;" srcdoc="<!DOCTYPE html>
+<html lang=&quot;pt-BR&quot; data-theme=&quot;light&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>ISISMOREIRA · Design System v6</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,200;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,300;1,9..40,400&amp;family=DM+Serif+Display:ital@0;1&amp;family=IBM+Plex+Mono:wght@300;400;500;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
 
-:root{
-  --marfim:#F5F0E6;--creme:#EDE6D8;--titanium:#BAA78C;--cacao:#231710;--mirror:#93979B;
-  --mirror-10:rgba(147,151,155,.06);--mirror-20:rgba(147,151,155,.10);--mirror-30:rgba(147,151,155,.18);
-  --cacao-70:rgba(35,23,16,.70);--cacao-20:rgba(35,23,16,.20);--cacao-10:rgba(35,23,16,.10);--cacao-05:rgba(35,23,16,.05);
-  --marfim-20:rgba(245,240,230,.20);--marfim-10:rgba(245,240,230,.10);--marfim-05:rgba(245,240,230,.04);
-  --surface-elevated:var(--creme);--surface-dark-elevated:rgba(245,240,230,.04);
-  --text-primary-light:var(--cacao);--text-secondary-light:var(--cacao-70);--text-meta:var(--mirror);--text-accent:var(--titanium);
-  --text-primary-dark:var(--marfim);--text-secondary-dark:var(--creme);
-  --border-subtle-light:var(--cacao-05);--border-subtle-dark:var(--marfim-05);--border-strong-dark:var(--marfim-10);--border-mirror:rgba(147,151,155,.15);
-  --divider-light:var(--creme);--divider-dark:var(--marfim-10);
-  --shadow-sm:0 1px 2px rgba(35,23,16,.06);--shadow-md:0 2px 6px rgba(35,23,16,.08);--shadow-precision:0 1px 3px rgba(35,23,16,.12),0 0 0 1px rgba(35,23,16,.04);
-  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;--radius-full:100px;
-  --sans:'DM Sans',sans-serif;--serif:'DM Serif Display',serif;--mono:'Outfit',sans-serif;
+/* ═══════════════════════════════════════════
+   ISIS v6 · Isis Moreira Design System
+   Tokens · Identidade · Componentes
+═══════════════════════════════════════════ */
+
+:root {
+  --marfim:   #F5F0E6;
+  --creme:    #E4DBC9;
+  --titanium: #9E9485;
+  --cacao:    #231710;
+  --mirror:   #8E8C88;
+  --ouro:     #D4C090;
+  --ouro-pale:#E3D6B6;
+  --ouro-deep:#988A67;
+
+  --cacao-04:  rgba(35,23,16,.04);
+  --cacao-06:  rgba(35,23,16,.06);
+  --cacao-08:  rgba(35,23,16,.08);
+  --cacao-12:  rgba(35,23,16,.12);
+  --cacao-20:  rgba(35,23,16,.20);
+  --marfim-06: rgba(245,240,230,.06);
+  --marfim-12: rgba(245,240,230,.12);
+  --marfim-35: rgba(245,240,230,.35);
+  --ouro-10:   rgba(212,192,144,.10);
+  --ouro-20:   rgba(212,192,144,.20);
+  --ouro-30:   rgba(212,192,144,.30);
+
+  --bg:         var(--marfim);
+  --bg-raised:  var(--creme);
+  --bg-sunken:  var(--cacao-04);
+  --bg-card:    var(--creme);
+  --bg-input:   var(--marfim);
+  --text-1:     var(--cacao);
+  --text-2:     rgba(35,23,16,.65);
+  --text-3:     var(--mirror);
+  --accent:     var(--ouro);
+  --accent-text:var(--ouro-deep);
+  --border-1:   var(--cacao-06);
+  --border-2:   var(--cacao-12);
+  --border-acc: var(--ouro-20);
+  --divider:    var(--creme);
+  --sb-bg:      rgba(245,240,230,.92);
+  --sb-border:  var(--cacao-08);
+
+  --dark-0: #1A0F09;
+  --dark-1: #231710;
+  --dark-2: #2B1C13;
+  --dark-3: #332016;
+
+  --ok:   #34A853; --ok-bg: rgba(52,168,83,.08);   --ok-bd: rgba(52,168,83,.20);
+  --warn: #F5A623; --warn-bg: rgba(245,166,35,.08); --warn-bd: rgba(245,166,35,.20);
+  --err:  #E03131; --err-bg: rgba(224,49,49,.08);   --err-bd: rgba(224,49,49,.20);
+
+  --sans:  'DM Sans', sans-serif;
+  --serif: 'DM Serif Display', serif;
+  --mono:  'IBM Plex Mono', monospace;
+
+  --t-2xs: 9px; --t-xs: 11px; --t-sm: 13px; --t-md: 15px;
+  --t-lg: 18px; --t-xl: 24px; --t-2xl: 32px; --t-3xl: 48px;
+  --t-4xl: 64px; --t-5xl: 80px;
+
+  --d-xs: 8px; --d-sm: 12px; --d-md: 16px;
+  --d-lg: 24px; --d-xl: 40px; --d-2xl: 64px;
+
+  --r-xs: 3px; --r-sm: 6px; --r-md: 8px; --r-lg: 10px;
+  --r-xl: 14px; --r-2xl: 20px; --r-full: 9999px;
+
+  --sh-1: 0 1px 2px var(--cacao-06);
+  --sh-2: 0 1px 4px var(--cacao-08), 0 0 0 1px var(--cacao-04);
+  --sh-3: 0 2px 8px var(--cacao-08), 0 1px 3px var(--cacao-06);
+  --sh-4: 0 4px 20px var(--cacao-12), 0 2px 6px var(--cacao-06);
+  --sh-focus: 0 0 0 3px rgba(212,192,144,.25);
+  --sh-ouro:  0 0 24px var(--ouro-10), 0 0 48px rgba(212,192,144,.05);
+
+  --fast:   120ms; --normal: 200ms; --slow: 400ms; --spring: 380ms;
+  --ease-std:    cubic-bezier(.4,0,.2,1);
+  --ease-out:    cubic-bezier(0,0,.2,1);
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+
+  --track-ui:  0.5px;
+  --track-eye: 2.5px;
+  --track-logo: 4px;
 }
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--marfim);color:var(--text-primary-light);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
-::selection{background:var(--titanium);color:var(--marfim)}
-.topbar{position:sticky;top:0;z-index:90;display:flex;justify-content:space-between;align-items:center;padding:14px clamp(24px,5vw,64px);font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:background .35s,color .35s;background:var(--marfim);color:var(--text-meta);border-bottom:1px solid var(--divider-light)}
-.topbar.dark{background:var(--cacao);color:var(--text-meta);border-bottom-color:var(--border-subtle-dark)}
-.topbar-brand{font-weight:500}.topbar.dark .topbar-brand{color:var(--text-accent)}.topbar:not(.dark) .topbar-brand{color:var(--text-primary-light)}
-.s{padding:clamp(80px,12vh,160px) clamp(24px,5vw,64px) clamp(64px,10vh,130px)}
-.s-light{background:var(--marfim);color:var(--text-primary-light)}.s-dark{background:var(--cacao);color:var(--text-primary-dark)}
-.display{font-weight:900;font-size:clamp(44px,7.5vw,100px);line-height:1.0;letter-spacing:-1.5px;margin-bottom:48px;max-width:920px}
-.display em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--text-accent)}
-.label{font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;display:block;color:var(--text-accent)}
-.body{font-size:15px;line-height:1.8;max-width:640px}.s-light .body{color:var(--text-primary-light)}.s-dark .body{color:var(--text-secondary-dark)}
-.mirror-text{color:var(--text-meta);font-size:14px;line-height:1.75;max-width:600px}.s-dark .mirror-text{font-size:12px}
-.sec-num{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:28px;color:var(--text-meta)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:28px 0}
-.card{padding:28px;border-radius:var(--radius-lg);transition:transform .15s,box-shadow .15s}.card:hover{transform:translateY(-2px)}
-.s-light .card{background:var(--surface-elevated);border:1px solid var(--border-subtle-light);box-shadow:var(--shadow-sm)}.s-light .card:hover{box-shadow:var(--shadow-precision)}
-.s-dark .card{background:var(--surface-dark-elevated);border:1px solid var(--border-subtle-dark)}.s-dark .card:hover{border-color:var(--border-strong-dark)}
-.card h4{font-weight:800;font-size:18px;margin-bottom:6px;letter-spacing:-.2px}
-.card p{font-size:13.5px;line-height:1.7}.s-light .card p{color:var(--text-secondary-light)}.s-dark .card p{color:var(--text-secondary-dark)}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0}.col-box{padding:28px;border-radius:var(--radius-lg)}
-.s-light .col-do{background:rgba(186,167,140,.04);border:1px solid rgba(186,167,140,.12)}.s-light .col-dont{background:var(--mirror-10);border:1px solid var(--border-mirror)}
-.s-dark .col-do{background:rgba(186,167,140,.06);border:1px solid rgba(186,167,140,.12)}.s-dark .col-dont{background:var(--marfim-05);border:1px solid var(--border-subtle-dark)}
-.col-box h4{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px}
-.col-do h4{color:var(--text-accent)}.col-dont h4{color:var(--text-meta)}
-.col-box li{list-style:none;font-size:14px;padding:5px 0}.s-light .col-box li{color:var(--text-primary-light)}.s-dark .col-box li{color:var(--text-secondary-dark)}
-.tags{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
-.tag{padding:6px 14px;border-radius:var(--radius-full);font-family:var(--mono);font-size:11px;font-weight:800;letter-spacing:.5px}
-.s-light .tag{background:var(--surface-elevated);border:1px solid var(--divider-light);color:var(--text-primary-light)}
-.s-dark .tag{background:var(--marfim-05);border:1px solid var(--border-subtle-dark);color:var(--text-secondary-dark)}
-.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:28px 0}
-.sw{border-radius:var(--radius-lg);overflow:hidden}.sw-top{height:100px;display:flex;align-items:flex-end;padding:8px 10px}
-.sw-top span{font-family:var(--mono);font-size:11px;padding:3px 7px;border-radius:3px}
-.sw-bot{padding:12px 14px;background:var(--surface-elevated);border:1px solid var(--border-subtle-light);border-top:0;border-radius:0 0 var(--radius-lg) var(--radius-lg)}
-.sw-bot strong{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
-.sw-bot small{font-family:var(--mono);font-size:11px;color:var(--text-meta);display:block;line-height:1.5}
-.logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin:28px 0}
-.lbox{aspect-ratio:16/10;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;letter-spacing:3px;text-transform:uppercase;position:relative}
-.lbox::after{content:attr(data-label);position:absolute;bottom:7px;right:11px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-meta)}
-.tbl{width:100%;border-collapse:collapse;margin:28px 0;font-size:14px;border-radius:var(--radius-lg);overflow:hidden}
-.s-light .tbl{background:var(--surface-elevated);border:1px solid var(--border-subtle-light)}
-.s-dark .tbl{background:var(--surface-dark-elevated);border:1px solid var(--border-subtle-dark)}
-.tbl th{text-align:left;padding:14px 20px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:800;background:var(--cacao);color:var(--text-accent)}
-.s-dark .tbl th{background:rgba(0,0,0,.25)}.tbl td{padding:14px 20px}
-.s-light .tbl td{color:var(--text-primary-light);border-bottom:1px solid var(--divider-light)}
-.s-dark .tbl td{color:var(--text-secondary-dark);border-bottom:1px solid var(--divider-dark)}.tbl tr:last-child td{border-bottom:none}
-.callout{border-left:3px solid var(--text-accent);padding:22px 26px;border-radius:0 var(--radius-lg) var(--radius-lg) 0;margin:28px 0;font-size:14px;line-height:1.85}
-.s-light .callout{background:var(--surface-elevated);color:var(--text-secondary-light)}
-.s-dark .callout{background:var(--surface-dark-elevated);color:var(--text-secondary-dark)}
-.callout strong{color:var(--text-primary-light)}.s-dark .callout strong{color:var(--text-primary-dark)}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:28px 0}
-.ccard{border-radius:var(--radius-lg);padding:22px;display:flex;flex-direction:column;gap:6px;min-height:110px}
-.ccard .cc-label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
-.ccard .cc-text{font-size:16px;font-weight:800}.ccard .cc-ratio{font-family:var(--mono);font-size:11px;margin-top:auto}
-.specimen{border-radius:var(--radius-xl);padding:36px;margin:24px 0}
-.s-light .specimen{background:var(--surface-elevated);border:1px solid var(--border-subtle-light);box-shadow:var(--shadow-sm)}
-.grid-demo{border-radius:var(--radius-xl);padding:32px;margin:24px 0}
-.s-dark .grid-demo{background:var(--surface-dark-elevated);border:1px solid var(--border-subtle-dark)}
-.twelve{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:12px 0}
-.col-u{height:44px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:800;background:var(--mirror);color:var(--marfim)}
-.protection{border-radius:var(--radius-xl);padding:44px;margin:24px 0;text-align:center}
-.s-light .protection{background:var(--surface-elevated);border:1px solid var(--border-subtle-light);box-shadow:var(--shadow-sm)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 28px;border-radius:var(--radius-md);font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.3px;border:none;cursor:pointer;transition:all .15s ease;text-decoration:none}
-.btn-conversao{background:var(--marfim);color:var(--cacao);box-shadow:var(--shadow-precision)}
-.btn-conversao:hover{background:#FEFCF6;box-shadow:var(--shadow-md),0 0 0 1px var(--cacao-10)}
-.btn-premium{background:var(--titanium);color:var(--cacao);box-shadow:var(--shadow-precision)}
-.btn-premium:hover{background:#C4B39A;box-shadow:var(--shadow-md),0 0 0 1px rgba(186,167,140,.3)}
-.btn-secondary{background:transparent;color:var(--mirror);border:1px solid var(--border-mirror);box-shadow:none}
-.btn-secondary:hover{border-color:var(--mirror);color:var(--cacao);background:var(--mirror-10)}
-.s-dark .btn-secondary{color:var(--mirror);border-color:var(--marfim-10)}
-.s-dark .btn-secondary:hover{color:var(--marfim);border-color:var(--marfim-20);background:var(--marfim-05)}
-.footer{padding:72px clamp(24px,5vw,64px) 36px;text-align:center;background:var(--marfim);border-top:1px solid var(--divider-light)}
-.footer-mark{font-weight:900;font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--text-primary-light);margin-bottom:4px}
-.footer p{font-family:var(--mono);font-size:11px;color:var(--text-meta)}
-.btt{position:fixed;bottom:22px;right:22px;width:42px;height:42px;border-radius:50%;background:var(--cacao);color:var(--text-accent);border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:80;box-shadow:var(--shadow-precision)}.btt.on{opacity:1}
-@media(max-width:768px){.split{grid-template-columns:1fr}.display{font-size:clamp(36px,10vw,56px)}.twelve{grid-template-columns:repeat(6,1fr)}}
-@media print{.topbar,.btt{display:none!important}.s{page-break-inside:avoid;min-height:auto}}
 
-        </style>
-        <div class="branding-root">
+[data-theme=&quot;dark&quot;] {
+  --bg:        var(--dark-1);
+  --bg-raised: var(--dark-2);
+  --bg-sunken: var(--dark-0);
+  --bg-card:   var(--dark-2);
+  --bg-input:  var(--dark-2);
+  --text-1:    var(--marfim);
+  --text-2:    rgba(245,240,230,.65);
+  --text-3:    rgba(245,240,230,.38);
+  --border-1:  var(--marfim-06);
+  --border-2:  var(--marfim-12);
+  --divider:   var(--dark-3);
+  --sb-bg:     rgba(43,28,19,.95);
+  --sb-border: var(--marfim-06);
+  --sh-1: 0 1px 3px rgba(0,0,0,.4);
+  --sh-2: 0 2px 6px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.04);
+  --sh-3: 0 3px 12px rgba(0,0,0,.5);
+  --sh-4: 0 6px 24px rgba(0,0,0,.6);
+}
 
-<div class="topbar" id="topbar"><span>Branding Guidelines</span><span class="topbar-brand">Isis Moreira</span><span>v2.0</span></div>
-<button class="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+/* ─── BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-1);
+  font-size: var(--t-md);
+  line-height: 1.6;
+  transition: background var(--normal) var(--ease-std), color var(--normal) var(--ease-std);
+  overflow-x: hidden;
+}
+[data-theme=&quot;dark&quot;] body { background-image: none; }
+::selection { background: var(--ouro); color: var(--cacao); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; }
 
-<section class="s s-light" style="display:flex;align-items:center;min-height:100vh;"><div>
-  <span class="sec-num">Ecossistema Donas do Ouro</span>
-  <h1 class="display" style="font-size:clamp(56px,10vw,130px);">Branding<br><em>Guidelines</em></h1>
-  <p class="mirror-text" style="max-width:460px;">Diretrizes de marca para garantir consistência visual e verbal em todos os pontos de contato.</p>
-</div></section>
+/* ─── LAYOUT ─── */
+.layout { display: flex; flex-direction: column; min-height: 100vh; }
+.main   { flex: 1; }
 
-<section class="s s-dark" id="s1"><span class="sec-num">Seção 01</span>
-  <h2 class="display">Visão geral<br><em>da marca</em></h2>
-  <div style="max-width:680px;">
-    <span class="label">Quem somos</span>
-    <p class="body">Isis Moreira é uma marca pessoal de mentoria de negócios e mentalidade com mais de 40 mil alunas. Conduz mulheres a uma vida alinhada, livre e leve através de autoconhecimento profundo e estratégia prática.</p>
-    <span class="mirror-text" style="margin-top:8px;display:block;">Marca pessoal · Mentoria · Negócios e mentalidade</span><br>
-    <span class="label">Público</span>
-    <p class="body">Mulheres de 30 a 40 anos. Empreendedoras, empresárias e profissionais liberais. Inteligentes e dedicadas, mas que não se sentem alinhadas com a própria verdade.</p><br>
-    <span class="label">Problema que resolvemos</span>
-    <p class="body">O Desalinhamento. Viver uma vida "ok" por fora, mas vazia por dentro. O caminho passa por tirar as máscaras e reconectar com quem você realmente é.</p>
-  </div>
-</section>
+/* ═══════════════════════════════════════════
+   NAV — linha única, limpa
+═══════════════════════════════════════════ */
+.topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: var(--sb-bg);
+  border-bottom: 1px solid var(--sb-border);
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
-<section class="s s-light" id="s2"><span class="sec-num">Seção 02</span>
-  <h2 class="display">Essência e<br><em>posicionamento</em></h2>
-  <div style="max-width:680px;">
-    <span class="label">Posicionamento</span>
-    <p class="body">A mentora que conduz a uma transformação real, prática e profunda. Sem misticismo e sem romantização. A saída começa quando você tira as máscaras.</p><br>
-    <span class="label">Proposta de valor</span>
-    <p class="body">Transformação que faz sentido. A cliente encontra clareza, segurança, alívio e movimento.</p>
-    <p class="mirror-text" style="margin-top:6px;">Alguém que fala a verdade sem pesar.</p>
-  </div>
-  <span class="label" style="margin-top:48px;">Pilares</span>
-  <div class="cards" style="grid-template-columns:repeat(3,1fr);">
-    <div class="card"><h4>Alinhamento</h4><p>Clareza para decidir, conexão com a própria verdade, sair do automático.</p></div>
-    <div class="card"><h4>Liberdade</h4><p>De tempo, dinheiro e ser. Sem pesos que nunca foram dela.</p></div>
-    <div class="card"><h4>Leveza</h4><p>Nasce da clareza. Vem quando você para de lutar contra si mesma.</p></div>
-  </div>
-  <span class="label">Sensações da marca</span>
-  <div class="tags"><span class="tag">Clareza</span><span class="tag">Alívio</span><span class="tag">Liberdade</span><span class="tag">Coragem</span><span class="tag">Firmeza</span><span class="tag">Esperança</span><span class="tag">Ordem</span><span class="tag">Acolhimento</span><span class="tag">Movimento</span></div>
-</section>
+/* Linha 1: identidade */
+.nav-row1 {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 24px;
+  gap: 14px;
+  border-bottom: 1px solid var(--border-1);
+}
 
-<section class="s s-dark" id="s3"><span class="sec-num">Seção 03</span>
-  <h2 class="display">Personalidade<br><em>da marca</em></h2>
-  <div class="cards">
-    <div class="card"><h4>Firme</h4><p>Sustenta sua posição com clareza. Firmeza não é dureza, é sobriedade.</p></div>
-    <div class="card"><h4>Sensível</h4><p>Entende a dor da mulher e reconhece sua história.</p></div>
-    <div class="card"><h4>Verdadeira</h4><p>Fala a verdade como ela é. Sem rodeios e sem romantização.</p></div>
-    <div class="card"><h4>Elegante</h4><p>Estética atemporal, editorial e cinematográfica.</p></div>
-  </div>
-  <div class="split">
-    <div class="col-box col-do"><h4>A marca é</h4><ul><li>Verdadeira sem ser rude</li><li>Firme sem ser dura</li><li>Leve sem ser superficial</li><li>Didática sem ser condescendente</li></ul></div>
-    <div class="col-box col-dont"><h4>A marca não é</h4><ul><li>Mística ou fantasiosa</li><li>Agressiva ou impositiva</li><li>Corporativa ou genérica</li><li>Romantizadora do sofrimento</li></ul></div>
-  </div>
-</section>
+.nav-logo {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: var(--track-logo);
+  text-transform: uppercase;
+  color: var(--text-1);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-logo b { font-weight: 700; }
 
-<section class="s s-light" id="s4"><span class="sec-num">Seção 04</span>
-  <h2 class="display">Tom de voz<br><em>e escrita</em></h2>
-  <span class="label">Atributos de voz</span>
-  <div class="cards" style="grid-template-columns:repeat(3,1fr);">
-    <div class="card"><h4>Verdadeiro</h4><p>Sem máscaras, sem rodeios.</p></div>
-    <div class="card"><h4>Firme</h4><p>Clareza e maturidade.</p></div>
-    <div class="card"><h4>Leve</h4><p>Não pressiona, não pesa.</p></div>
-    <div class="card"><h4>Sensível</h4><p>Ver além da superfície.</p></div>
-    <div class="card"><h4>Calmo</h4><p>Sereno e consciente.</p></div>
-    <div class="card"><h4>Realista</h4><p>Prática e pé no chão.</p></div>
-    <div class="card"><h4>Claro</h4><p>Frases limpas e objetivas.</p></div>
-    <div class="card"><h4>Didático</h4><p>Simplicidade com profundidade.</p></div>
-    <div class="card"><h4>Cirúrgico</h4><p>Cada palavra vai ao ponto.</p></div>
-  </div>
-  <span class="label" style="margin-top:40px;">Bordões oficiais</span>
-  <div class="tags"><span class="tag">Alinhada. Livre. Leve.</span><span class="tag">Pense além. Seja dona.</span><span class="tag">Quem se alinha, chega.</span><span class="tag">Menos peso, mais leveza.</span><span class="tag">Faça 50 vezes.</span><span class="tag">Meu cargo: filha do Dono.</span></div>
-</section>
+.nav-tagline {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
 
-<section class="s s-dark" id="s5"><span class="sec-num">Seção 05</span>
-  <h2 class="display">Identidade<br><em>visual</em></h2>
-  <span class="label">Marca pessoal</span>
-  <div class="logos">
-    <div class="lbox" style="background:var(--marfim);color:var(--cacao);" data-label="Principal">Isis Moreira</div>
-    <div class="lbox" style="background:var(--cacao);color:var(--marfim);border:1px solid var(--border-subtle-dark);" data-label="Negativo">Isis Moreira</div>
-    <div class="lbox" style="background:var(--cacao);color:var(--titanium);border:1px solid var(--border-subtle-dark);" data-label="Titanium">Isis Moreira</div>
-  </div>
-  <span class="label" style="margin-top:40px;">Sub marcas</span>
-  <div class="logos">
-    <div class="lbox" style="background:var(--marfim);color:var(--titanium);" data-label="PDO"><span style="letter-spacing:2px;font-size:15px;">Donas do Ouro</span></div>
-    <div class="lbox" style="background:var(--marfim);color:var(--titanium);" data-label="Skava"><span style="font-family:var(--serif);font-style:italic;font-size:26px;font-weight:400;letter-spacing:1px;">skava</span></div>
-    <div class="lbox" style="background:var(--marfim);color:var(--titanium);" data-label="Myna"><span style="letter-spacing:6px;font-size:18px;">MYNA</span></div>
-  </div>
-  <div class="callout"><strong>Nota:</strong> Todas as marcas usam tipografia serifada editorial. A assinatura "ISIS MOREIRA" em versalete espaçado aparece no rodapé de toda peça.</div>
-</section>
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
 
-<section class="s s-light" id="s6"><span class="sec-num">Seção 06</span>
-  <h2 class="display">Regras do<br><em>logotipo</em></h2>
-  <div class="protection">
-    <div style="display:inline-block;position:relative;padding:38px 60px;border:2px dashed var(--titanium);border-radius:var(--radius-md);">
-      <span style="font-size:22px;font-weight:900;letter-spacing:5px;color:var(--cacao);">ISIS MOREIRA</span>
-      <span style="position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--titanium);font-weight:800;">X</span>
-      <span style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:var(--titanium);font-weight:800;">X</span>
-      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--titanium);font-weight:800;">X</span>
-      <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:11px;color:var(--titanium);font-weight:800;">X</span>
-    </div>
-    <p style="margin-top:18px;font-size:13px;color:var(--text-meta);">Área de proteção = <strong style="color:var(--text-accent)">X</strong> (altura da letra "I") em todas as direções.</p>
-  </div>
-  <table class="tbl"><thead><tr><th>Aplicação</th><th>Tamanho mínimo</th><th>Observação</th></tr></thead><tbody>
-    <tr><td>Digital</td><td>100px de largura</td><td>Abaixo disso, usar monograma</td></tr>
-    <tr><td>Impresso</td><td>30mm de largura</td><td>Mínimo 300 dpi</td></tr>
-    <tr><td>Favicon</td><td>16×16px</td><td>Ícone simplificado</td></tr>
-  </tbody></table>
-</section>
+.nav-ver {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+}
 
-<section class="s s-dark" id="s7"><span class="sec-num">Seção 07</span>
-  <h2 class="display">Aplicação do<br><em>logotipo</em></h2>
-  <span class="label">Aplicações corretas</span>
-  <div class="logos">
-    <div class="lbox" style="background:var(--marfim);color:var(--cacao);" data-label="Fundo claro"><span style="font-size:14px;">Isis Moreira</span></div>
-    <div class="lbox" style="background:var(--cacao);color:var(--marfim);border:1px solid var(--border-subtle-dark);" data-label="Fundo escuro"><span style="font-size:14px;">Isis Moreira</span></div>
-    <div class="lbox" style="background:var(--creme);color:var(--cacao);" data-label="Fundo creme"><span style="font-size:14px;">Isis Moreira</span></div>
-  </div>
-  <span class="label" style="margin-top:40px;">O que nunca fazer</span>
-  <div class="cards">
-    <div class="card"><h4 style="color:var(--text-meta);">Distorcer</h4><p>Nunca alterar proporções.</p></div>
-    <div class="card"><h4 style="color:var(--text-meta);">Cores erradas</h4><p>Não usar fora da paleta oficial.</p></div>
-    <div class="card"><h4 style="color:var(--text-meta);">Efeitos</h4><p>Sem sombra, brilho ou 3D.</p></div>
-    <div class="card"><h4 style="color:var(--text-meta);">Trocar fonte</h4><p>Nunca substituir a tipografia.</p></div>
-  </div>
-</section>
+/* Linha 2: links */
+.nav-row2 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0 8px;
+  min-height: 34px;
+}
 
-<section class="s s-light" id="s8"><span class="sec-num">Seção 08</span>
-  <h2 class="display">Paleta de<br><em>cores</em></h2>
-  <span class="label">Cores oficiais</span>
-  <div class="swatches">
-    <div class="sw"><div class="sw-top" style="background:#F5F0E6;border:1px solid var(--divider-light);border-bottom:0;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"><span style="background:var(--cacao-05);color:var(--cacao);">#F5F0E6</span></div><div class="sw-bot"><strong>Marfim</strong><small>Base · texto no escuro · 45%</small></div></div>
-    <div class="sw"><div class="sw-top" style="background:#EDE6D8;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"><span style="background:var(--cacao-05);color:var(--cacao);">#EDE6D8</span></div><div class="sw-bot"><strong>Creme</strong><small>Superfícies · corpo no escuro · 10%</small></div></div>
-    <div class="sw"><div class="sw-top" style="background:#BAA78C;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"><span style="background:rgba(255,255,255,.6);color:var(--cacao);">#BAA78C</span></div><div class="sw-bot"><strong>Titanium Warm</strong><small>Identidade · CTAs · 10%</small></div></div>
-    <div class="sw"><div class="sw-top" style="background:#231710;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"><span style="background:rgba(255,255,255,.1);color:var(--marfim);">#231710</span></div><div class="sw-bot"><strong>Cacao</strong><small>Estrutura · texto · 25%</small></div></div>
-    <div class="sw"><div class="sw-top" style="background:#93979B;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"><span style="background:rgba(255,255,255,.15);color:var(--marfim);">#93979B</span></div><div class="sw-bot"><strong>Mirror</strong><small>Metadata · bordas · 10%</small></div></div>
-  </div>
-  <span class="label" style="margin-top:40px;">Papel de cada cor</span>
-  <table class="tbl"><thead><tr><th>Cor</th><th>Papel</th><th>Onde aparece</th></tr></thead><tbody>
-    <tr><td><strong>Marfim</strong></td><td>Base e texto no escuro</td><td>Fundo claro, títulos sobre Cacao</td></tr>
-    <tr><td><strong>Creme</strong></td><td>Superfícies e corpo no escuro</td><td>Cards, texto corrido sobre Cacao, dividers</td></tr>
-    <tr><td><strong>Titanium</strong></td><td>Identidade e ação</td><td>Títulos italic, CTAs, labels, focus ring</td></tr>
-    <tr><td><strong>Cacao</strong></td><td>Peso e ancoragem</td><td>Texto no claro, fundos escuros</td></tr>
-    <tr><td><strong>Mirror</strong></td><td>Metadata e estrutura</td><td>Labels curtas, timestamps, bordas, dividers</td></tr>
-  </tbody></table>
-  <div class="callout"><strong>Titanium</strong> é a voz da marca. <strong>Mirror</strong> é estrutura funcional. <strong>Creme</strong> substitui Mirror no escuro para texto corrido legível.</div>
-</section>
+.nav-links {
+  display: contents;
+}
 
-<section class="s s-dark" id="s9"><span class="sec-num">Seção 09</span>
-  <h2 class="display">Contraste e<br><em>legibilidade</em></h2>
-  <div class="cgrid">
-    <div class="ccard" style="background:var(--cacao);color:var(--marfim);border:1px solid var(--border-subtle-dark);"><span class="cc-label" style="color:var(--titanium);">AAA</span><span class="cc-text">Marfim em Cacao</span><span class="cc-ratio" style="color:var(--mirror);">14.5:1</span></div>
-    <div class="ccard" style="background:var(--cacao);color:var(--creme);border:1px solid var(--border-subtle-dark);"><span class="cc-label" style="color:var(--titanium);">AAA</span><span class="cc-text">Creme em Cacao</span><span class="cc-ratio" style="color:var(--mirror);">11.8:1</span></div>
-    <div class="ccard" style="background:var(--cacao);color:var(--titanium);border:1px solid var(--border-subtle-dark);"><span class="cc-label" style="color:var(--mirror);">AA 18px+</span><span class="cc-text">Titanium em Cacao</span><span class="cc-ratio" style="color:var(--mirror);">5.2:1</span></div>
-    <div class="ccard" style="background:var(--cacao);color:var(--mirror);border:1px solid var(--border-subtle-dark);"><span class="cc-label" style="color:var(--titanium);">Meta only</span><span class="cc-text">Mirror em Cacao</span><span class="cc-ratio" style="color:var(--titanium);">4.1:1</span></div>
-    <div class="ccard" style="background:var(--marfim);color:var(--cacao);border:1px solid var(--cacao-10);"><span class="cc-label" style="color:var(--titanium);">AAA</span><span class="cc-text">Cacao em Marfim</span><span class="cc-ratio" style="color:var(--mirror);">14.5:1</span></div>
-    <div class="ccard" style="background:var(--marfim);color:var(--mirror);border:1px solid var(--cacao-10);"><span class="cc-label" style="color:var(--titanium);">AA 14px+</span><span class="cc-text">Mirror em Marfim</span><span class="cc-ratio" style="color:var(--mirror);">3.5:1</span></div>
-  </div>
-  <p class="body" style="margin-top:24px;">Texto corpo sobre Cacao sempre em Creme ou Marfim. Mirror sobre Cacao somente para metadata curta. Testar com brilho de tela a 30%.</p>
-</section>
+.nav-link {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color var(--fast) var(--ease-std),
+              border-color var(--fast) var(--ease-std);
+  font-weight: 400;
+  line-height: 1;
+}
+.nav-link:hover { color: var(--text-1); background: var(--bg-sunken); }
+.nav-link.on    { color: var(--text-1); font-weight: 500; border-bottom-color: var(--accent); }
 
-<section class="s s-light" id="s10"><span class="sec-num">Seção 10</span>
-  <h2 class="display">Tipografia</h2>
-  <div class="specimen">
-    <span class="label">Primária · títulos</span>
-    <p style="font-weight:900;font-size:clamp(36px,5vw,56px);line-height:1.05;margin-bottom:4px;">DM Sans Black</p>
-    <p class="mirror-text">Sans Serif · Display · Peso 900</p>
-    <div style="margin-top:20px;">
-      <p style="font-family:var(--serif);font-size:clamp(28px,4vw,44px);font-style:italic;color:var(--titanium);line-height:1.1;">DM Serif Display Italic</p>
-      <p class="mirror-text" style="margin-top:6px;">Serif · Accent · Itálico para destaques</p>
-    </div>
-  </div>
-  <div class="specimen">
-    <span class="label">Secundária · corpo</span>
-    <div style="display:flex;flex-wrap:wrap;gap:32px;margin-top:12px;">
-      <div><p style="font-weight:400;font-size:28px;">Aa Bb Cc</p><p class="mirror-text" style="font-size:12px;">Regular 400</p></div>
-      <div><p style="font-weight:500;font-size:28px;">Aa Bb Cc</p><p class="mirror-text" style="font-size:12px;">Medium 500</p></div>
-      <div><p style="font-weight:700;font-size:28px;">Aa Bb Cc</p><p class="mirror-text" style="font-size:12px;">Bold 700</p></div>
-    </div>
-  </div>
-  <div class="specimen">
-    <span class="label">Caption · sistema e micro-UI</span>
-    <p style="font-family:var(--mono);font-size:22px;color:var(--mirror);font-weight:800;">Outfit</p>
-    <p class="mirror-text" style="margin-top:6px;">Labels, steps, timestamps, badges, tags, números, metadata, tabelas de dados</p>
-  </div>
-  <table class="tbl"><thead><tr><th>Elemento</th><th>Fonte</th><th>Tamanho</th><th>Cor</th></tr></thead><tbody>
-    <tr><td>Display</td><td>DM Sans Black</td><td>56 a 96px</td><td>Cacao (claro) ou Marfim (escuro)</td></tr>
-    <tr><td>Accent</td><td>DM Serif Display Italic</td><td>36 a 72px</td><td>Titanium</td></tr>
-    <tr><td>Body</td><td>DM Sans Regular</td><td>15 a 16px</td><td>Cacao (claro) ou Creme (escuro)</td></tr>
-    <tr><td>Secondary</td><td>DM Sans Regular</td><td>13 a 14px</td><td>Mirror (somente no claro)</td></tr>
-    <tr><td>Caption</td><td>Outfit 800</td><td>11 a 12px</td><td>Mirror ou Titanium</td></tr>
-  </tbody></table>
-</section>
+/* toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.theme-toggle-track {
+  width: 28px; height: 16px;
+  background: var(--border-2);
+  border-radius: var(--r-full);
+  position: relative;
+  transition: background var(--fast) var(--ease-std);
+}
+.theme-toggle-track.active { background: var(--ouro); }
+.theme-toggle-thumb {
+  width: 11px; height: 11px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2.5px; left: 2.5px;
+  transition: transform var(--fast) var(--ease-spring);
+  box-shadow: var(--sh-1);
+}
+.theme-toggle-track.active .theme-toggle-thumb { transform: translateX(12px); }
+.theme-toggle-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+}
 
-<section class="s s-dark" id="s11"><span class="sec-num">Seção 11</span>
-  <h2 class="display">Layout e<br><em>hierarquia</em></h2>
-  <div class="grid-demo">
-    <span class="label">Grid · 12 colunas</span>
-    <div class="twelve"><div class="col-u">1</div><div class="col-u">2</div><div class="col-u">3</div><div class="col-u">4</div><div class="col-u">5</div><div class="col-u">6</div><div class="col-u">7</div><div class="col-u">8</div><div class="col-u">9</div><div class="col-u">10</div><div class="col-u">11</div><div class="col-u">12</div></div>
-    <p class="body" style="margin-top:12px;font-size:13px;">Base de 12 colunas, gap de 4px. Margem lateral 24px mobile, 64px desktop.</p>
-  </div>
-  <div style="max-width:640px;margin-top:32px;">
-    <span class="label">Regras de composição</span>
-    <p class="body"><strong>Alinhamento:</strong> Centralizado para títulos de capa e CTAs. Esquerda para corpo.</p><br>
-    <p class="body"><strong>Spacing:</strong> Múltiplos de 8px. A marca respira, generosa em espaço.</p><br>
-    <p class="body"><strong>Bordas:</strong> 1px com tokens semânticos. border-subtle para containers, border-strong para inputs e separadores ativos.</p><br>
-    <p class="body"><strong>Sombras:</strong> Nítidas (shadow-precision), não difusas. Cacao com opacidade baixa, nunca preto puro.</p><br>
-    <p class="body"><strong>Assinatura:</strong> "ISIS MOREIRA" em versalete monospace espaçado no rodapé de toda peça.</p>
-  </div>
-</section>
+/* ═══════════════════════════════════════════
+   SEÇÕES
+═══════════════════════════════════════════ */
+.sec {
+  padding: 56px 64px;
+  border-bottom: 1px solid var(--border-1);
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-<section class="s s-light" id="s12"><span class="sec-num">Seção 12</span>
-  <h2 class="display">Elementos<br><em>gráficos</em></h2>
-  <div style="max-width:640px;">
-    <p class="body"><strong>Overlays de luz:</strong> Sobreposições âmbar sobre fotos, opacidade 15 a 30%, modo Screen.</p>
-    <p class="mirror-text" style="margin-top:4px;">Usar com fotos editoriais para unificar tom quente.</p><br>
-    <p class="body"><strong>Linhas divisórias:</strong> 1px usando --divider-light (Creme) ou --divider-dark (Marfim 10%).</p><br>
-    <p class="body"><strong>Tipografia como grafismo:</strong> Títulos oversize com opacidade reduzida como elemento decorativo.</p><br>
-    <p class="body"><strong>Texturas de fundo:</strong> Mármore, linho, estuco. Sempre sutis.</p><br>
-    <p class="body"><strong>Cantos arredondados:</strong> radius-sm (6px) para badges, radius-md (10px) para botões, radius-lg (14px) para cards, radius-xl (20px) para containers.</p><br>
-    <p class="body"><strong>Mirror como estrutura:</strong> Bordas, dividers, ícones secundários e metadata curta. Nunca texto corrido sobre escuro.</p>
-  </div>
-</section>
+.sec-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent-text);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
 
-<section class="s s-dark" id="s13"><span class="sec-num">Seção 13</span>
-  <h2 class="display">CTAs e<br><em>ações</em></h2>
-  <p class="body" style="margin-bottom:28px;">Dois tipos de CTA primário. Conversão para momentos de venda. Premium para momentos de marca. Nunca misturar no mesmo bloco.</p>
-  <span class="label">Conversão (venda)</span>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 28px;">
-    <button class="btn btn-conversao">Quero começar</button>
-    <button class="btn btn-secondary">Ver detalhes</button>
-  </div>
-  <span class="label">Premium (marca)</span>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 28px;">
-    <button class="btn btn-premium">Aplicar para Skava</button>
-    <button class="btn btn-secondary">Conhecer programa</button>
-  </div>
-  <table class="tbl"><thead><tr><th>Variante</th><th>Fundo</th><th>Texto</th><th>Quando usar</th></tr></thead><tbody>
-    <tr><td><strong>Conversão</strong></td><td>Marfim</td><td>Cacao</td><td>Páginas de venda, checkout, captura</td></tr>
-    <tr><td><strong>Premium</strong></td><td>Titanium</td><td>Cacao</td><td>Landing pages, hero, marca</td></tr>
-    <tr><td><strong>Secundário</strong></td><td>Transparente</td><td>Mirror</td><td>Ações complementares</td></tr>
-  </tbody></table>
-</section>
+.sec-title {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-style: italic;
+  color: var(--text-1);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
 
-<section class="s s-light" id="s14"><span class="sec-num">Seção 14</span>
-  <h2 class="display">Aplicações<br><em>essenciais</em></h2>
-  <div class="cards">
-    <div class="card"><h4>Carrossel (1:1)</h4><p>Título serifado + subtítulo. Foto editorial com overlay. Assinatura no rodapé.</p></div>
-    <div class="card"><h4>Reels (9:16)</h4><p>Capa com foto sem título. Mesclar perfil, objetos e ambientes para respiro.</p></div>
-    <div class="card"><h4>Frase de Revanche</h4><p>Fundo Cacao ou foto com overlay. Frase curta em serifada.</p></div>
-    <div class="card"><h4>Feed</h4><p>Alternar carrosséis com título e reels com foto.</p></div>
-    <div class="card"><h4>Páginas de Venda</h4><p>Diagnóstico, dor, solução, CTA Conversão. Fundo Marfim.</p></div>
-    <div class="card"><h4>Apresentações</h4><p>Fundo Marfim. Títulos em Titanium. Layout limpo.</p></div>
-  </div>
-</section>
+.sec-sub {
+  font-size: var(--t-md);
+  color: var(--text-2);
+  max-width: 560px;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
 
-<section class="s s-dark" id="s15"><span class="sec-num">Seção 15</span>
-  <h2 class="display">Direção de arte<br><em>fotográfica</em></h2>
-  <table class="tbl"><thead><tr><th>Aspecto</th><th>Diretriz</th></tr></thead><tbody>
-    <tr><td>Maquiagem</td><td>Pele natural, pouca maquiagem, unhas claras</td></tr>
-    <tr><td>Composição</td><td>Elegante, sensorial, atemporal</td></tr>
-    <tr><td>Luz</td><td>Tons neutros a quentes, luz e sombra em contraste</td></tr>
-    <tr><td>Estética</td><td>Atmosfera de sonho, clima analógico, cinematográfico</td></tr>
-    <tr><td>Arquétipos</td><td>Amante, Sábia, Exploradora</td></tr>
-  </tbody></table>
-</section>
+.sec-rule {
+  height: 1px;
+  background: var(--border-1);
+  margin: 24px 0;
+}
 
-<footer class="footer"><div class="footer-mark">ISIS MOREIRA</div><p>Branding Guidelines · v2.0</p></footer>
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero {
+  padding: 120px 64px 100px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-1);
+  max-width: 100%;
+}
 
-<script>
-var btt=document.querySelector('.btt');
-window.addEventListener('scroll',function(){btt.classList.toggle('on',scrollY>500)});
-var topbar=document.getElementById('topbar');
-var darks=document.querySelectorAll('.s-dark');
-function ck(){var d=false;darks.forEach(function(s){var r=s.getBoundingClientRect();if(r.top<56&&r.bottom>56)d=true});topbar.classList.toggle('dark',d)}
-window.addEventListener('scroll',ck,{passive:true});ck();
-</script>
+.hero-symbol {
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  display: block;
+}
 
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(48px, 7vw, 84px);
+  font-style: italic;
+  color: var(--text-1);
+  letter-spacing: -2px;
+  line-height: 1.0;
+  margin-bottom: 20px;
+  max-width: 720px;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--accent-text);
+}
+
+.hero-desc {
+  font-size: var(--t-md);
+  color: var(--text-2);
+  max-width: 440px;
+  line-height: 1.6;
+  margin-bottom: 36px;
+  font-weight: 300;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+}
+
+.hero-stat-val {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  color: var(--text-1);
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.hero-stat-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+}
+
+.hero-bg {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--serif);
+  font-size: clamp(160px, 22vw, 280px);
+  font-style: italic;
+  color: var(--cacao-04);
+  letter-spacing: -8px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+[data-theme=&quot;dark&quot;] .hero-bg { color: var(--marfim-06); }
+
+.hero-logo {
+  position: absolute;
+  bottom: 40px;
+  right: 64px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.hero-logo b { font-weight: 700; color: var(--text-2); }
+
+/* ═══════════════════════════════════════════
+   IDENTIDADE
+═══════════════════════════════════════════ */
+.identity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.identity-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  padding: 32px;
+  border-radius: var(--r-md);
+  transition: box-shadow var(--normal) var(--ease-std);
+}
+.identity-card:hover { box-shadow: var(--sh-3); }
+
+.id-num {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent-text);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.id-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-style: italic;
+  color: var(--text-1);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.id-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+.manifesto {
+  background: var(--cacao);
+  border-radius: var(--r-md);
+  padding: 36px 40px;
+  margin-top: 16px;
+}
+[data-theme=&quot;dark&quot;] .manifesto { background: var(--dark-0); }
+
+.manifesto-q {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-style: italic;
+  color: var(--marfim);
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+  margin-bottom: 20px;
+}
+
+.manifesto-a {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ouro);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.values-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 24px;
+}
+
+/* ═══════════════════════════════════════════
+   CORES
+═══════════════════════════════════════════ */
+.color-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.color-tile {
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-2);
+  overflow: hidden;
+}
+
+.color-chip {
+  height: 88px;
+  width: 100%;
+}
+
+.color-meta {
+  padding: 10px 12px;
+  background: var(--bg-card);
+}
+
+.color-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 16px;
+}
+
+.color-hex {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 0.5px;
+}
+
+.token-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-1);
+  font-size: 13px;
+}
+.token-row:last-child { border-bottom: none; }
+
+.token-dot {
+  width: 18px; height: 18px;
+  border-radius: var(--r-xs);
+  flex-shrink: 0;
+  border: 1px solid var(--border-1);
+}
+
+.token-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-1);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.token-desc {
+  font-size: 12px;
+  color: var(--text-3);
+  flex: 1;
+}
+
+.token-val {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.status-tile {
+  padding: 20px 24px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-info-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 1px;
+}
+
+.status-info-hex {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════
+   TIPOGRAFIA
+═══════════════════════════════════════════ */
+.type-families {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.type-family-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-2);
+  padding: 28px;
+  border-radius: var(--r-md);
+}
+
+.type-family-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.type-sample-serif { font-family: var(--serif); font-size: 38px; font-style: italic; color: var(--text-1); line-height: 1; letter-spacing: -1px; }
+.type-sample-sans  { font-family: var(--sans);  font-size: 36px; font-weight: 300;   color: var(--text-1); line-height: 1; letter-spacing: -0.5px; }
+.type-sample-mono  { font-family: var(--mono);  font-size: 22px; font-weight: 400;   color: var(--text-1); line-height: 1; letter-spacing: 1px; }
+
+.type-family-use {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 12px;
+  font-weight: 300;
+}
+
+.type-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.type-scale-row {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-1);
+}
+.type-scale-row:last-child { border-bottom: none; }
+
+.type-scale-token {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  width: 56px;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.type-scale-sample {
+  color: var(--text-1);
+  line-height: 1.2;
+  flex: 1;
+}
+
+.type-scale-px {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENTES — ÁREA DE PREVIEW
+═══════════════════════════════════════════ */
+.comp-block {
+  margin-bottom: 32px;
+}
+
+.comp-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.preview {
+  background: var(--bg-card);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-2);
+  padding: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.preview.col {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.preview.tight { gap: 8px; }
+.preview.dark  { background: var(--cacao); border-color: rgba(245,240,230,.08); }
+[data-theme=&quot;dark&quot;] .preview.dark { background: var(--dark-0); }
+
+.code {
+  background: var(--dark-2);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(245,240,230,.06);
+  padding: 20px 20px 20px 52px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.8;
+  color: rgba(245,240,230,.55);
+  position: relative;
+  overflow-x: auto;
+  counter-reset: line;
+}
+
+/* Faixa lateral de números de linha */
+.code::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 40px;
+  background: rgba(0,0,0,.2);
+  border-right: 1px solid rgba(245,240,230,.06);
+  border-radius: var(--r-md) 0 0 var(--r-md);
+  pointer-events: none;
+}
+
+/* Cada linha de código com número */
+.code-line {
+  display: block;
+  position: relative;
+  counter-increment: line;
+}
+.code-line::before {
+  content: counter(line);
+  position: absolute;
+  left: -40px;
+  width: 32px;
+  text-align: right;
+  font-size: 9px;
+  color: rgba(245,240,230,.18);
+  user-select: none;
+  pointer-events: none;
+  line-height: inherit;
+}
+
+.code .kw  { color: #F5F0E6; }
+.code .at  { color: var(--ouro); }
+.code .val { color: var(--ouro-pale); }
+.code .cm  { color: rgba(245,240,230,.3); font-style: italic; }
+
+.copy-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(245,240,230,.3);
+  background: rgba(245,240,230,.04);
+  border: 1px solid rgba(245,240,230,.08);
+  border-radius: var(--r-xs);
+  padding: 3px 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--fast) var(--ease-std);
+  z-index: 1;
+}
+.copy-btn:hover { color: var(--ouro); border-color: var(--ouro-20); }
+
+/* ═══════════════════════════════════════════
+   BOTÕES
+═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 500;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  transition: all var(--fast) var(--ease-std);
+  letter-spacing: 0.2px;
+}
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--cacao);
+  color: var(--marfim);
+  border-color: var(--cacao);
+}
+.btn-primary:hover:not(:disabled) { background: rgba(35,23,16,.85); }
+
+.btn-ouro {
+  background: var(--ouro);
+  color: var(--cacao);
+  border-color: var(--ouro);
+  font-weight: 600;
+}
+.btn-ouro:hover:not(:disabled) { background: var(--ouro-deep); border-color: var(--ouro-deep); color: var(--marfim); box-shadow: var(--sh-ouro); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-1);
+  border-color: var(--border-2);
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--accent); background: var(--ouro-10); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border-color: transparent;
+}
+.btn-ghost:hover:not(:disabled) { background: var(--bg-sunken); color: var(--text-1); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--err);
+  border-color: var(--err-bd);
+}
+.btn-danger:hover:not(:disabled) { background: var(--err-bg); }
+
+.btn-sm { padding: 5px 11px; font-size: 11px; border-radius: var(--r-sm); }
+.btn-lg { padding: 11px 22px; font-size: 15px; border-radius: var(--r-lg); }
+.btn-pill { border-radius: var(--r-full); }
+.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
+
+/* ═══════════════════════════════════════════
+   BADGES &amp; CHIPS
+═══════════════════════════════════════════ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  border-radius: var(--r-xs);
+  border: 1px solid;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge-default { background: var(--bg-sunken); color: var(--text-2); border-color: var(--border-2); }
+.badge-ouro    { background: var(--ouro-10);   color: var(--ouro-deep); border-color: var(--ouro-20); }
+.badge-ok      { background: var(--ok-bg);     color: var(--ok);       border-color: var(--ok-bd); }
+.badge-warn    { background: var(--warn-bg);   color: var(--warn);     border-color: var(--warn-bd); }
+.badge-err     { background: var(--err-bg);    color: var(--err);      border-color: var(--err-bd); }
+
+.badge-dot::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--bg-sunken);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-full);
+  white-space: nowrap;
+  cursor: default;
+  transition: all var(--fast) var(--ease-std);
+}
+.chip:hover { border-color: var(--accent); color: var(--text-1); }
+.chip-x {
+  font-size: 14px;
+  line-height: 1;
+  opacity: .4;
+  cursor: pointer;
+  font-weight: 300;
+  margin-left: 2px;
+}
+.chip-x:hover { opacity: 1; color: var(--err); }
+
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-1);
+  border-radius: var(--r-lg);
+  padding: var(--d-lg);
+  transition: box-shadow var(--normal) var(--ease-std),
+              border-color var(--normal) var(--ease-std);
+}
+.card:hover { box-shadow: var(--sh-3); border-color: var(--border-2); }
+
+.card-ouro {
+  background: var(--bg-card);
+  border-color: var(--ouro-20);
+}
+.card-ouro:hover { box-shadow: var(--sh-ouro); border-color: var(--ouro-30); }
+
+.card-sm { padding: var(--d-sm) var(--d-md); border-radius: var(--r-md); }
+.card-lg { padding: var(--d-xl); border-radius: var(--r-xl); }
+
+.card-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card-title    { font-size: 14px; font-weight: 600; color: var(--text-1); line-height: 1.3; }
+.card-subtitle { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.card-body     { font-size: 13px; color: var(--text-2); line-height: 1.6; font-weight: 300; }
+
+.card-ft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-1);
+}
+
+/* ═══════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════ */
+.field { display: flex; flex-direction: column; gap: 5px; }
+
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-1);
+  letter-spacing: 0.2px;
+}
+
+.field-input {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text-1);
+  background: var(--bg-input);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  line-height: 1.5;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--fast) var(--ease-std), box-shadow var(--fast) var(--ease-std);
+}
+.field-input::placeholder { color: var(--text-3); }
+.field-input:focus { border-color: var(--accent); box-shadow: var(--sh-focus); }
+.field-input.err  { border-color: var(--err); }
+
+.field-hint { font-size: 11px; color: var(--text-3); }
+.field-err  { font-size: 11px; color: var(--err); }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.checkbox-input {
+  width: 15px; height: 15px;
+  accent-color: var(--cacao);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+textarea.field-input { resize: vertical; min-height: 80px; }
+
+/* ═══════════════════════════════════════════
+   NAVEGAÇÃO (componentes)
+═══════════════════════════════════════════ */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-1);
+  gap: 0;
+}
+
+.tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all var(--fast) var(--ease-std);
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text-1); }
+.tab.on    { color: var(--text-1); font-weight: 500; border-bottom-color: var(--accent); }
+
+.breadcrumb { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { font-size: 13px; color: var(--text-3); transition: color var(--fast); }
+.breadcrumb a:hover { color: var(--text-1); }
+.breadcrumb-sep { font-size: 11px; color: var(--border-2); }
+.breadcrumb-cur { font-size: 13px; color: var(--text-1); font-weight: 500; }
+
+.dd {
+  background: var(--bg-raised);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--sh-3);
+}
+.dd-item {
+  padding: 9px 14px;
+  font-size: 13px;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all var(--fast) var(--ease-std);
+  border-bottom: 1px solid var(--border-1);
+}
+.dd-item:last-child { border-bottom: none; }
+.dd-item:hover  { background: var(--bg-sunken); color: var(--text-1); }
+.dd-item.active { color: var(--accent-text); font-weight: 500; }
+
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cacao);
+  color: var(--marfim);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease-std);
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+}
+.tooltip-wrap:hover .tooltip { opacity: 1; }
+
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg-sunken);
+  border: 2px solid var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.avatar-ouro { background: var(--ouro-10); color: var(--ouro-deep); border-color: var(--ouro-20); }
+.avatar-group { display: flex; }
+.avatar-group .avatar { margin-left: -8px; }
+.avatar-group .avatar:first-child { margin-left: 0; }
+
+/* ═══════════════════════════════════════════
+   ALERTAS &amp; PROGRESS
+═══════════════════════════════════════════ */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid;
+  font-size: 13px;
+}
+.alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; font-weight: 700; }
+.alert-title { font-weight: 600; margin-bottom: 2px; }
+.alert-desc  { color: inherit; opacity: .75; font-size: 12px; font-weight: 300; }
+
+.alert-ok   { background: var(--ok-bg);   border-color: var(--ok-bd);   color: var(--ok); }
+.alert-warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn); }
+.alert-err  { background: var(--err-bg);  border-color: var(--err-bd);  color: var(--err); }
+.alert-info { background: var(--ouro-10); border-color: var(--ouro-20); color: var(--ouro-deep); }
+
+.progress {
+  height: 4px;
+  background: var(--border-1);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--r-full);
+  transition: width var(--slow) var(--ease-out);
+}
+.progress-fill.ok { background: var(--ok); }
+
+/* ═══════════════════════════════════════════
+   DIRETRIZES
+═══════════════════════════════════════════ */
+.guideline-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.guideline-col {
+  padding: 24px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+}
+.guideline-col.do   { background: var(--ok-bg); }
+.guideline-col.dont { background: var(--err-bg); }
+
+.guideline-col-hd {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.do   .guideline-col-hd { color: var(--ok); }
+.dont .guideline-col-hd { color: var(--err); }
+
+.guideline-item {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 300;
+}
+.guideline-item:last-child { margin-bottom: 0; }
+
+.guideline-mark { flex-shrink: 0; font-weight: 700; font-size: 11px; }
+.do   .guideline-mark { color: var(--ok); }
+.dont .guideline-mark { color: var(--err); }
+
+/* ═══════════════════════════════════════════
+   ESPAÇAMENTO
+═══════════════════════════════════════════ */
+.space-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.space-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-1);
+}
+.space-row:last-child { border-bottom: none; }
+
+.space-bar-wrap {
+  width: 200px;
+  flex-shrink: 0;
+}
+.space-bar {
+  height: 8px;
+  background: var(--ouro-30);
+  border-radius: var(--r-xs);
+}
+
+.space-token {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-3);
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.space-val {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-2);
+}
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+.divider { height: 1px; background: var(--border-1); margin: 24px 0; }
+.divider-ouro { height: 1px; background: var(--ouro); opacity: .4; margin: 24px 0; }
+
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mt-40 { margin-top: 32px; }
+.mt-48 { margin-top: 40px; }
+
+</style>
+</head>
+<body>
+<div class=&quot;layout&quot;>
+
+  <!-- ═══ NAV ═══ -->
+  <nav class=&quot;topnav&quot; id=&quot;topnav&quot;>
+    <div class=&quot;nav-row1&quot;>
+      <span class=&quot;nav-logo&quot;><b>ISIS</b>MOREIRA</span>
+      <span class=&quot;nav-tagline&quot;>Design System</span>
+      <div class=&quot;nav-end&quot;>
+        <span class=&quot;nav-ver&quot;>v6.0</span>
+        <div class=&quot;theme-toggle&quot; onclick=&quot;toggleTheme()&quot;>
+          <div class=&quot;theme-toggle-track&quot; id=&quot;themeTrack&quot;>
+            <div class=&quot;theme-toggle-thumb&quot;></div>
+          </div>
+          <span class=&quot;theme-toggle-label&quot; id=&quot;themeLabel&quot;>Light</span>
         </div>
       </div>
     </div>
+    <div class=&quot;nav-row2&quot;>
+      <div class=&quot;nav-links&quot;>
+        <button class=&quot;nav-link on&quot;  onclick=&quot;navTo('hero',this)&quot;>Marca</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('identidade',this)&quot;>Identidade</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('cores',this)&quot;>Cores</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('tipo',this)&quot;>Tipografia</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('espaco',this)&quot;>Espaço</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('componentes',this)&quot;>Componentes</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('formularios',this)&quot;>Formulários</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('navegacao',this)&quot;>Navegação</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('feedback',this)&quot;>Feedback</button>
+        <button class=&quot;nav-link&quot;     onclick=&quot;navTo('diretrizes',this)&quot;>Diretrizes</button>
+      </div>
+    </div>
+  </nav>
 
-    <!-- CONFIGURACOES -->
+  <main class=&quot;main&quot; style=&quot;padding-top:48px&quot;>
+
+    <!-- ═══ 00 HERO ═══ -->
+    <section id=&quot;hero&quot; class=&quot;sec&quot; style=&quot;max-width:100%;padding:72px 64px 64px;min-height:70vh;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border-1)&quot;>
+      <div class=&quot;hero-bg&quot;>Isis</div>
+      <span class=&quot;hero-symbol&quot;>✦</span>
+      <h1 class=&quot;hero-title&quot;>
+        Ecossistema<br>
+        <em>Donas do</em><br>
+        Ouro.
+      </h1>
+      <p class=&quot;hero-desc&quot;>
+        Sistema de identidade visual de Isis Moreira. Estratégia, feminilidade e posicionamento de alto nível em cada decisão.
+      </p>
+      <div class=&quot;hero-stats&quot;>
+        <div>
+          <span class=&quot;hero-stat-val&quot;>12</span>
+          <span class=&quot;hero-stat-lbl&quot;>Seções</span>
+        </div>
+        <div>
+          <span class=&quot;hero-stat-val&quot;>80+</span>
+          <span class=&quot;hero-stat-lbl&quot;>Componentes</span>
+        </div>
+        <div>
+          <span class=&quot;hero-stat-val&quot;>5</span>
+          <span class=&quot;hero-stat-lbl&quot;>Primitivos</span>
+        </div>
+        <div>
+          <span class=&quot;hero-stat-val&quot;>2025</span>
+          <span class=&quot;hero-stat-lbl&quot;>Edição</span>
+        </div>
+      </div>
+      <div class=&quot;hero-logo&quot;><b>ISIS</b>MOREIRA</div>
+    </section>
+
+    <!-- ═══ 01 IDENTIDADE ═══ -->
+    <section class=&quot;sec&quot; id=&quot;identidade&quot;>
+      <span class=&quot;sec-num&quot;>01 · Identidade</span>
+      <h2 class=&quot;sec-title&quot;>Posicionamento de marca</h2>
+      <p class=&quot;sec-sub&quot;>Estratégica, intensa e refinada. Cada decisão visual carrega profundidade, verdade e posicionamento.</p>
+
+      <div class=&quot;identity-grid&quot;>
+        <div class=&quot;identity-card&quot;>
+          <span class=&quot;id-num&quot;>01 · Arquétipo</span>
+          <div class=&quot;id-title&quot;>A Soberana</div>
+          <div class=&quot;id-desc&quot;>Ocupa espaço com intenção. Age com discernimento e carrega profundidade em cada escolha.</div>
+        </div>
+        <div class=&quot;identity-card&quot;>
+          <span class=&quot;id-num&quot;>02 · Tom de Voz</span>
+          <div class=&quot;id-title&quot;>Verdadeiro e Preciso</div>
+          <div class=&quot;id-desc&quot;>Clareza direta. Profundidade acessível. Sofisticação que convida. Cada palavra tem peso e propósito.</div>
+        </div>
+        <div class=&quot;identity-card&quot;>
+          <span class=&quot;id-num&quot;>03 · Estética</span>
+          <div class=&quot;id-title&quot;>Minimalismo de Alto Nível</div>
+          <div class=&quot;id-desc&quot;>Paleta quente, formas limpas, presença feminina. Beleza com estrutura. Sofisticação discreta.</div>
+        </div>
+        <div class=&quot;identity-card&quot;>
+          <span class=&quot;id-num&quot;>04 · Missão</span>
+          <div class=&quot;id-title&quot;>Identidade como Estrutura</div>
+          <div class=&quot;id-desc&quot;>Mentalidade, negócios e tecnologia integrados. O sistema visual é reflexo direto do posicionamento.</div>
+        </div>
+      </div>
+
+      <div class=&quot;manifesto mt-8&quot;>
+        <p class=&quot;manifesto-q&quot;>&quot;Crescimento sem perder verdade. Construir o ecossistema Donas do Ouro.&quot;</p>
+        <p class=&quot;manifesto-a&quot;>✦ Isis Moreira</p>
+      </div>
+
+      <div class=&quot;values-row&quot;>
+        <span class=&quot;badge badge-ouro&quot;>✦ Profundidade</span>
+        <span class=&quot;badge badge-default&quot;>Verdade</span>
+        <span class=&quot;badge badge-default&quot;>Posicionamento</span>
+        <span class=&quot;badge badge-ouro&quot;>Feminilidade</span>
+        <span class=&quot;badge badge-default&quot;>Discernimento</span>
+        <span class=&quot;badge badge-ok&quot;>Execução</span>
+        <span class=&quot;badge badge-default&quot;>Beleza</span>
+      </div>
+    </section>
+
+    <!-- ═══ 02 CORES ═══ -->
+    <section class=&quot;sec&quot; id=&quot;cores&quot;>
+      <span class=&quot;sec-num&quot;>02 · Fundamentos</span>
+      <h2 class=&quot;sec-title&quot;>Cores &amp; Tokens</h2>
+      <p class=&quot;sec-sub&quot;>Cinco primitivos. Nenhuma cor aqui é acidental.</p>
+
+      <div class=&quot;color-strip&quot;>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#F5F0E6&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Marfim</div><div class=&quot;color-hex&quot;>#F5F0E6 · --marfim</div></div>
+        </div>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#E4DBC9&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Creme</div><div class=&quot;color-hex&quot;>#E4DBC9 · --creme</div></div>
+        </div>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#9E9485&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Titanium</div><div class=&quot;color-hex&quot;>#9E9485 · --titanium</div></div>
+        </div>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#231710&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Cacau</div><div class=&quot;color-hex&quot;>#231710 · --cacao</div></div>
+        </div>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#8E8C88&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Mirror</div><div class=&quot;color-hex&quot;>#8E8C88 · --mirror</div></div>
+        </div>
+        <div class=&quot;color-tile&quot;>
+          <div class=&quot;color-chip&quot; style=&quot;background:#D4C090&quot;></div>
+          <div class=&quot;color-meta&quot;><div class=&quot;color-name&quot;>Ouro ✦</div><div class=&quot;color-hex&quot;>#D4C090 · --ouro</div></div>
+        </div>
+      </div>
+
+      <div class=&quot;status-strip&quot;>
+        <div class=&quot;status-tile&quot; style=&quot;background:var(--ok-bg);border:1px solid var(--ok-bd)&quot;>
+          <div class=&quot;status-dot&quot; style=&quot;background:var(--ok)&quot;></div>
+          <div><div class=&quot;status-info-name&quot;>Sucesso</div><div class=&quot;status-info-hex&quot;>#34A853 · --ok</div></div>
+        </div>
+        <div class=&quot;status-tile&quot; style=&quot;background:var(--warn-bg);border:1px solid var(--warn-bd)&quot;>
+          <div class=&quot;status-dot&quot; style=&quot;background:var(--warn)&quot;></div>
+          <div><div class=&quot;status-info-name&quot;>Atenção</div><div class=&quot;status-info-hex&quot;>#F5A623 · --warn</div></div>
+        </div>
+        <div class=&quot;status-tile&quot; style=&quot;background:var(--err-bg);border:1px solid var(--err-bd)&quot;>
+          <div class=&quot;status-dot&quot; style=&quot;background:var(--err)&quot;></div>
+          <div><div class=&quot;status-info-name&quot;>Erro</div><div class=&quot;status-info-hex&quot;>#E03131 · --err</div></div>
+        </div>
+      </div>
+
+      <div class=&quot;sec-rule&quot;></div>
+
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--bg);border:1px solid var(--border-2)&quot;></div><span class=&quot;token-name&quot;>--bg</span><span class=&quot;token-desc&quot;>Fundo base da interface</span><span class=&quot;token-val&quot;>marfim / dark-1</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--bg-card)&quot;></div><span class=&quot;token-name&quot;>--bg-card</span><span class=&quot;token-desc&quot;>Cards e superfícies elevadas</span><span class=&quot;token-val&quot;>creme / dark-2</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--text-1)&quot;></div><span class=&quot;token-name&quot;>--text-1</span><span class=&quot;token-desc&quot;>Texto primário</span><span class=&quot;token-val&quot;>cacao / marfim</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--text-2)&quot;></div><span class=&quot;token-name&quot;>--text-2</span><span class=&quot;token-desc&quot;>Texto secundário</span><span class=&quot;token-val&quot;>cacao 65%</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--text-3)&quot;></div><span class=&quot;token-name&quot;>--text-3</span><span class=&quot;token-desc&quot;>Labels e meta</span><span class=&quot;token-val&quot;>mirror</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--accent)&quot;></div><span class=&quot;token-name&quot;>--accent</span><span class=&quot;token-desc&quot;>Cor de destaque e interação</span><span class=&quot;token-val&quot;>ouro</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--border-2)&quot;></div><span class=&quot;token-name&quot;>--border-2</span><span class=&quot;token-desc&quot;>Bordas visíveis</span><span class=&quot;token-val&quot;>cacao 12%</span></div>
+      <div class=&quot;token-row&quot;><div class=&quot;token-dot&quot; style=&quot;background:var(--sh-focus,var(--ouro));border-radius:50%&quot;></div><span class=&quot;token-name&quot;>--sh-focus</span><span class=&quot;token-desc&quot;>Anel de foco acessível</span><span class=&quot;token-val&quot;>ouro 25%</span></div>
+    </section>
+
+    <!-- ═══ 03 TIPOGRAFIA ═══ -->
+    <section class=&quot;sec&quot; id=&quot;tipo&quot;>
+      <span class=&quot;sec-num&quot;>03 · Fundamentos</span>
+      <h2 class=&quot;sec-title&quot;>Tipografia</h2>
+      <p class=&quot;sec-sub&quot;>Três famílias. O serif carrega emoção. O sans carrega estrutura. O mono carrega precisão.</p>
+
+      <div class=&quot;type-families&quot;>
+        <div class=&quot;type-family-card&quot;>
+          <div class=&quot;type-family-label&quot;>Display · DM Serif Display</div>
+          <div class=&quot;type-sample-serif&quot;>Isis</div>
+          <div class=&quot;type-family-use&quot;>Títulos, manifestos, hero</div>
+        </div>
+        <div class=&quot;type-family-card&quot;>
+          <div class=&quot;type-family-label&quot;>Texto · DM Sans</div>
+          <div class=&quot;type-sample-sans&quot;>Moreira</div>
+          <div class=&quot;type-family-use&quot;>Corpo, UI, navegação</div>
+        </div>
+        <div class=&quot;type-family-card&quot;>
+          <div class=&quot;type-family-label&quot;>Técnico · IBM Plex Mono</div>
+          <div class=&quot;type-sample-mono&quot;>v6.0</div>
+          <div class=&quot;type-family-use&quot;>Labels, código, tokens</div>
+        </div>
+      </div>
+
+      <div class=&quot;type-scale&quot;>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-5xl</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:40px;font-family:var(--serif);font-style:italic;letter-spacing:-1px;line-height:1&quot;>Destaque</span>
+          <span class=&quot;type-scale-px&quot;>80px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-3xl</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:36px;font-family:var(--serif);font-style:italic;letter-spacing:-0.5px;line-height:1&quot;>Título principal</span>
+          <span class=&quot;type-scale-px&quot;>48px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-2xl</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:28px;font-weight:600;letter-spacing:-0.3px;line-height:1&quot;>Subtítulo de seção</span>
+          <span class=&quot;type-scale-px&quot;>32px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-xl</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:22px;font-weight:400;line-height:1.2&quot;>Introdução de conteúdo</span>
+          <span class=&quot;type-scale-px&quot;>24px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-lg</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:18px;font-weight:300;line-height:1.3&quot;>Corpo lead, citação</span>
+          <span class=&quot;type-scale-px&quot;>18px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-md</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:15px;font-weight:400;line-height:1.5&quot;>Corpo de texto padrão da interface</span>
+          <span class=&quot;type-scale-px&quot;>15px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-sm</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:13px;font-weight:400&quot;>Texto secundário, labels de campo</span>
+          <span class=&quot;type-scale-px&quot;>13px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-xs</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:11px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase&quot;>RÓTULO · MARCADOR</span>
+          <span class=&quot;type-scale-px&quot;>11px</span>
+        </div>
+        <div class=&quot;type-scale-row&quot;>
+          <span class=&quot;type-scale-token&quot;>--t-2xs</span>
+          <span class=&quot;type-scale-sample&quot; style=&quot;font-size:9px;font-family:var(--mono);letter-spacing:2px;text-transform:uppercase&quot;>MICRO · TÉCNICO</span>
+          <span class=&quot;type-scale-px&quot;>9px</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 ESPAÇAMENTO ═══ -->
+    <section class=&quot;sec&quot; id=&quot;espaco&quot;>
+      <span class=&quot;sec-num&quot;>04 · Fundamentos</span>
+      <h2 class=&quot;sec-title&quot;>Espaçamento</h2>
+      <p class=&quot;sec-sub&quot;>Espaço não é vazio. É respiração.</p>
+
+      <div class=&quot;space-grid&quot;>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-xs</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:8px&quot;></div></div>
+          <span class=&quot;space-val&quot;>8px · micro espaço, gaps internos</span>
+        </div>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-sm</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:12px&quot;></div></div>
+          <span class=&quot;space-val&quot;>12px · padding compact</span>
+        </div>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-md</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:16px&quot;></div></div>
+          <span class=&quot;space-val&quot;>16px · padding padrão</span>
+        </div>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-lg</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:24px&quot;></div></div>
+          <span class=&quot;space-val&quot;>24px · cards, blocos</span>
+        </div>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-xl</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:40px&quot;></div></div>
+          <span class=&quot;space-val&quot;>40px · seções, hero</span>
+        </div>
+        <div class=&quot;space-row&quot;>
+          <span class=&quot;space-token&quot;>--d-2xl</span>
+          <div class=&quot;space-bar-wrap&quot;><div class=&quot;space-bar&quot; style=&quot;width:64px&quot;></div></div>
+          <span class=&quot;space-val&quot;>64px · separações estruturais</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 05 COMPONENTES ═══ -->
+    <section class=&quot;sec&quot; id=&quot;componentes&quot;>
+      <span class=&quot;sec-num&quot;>05 · Componentes</span>
+      <h2 class=&quot;sec-title&quot;>Botões &amp; Marcadores</h2>
+
+      <!-- BOTÕES -->
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Botões · variantes</span>
+        <div class=&quot;preview&quot;>
+          <button class=&quot;btn btn-primary&quot;>Primary</button>
+          <button class=&quot;btn btn-ouro&quot;>✦ Ouro</button>
+          <button class=&quot;btn btn-secondary&quot;>Secondary</button>
+          <button class=&quot;btn btn-ghost&quot;>Ghost</button>
+          <button class=&quot;btn btn-danger&quot;>Danger</button>
+          <button class=&quot;btn btn-primary&quot; disabled>Disabled</button>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;kw&quot;>&amp;lt;button</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-primary&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Primary<span class=&quot;kw&quot;>&amp;lt;/button&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;button</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-ouro&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>✦ Ouro<span class=&quot;kw&quot;>&amp;lt;/button&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;button</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-secondary&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Secondary<span class=&quot;kw&quot;>&amp;lt;/button&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;button</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-ghost&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Ghost<span class=&quot;kw&quot;>&amp;lt;/button&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;button</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-danger&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Danger<span class=&quot;kw&quot;>&amp;lt;/button&amp;gt;</span></div>
+      </div>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Botões · tamanhos</span>
+        <div class=&quot;preview&quot;>
+          <button class=&quot;btn btn-primary btn-sm&quot;>Pequeno</button>
+          <button class=&quot;btn btn-primary&quot;>Padrão</button>
+          <button class=&quot;btn btn-primary btn-lg&quot;>Grande</button>
+          <button class=&quot;btn btn-ouro btn-pill&quot;>Pill ✦</button>
+          <button class=&quot;btn btn-secondary btn-icon&quot;>✦</button>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-primary btn-sm&quot;</span>   <span class=&quot;cm&quot;>/* 5 · 11px */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-primary&quot;</span>          <span class=&quot;cm&quot;>/* 8 · 16px */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-primary btn-lg&quot;</span>   <span class=&quot;cm&quot;>/* 11 · 22px */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-ouro btn-pill&quot;</span>    <span class=&quot;cm&quot;>/* r-full */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;btn btn-secondary btn-icon&quot;</span> <span class=&quot;cm&quot;>/* 32×32px */</span></div>
+      </div>
+
+      <!-- BADGES -->
+      <div class=&quot;comp-block mt-40&quot;>
+        <span class=&quot;comp-label&quot;>Badges</span>
+        <div class=&quot;preview&quot;>
+          <span class=&quot;badge badge-default&quot;>Default</span>
+          <span class=&quot;badge badge-ouro&quot;>✦ Ouro</span>
+          <span class=&quot;badge badge-ok&quot;>Sucesso</span>
+          <span class=&quot;badge badge-warn&quot;>Atenção</span>
+          <span class=&quot;badge badge-err&quot;>Erro</span>
+          <span class=&quot;badge badge-ok badge-dot&quot;>Online</span>
+          <span class=&quot;badge badge-err badge-dot&quot;>Offline</span>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;badge badge-ouro&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>✦ Ouro<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;badge badge-ok badge-dot&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Online<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;</span></div>
+      </div>
+
+      <!-- CHIPS -->
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Chips</span>
+        <div class=&quot;preview&quot;>
+          <span class=&quot;chip&quot;>Design System</span>
+          <span class=&quot;chip&quot;>Tecnologia<span class=&quot;chip-x&quot;>×</span></span>
+          <span class=&quot;chip&quot;>Isis Moreira<span class=&quot;chip-x&quot;>×</span></span>
+          <span class=&quot;chip&quot;>Donas do Ouro</span>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;chip&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Label<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;chip&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Label<span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;chip-x&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>×<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;&amp;lt;/span&amp;gt;</span></div>
+      </div>
+
+      <!-- CARDS -->
+      <div class=&quot;comp-block mt-40&quot;>
+        <span class=&quot;comp-label&quot;>Cards</span>
+        <div class=&quot;preview&quot; style=&quot;align-items:stretch&quot;>
+          <div class=&quot;grid-3&quot; style=&quot;width:100%&quot;>
+            <div class=&quot;card card-sm&quot;>
+              <div class=&quot;card-title&quot; style=&quot;font-size:13px&quot;>Card Compact</div>
+              <div class=&quot;card-body&quot; style=&quot;font-size:12px;margin-top:4px&quot;>Ideal para listas e grids densos.</div>
+            </div>
+            <div class=&quot;card&quot;>
+              <div class=&quot;card-hd&quot;>
+                <div><div class=&quot;card-title&quot;>Card Padrão</div><div class=&quot;card-subtitle&quot;>Subtítulo opcional</div></div>
+                <span class=&quot;badge badge-ouro&quot;>✦ v6</span>
+              </div>
+              <div class=&quot;card-body&quot;>Conteúdo com espaçamento padrão. Hover revela borda dourada.</div>
+              <div class=&quot;card-ft&quot;>
+                <span style=&quot;font-size:11px;color:var(--text-3);font-family:var(--mono)&quot;>Meta</span>
+                <button class=&quot;btn btn-ghost btn-sm&quot;>Ver mais</button>
+              </div>
+            </div>
+            <div class=&quot;card card-ouro&quot;>
+              <span class=&quot;badge badge-ouro&quot; style=&quot;margin-bottom:10px&quot;>✦ Destaque</span>
+              <div class=&quot;card-title&quot;>Card Ouro</div>
+              <div class=&quot;card-body&quot; style=&quot;margin-top:6px&quot;>Variante especial para itens em destaque no ecossistema.</div>
+            </div>
+          </div>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;card&quot;</span>            <span class=&quot;cm&quot;>/* padrão */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;card card-sm&quot;</span>    <span class=&quot;cm&quot;>/* compact */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;card card-lg&quot;</span>    <span class=&quot;cm&quot;>/* spacious */</span>
+<span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;card card-ouro&quot;</span>  <span class=&quot;cm&quot;>/* ✦ destaque */</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 06 FORMULÁRIOS ═══ -->
+    <section class=&quot;sec&quot; id=&quot;formularios&quot;>
+      <span class=&quot;sec-num&quot;>06 · Componentes</span>
+      <h2 class=&quot;sec-title&quot;>Formulários</h2>
+
+      <div class=&quot;comp-block&quot;>
+        <div class=&quot;preview col&quot; style=&quot;gap:20px&quot;>
+          <div class=&quot;field&quot; style=&quot;max-width:300px;width:100%&quot;>
+            <label class=&quot;field-label&quot;>Nome completo</label>
+            <input class=&quot;field-input&quot; placeholder=&quot;Sua Dona do Ouro…&quot; type=&quot;text&quot;>
+            <span class=&quot;field-hint&quot;>Usado no perfil público</span>
+          </div>
+          <div class=&quot;field&quot; style=&quot;max-width:300px;width:100%&quot;>
+            <label class=&quot;field-label&quot;>Email</label>
+            <input class=&quot;field-input err&quot; placeholder=&quot;email@isis-moreira.com&quot; type=&quot;email&quot;>
+            <span class=&quot;field-err&quot;>Email inválido</span>
+          </div>
+          <div class=&quot;field&quot; style=&quot;max-width:300px;width:100%&quot;>
+            <label class=&quot;field-label&quot;>Mensagem</label>
+            <textarea class=&quot;field-input&quot; rows=&quot;3&quot; placeholder=&quot;Escreva aqui…&quot;></textarea>
+          </div>
+          <div style=&quot;display:flex;flex-wrap:wrap;gap:16px&quot;>
+            <label class=&quot;checkbox-row&quot;><input class=&quot;checkbox-input&quot; type=&quot;checkbox&quot; checked> Aceito os termos</label>
+            <label class=&quot;checkbox-row&quot;><input class=&quot;checkbox-input&quot; type=&quot;checkbox&quot;> Receber novidades</label>
+          </div>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;kw&quot;>&amp;lt;div</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;field&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>
+  <span class=&quot;kw&quot;>&amp;lt;label</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;field-label&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Label<span class=&quot;kw&quot;>&amp;lt;/label&amp;gt;</span>
+  <span class=&quot;kw&quot;>&amp;lt;input</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;field-input&quot;</span> <span class=&quot;at&quot;>type</span>=<span class=&quot;val&quot;>&quot;text&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>
+  <span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;field-hint&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Dica<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;/div&amp;gt;</span>
+<span class=&quot;cm&quot;>/* Estado de erro: .err no .field-input */</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 07 NAVEGAÇÃO ═══ -->
+    <section class=&quot;sec&quot; id=&quot;navegacao&quot;>
+      <span class=&quot;sec-num&quot;>07 · Componentes</span>
+      <h2 class=&quot;sec-title&quot;>Navegação</h2>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Tabs</span>
+        <div class=&quot;preview col&quot; style=&quot;gap:12px&quot;>
+          <div class=&quot;tabs&quot;>
+            <div class=&quot;tab on&quot;>Visão Geral</div>
+            <div class=&quot;tab&quot;>Analytics</div>
+            <div class=&quot;tab&quot;>Configurações</div>
+            <div class=&quot;tab&quot;>Integrações</div>
+          </div>
+          <div style=&quot;font-size:13px;color:var(--text-2)&quot;>Conteúdo da aba ativa aparece aqui.</div>
+        </div>
+      </div>
+
+      <div class=&quot;comp-block mt-32&quot;>
+        <span class=&quot;comp-label&quot;>Breadcrumb</span>
+        <div class=&quot;preview&quot;>
+          <nav class=&quot;breadcrumb&quot;>
+            <a href=&quot;#&quot;>Isis Moreira</a>
+            <span class=&quot;breadcrumb-sep&quot;>/</span>
+            <a href=&quot;#&quot;>Componentes</a>
+            <span class=&quot;breadcrumb-sep&quot;>/</span>
+            <span class=&quot;breadcrumb-cur&quot;>Navegação</span>
+          </nav>
+        </div>
+      </div>
+
+      <div class=&quot;comp-block mt-32&quot;>
+        <span class=&quot;comp-label&quot;>Dropdown &amp; Tooltip &amp; Avatares</span>
+        <div class=&quot;preview&quot; style=&quot;align-items:flex-start;gap:24px&quot;>
+          <div class=&quot;dd&quot; style=&quot;width:200px&quot;>
+            <div class=&quot;dd-item active&quot;>✦ Isis Moreira Pro</div>
+            <div class=&quot;dd-item&quot;>Meu Ecossistema</div>
+            <div class=&quot;dd-item&quot;>Configurações</div>
+            <div class=&quot;dd-item&quot;>Sair</div>
+          </div>
+          <div style=&quot;display:flex;flex-direction:column;gap:16px&quot;>
+            <div class=&quot;tooltip-wrap&quot;>
+              <button class=&quot;btn btn-secondary btn-sm&quot;>Passe o cursor</button>
+              <div class=&quot;tooltip&quot;>ISISMOREIRA · v6.0</div>
+            </div>
+            <div class=&quot;avatar-group&quot;>
+              <div class=&quot;avatar avatar-ouro&quot;>D</div>
+              <div class=&quot;avatar&quot;>A</div>
+              <div class=&quot;avatar&quot;>B</div>
+              <div class=&quot;avatar&quot; style=&quot;font-size:10px;color:var(--text-3)&quot;>+4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 08 FEEDBACK ═══ -->
+    <section class=&quot;sec&quot; id=&quot;feedback&quot;>
+      <span class=&quot;sec-num&quot;>08 · Componentes</span>
+      <h2 class=&quot;sec-title&quot;>Feedback &amp; Estado</h2>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Alertas</span>
+        <div class=&quot;preview col tight&quot;>
+          <div class=&quot;alert alert-ok&quot;>
+            <span class=&quot;alert-icon&quot;>✓</span>
+            <div><div class=&quot;alert-title&quot;>Salvo com sucesso</div><div class=&quot;alert-desc&quot;>Suas alterações foram aplicadas.</div></div>
+          </div>
+          <div class=&quot;alert alert-info&quot;>
+            <span class=&quot;alert-icon&quot;>✦</span>
+            <div><div class=&quot;alert-title&quot;>Novidade disponível</div><div class=&quot;alert-desc&quot;>ISIS v6 foi atualizado.</div></div>
+          </div>
+          <div class=&quot;alert alert-warn&quot;>
+            <span class=&quot;alert-icon&quot;>!</span>
+            <div><div class=&quot;alert-title&quot;>Atenção necessária</div><div class=&quot;alert-desc&quot;>Verifique as configurações antes de publicar.</div></div>
+          </div>
+          <div class=&quot;alert alert-err&quot;>
+            <span class=&quot;alert-icon&quot;>✕</span>
+            <div><div class=&quot;alert-title&quot;>Erro ao salvar</div><div class=&quot;alert-desc&quot;>Não foi possível conectar. Tente novamente.</div></div>
+          </div>
+        </div>
+        <div class=&quot;code&quot;>
+          <button class=&quot;copy-btn&quot; onclick=&quot;copyCode(this)&quot;>Copiar</button>
+<span class=&quot;kw&quot;>&amp;lt;div</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;alert alert-ok&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>
+  <span class=&quot;kw&quot;>&amp;lt;span</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;alert-icon&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>✓<span class=&quot;kw&quot;>&amp;lt;/span&amp;gt;</span>
+  <span class=&quot;kw&quot;>&amp;lt;div&amp;gt;&amp;lt;div</span> <span class=&quot;at&quot;>class</span>=<span class=&quot;val&quot;>&quot;alert-title&quot;</span><span class=&quot;kw&quot;>&amp;gt;</span>Título<span class=&quot;kw&quot;>&amp;lt;/div&amp;gt;&amp;lt;/div&amp;gt;</span>
+<span class=&quot;kw&quot;>&amp;lt;/div&amp;gt;</span>
+<span class=&quot;cm&quot;>/* alert-ok · alert-info · alert-warn · alert-err */</span></div>
+      </div>
+
+      <div class=&quot;comp-block mt-32&quot;>
+        <span class=&quot;comp-label&quot;>Progresso</span>
+        <div class=&quot;preview col&quot; style=&quot;gap:16px&quot;>
+          <div style=&quot;width:100%&quot;>
+            <div style=&quot;display:flex;justify-content:space-between;margin-bottom:6px&quot;>
+              <span style=&quot;font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:1px&quot;>PROGRESSO GERAL</span>
+              <span style=&quot;font-family:var(--mono);font-size:9px;color:var(--accent-text)&quot;>72%</span>
+            </div>
+            <div class=&quot;progress&quot;><div class=&quot;progress-fill&quot; style=&quot;width:72%&quot;></div></div>
+          </div>
+          <div style=&quot;width:100%&quot;>
+            <div class=&quot;progress&quot;><div class=&quot;progress-fill ok&quot; style=&quot;width:90%&quot;></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 09 DIRETRIZES ═══ -->
+    <section class=&quot;sec&quot; id=&quot;diretrizes&quot;>
+      <span class=&quot;sec-num&quot;>09 · Diretrizes</span>
+      <h2 class=&quot;sec-title&quot;>Uso consciente</h2>
+      <p class=&quot;sec-sub&quot;>Este sistema é a voz visual de Isis Moreira. Cada desvio precisa ser uma escolha consciente, não um acidente.</p>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Ouro</span>
+        <div class=&quot;guideline-grid&quot;>
+          <div class=&quot;guideline-col do&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✓ Faça</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Máximo 3 elementos com ouro por tela</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Use sempre via var(--ouro), nunca #D4C090 direto</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Reserve para o que realmente importa na hierarquia</div>
+          </div>
+          <div class=&quot;guideline-col dont&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✕ Evite</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Ouro em mais de 3 elementos simultâneos</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Usar o valor fixo #D4C090; sempre use var(--ouro)</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Combinar texto ouro com fundo ouro no mesmo bloco</div>
+          </div>
+        </div>
+      </div>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Tipografia</span>
+        <div class=&quot;guideline-grid&quot;>
+          <div class=&quot;guideline-col do&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✓ Faça</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> DM Serif italic para títulos emocionais e manifestos</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> IBM Plex Mono exclusivamente para labels, código e meta</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Mono eyebrow + serif title: é a assinatura ISIS</div>
+          </div>
+          <div class=&quot;guideline-col dont&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✕ Evite</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Serif em corpo de texto longo; reservar para display</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Mono em mais de 3 linhas seguidas fora de código</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Letter-spacing positivo em texto body</div>
+          </div>
+        </div>
+      </div>
+
+      <div class=&quot;comp-block&quot;>
+        <span class=&quot;comp-label&quot;>Escrita &amp; Tom</span>
+        <div class=&quot;guideline-grid&quot;>
+          <div class=&quot;guideline-col do&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✓ Faça</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Ponto, vírgula, dois-pontos, ponto e vírgula</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> ✦ como único ornamento visual da marca</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✓</span> Frases diretas, sem rodeios, com profundidade</div>
+          </div>
+          <div class=&quot;guideline-col dont&quot;>
+            <div class=&quot;guideline-col-hd&quot;>✕ Evite</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Travessões em qualquer contexto de UI</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Emojis em labels, badges, títulos ou UI</div>
+            <div class=&quot;guideline-item&quot;><span class=&quot;guideline-mark&quot;>✕</span> Termos em inglês no conteúdo visível ao usuário</div>
+          </div>
+        </div>
+      </div>
+
+      <div class=&quot;manifesto&quot; style=&quot;margin-top:0&quot;>
+        <p class=&quot;manifesto-q&quot;>&quot;Identidade não é estética. É estrutura.&quot;</p>
+        <p class=&quot;manifesto-a&quot;>✦ ISIS v6 · Isis Moreira · 2025</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// Injeta números de linha em todos os blocos .code
+document.querySelectorAll('.code').forEach(block => {
+  const btn = block.querySelector('.copy-btn');
+  // Pega apenas os nós que não são o botão copiar
+  const nodes = Array.from(block.childNodes).filter(n => n !== btn);
+  const raw = nodes.map(n => n.outerHTML || n.textContent).join('');
+  const lines = raw.split('\n');
+  const wrapped = lines.map(l => `<span class=&quot;code-line&quot;>${l}</span>`).join('\n');
+  // Limpa e recria
+  nodes.forEach(n => n.remove());
+  const tmp = document.createElement('div');
+  tmp.innerHTML = wrapped;
+  Array.from(tmp.childNodes).forEach(n => block.appendChild(n));
+});
+
+function adjustPadding() {
+  const nav = document.getElementById('topnav');
+  const main = document.querySelector('.main');
+  if (nav &amp;&amp; main) main.style.paddingTop = nav.offsetHeight + 'px';
+}
+adjustPadding();
+window.addEventListener('resize', adjustPadding);
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  const track = document.getElementById('themeTrack');
+  const label = document.getElementById('themeLabel');
+  if (track) track.classList.toggle('active', !isDark);
+  if (label) label.textContent = isDark ? 'Light' : 'Dark';
+}
+
+function navTo(id, el) {
+  const target = document.getElementById(id);
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-link').forEach(i => i.classList.remove('on'));
+  if (el) el.classList.add('on');
+}
+
+const sections = ['hero','identidade','cores','tipo','espaco','componentes','formularios','navegacao','feedback','diretrizes'];
+const navLinks = document.querySelectorAll('.nav-link');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = sections.indexOf(e.target.id);
+      if (idx >= 0) {
+        navLinks.forEach(i => i.classList.remove('on'));
+        navLinks[idx]?.classList.add('on');
+      }
+    }
+  });
+}, { rootMargin: '-40% 0px -40% 0px' });
+
+sections.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) observer.observe(el);
+});
+
+function copyCode(btn) {
+  const code = btn.parentElement.innerText.replace('Copiar', '').trim();
+  navigator.clipboard?.writeText(code);
+  btn.textContent = 'Copiado';
+  setTimeout(() => btn.textContent = 'Copiar', 1500);
+}
+</script>
+</body>
+</html>
+"></iframe>
+      </div>
+    </div>
+
     <div id="section-config" style="display:none">
       <div class="topbar"><div class="page-title">Configurações</div></div>
       <div class="table-wrap" style="padding:32px;max-width:560px">
