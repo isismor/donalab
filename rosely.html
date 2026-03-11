@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rosely Vieira — Design System v3</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ═══ AS 4 CORES DA MARCA ═══ */
+      --rose-seco: #B89B94;
+      --nude-claro: #E6D8CC;
+      --petroleo: #2A3F47;
+      --grafite: #3D3631;
+
+      /* ═══ DERIVAÇÕES (opacidades das 4 cores) ═══ */
+      --nude-palido: #F2EBE4;
+      --branco-quente: #FDFAF7;
+
+      /* ═══ TYPOGRAPHY ═══ */
+      --font-display: 'DM Serif Display', 'Georgia', serif;
+      --font-body: 'Plus Jakarta Sans', 'Helvetica Neue', sans-serif;
+
+      /* ═══ SPACING ═══ */
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 2rem;
+      --space-lg: 4rem;
+      --space-xl: 6rem;
+      --space-2xl: 10rem;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--branco-quente);
+      color: var(--grafite);
+      font-weight: 400;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════
+       NAVIGATION
+    ═══════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(253, 250, 247, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(61,54,49,0.06);
+    }
+
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.1rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--grafite);
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    nav ul li a {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--rose-seco);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    nav ul li a:hover { color: var(--grafite); }
+
+    /* ═══════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--branco-quente);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 80%, rgba(184,155,148,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 20%, rgba(42,63,71,0.04) 0%, transparent 60%);
+    }
+
+    .hero-content {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+    }
+
+    .hero-tag {
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--rose-seco);
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      color: var(--grafite);
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.5s;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: var(--rose-seco);
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.7s;
+    }
+
+    .hero-line {
+      width: 48px;
+      height: 2px;
+      background: var(--grafite);
+      margin: 0 auto 2rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+    }
+
+    .hero-desc {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 1.1s;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTIONS
+    ═══════════════════════════════════════════════ */
+    section {
+      padding: var(--space-xl) 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: var(--rose-seco);
+      margin-bottom: var(--space-xs);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--grafite);
+      line-height: 1.2;
+      margin-bottom: var(--space-md);
+    }
+
+    .section-title em { font-style: italic; }
+
+    .section-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      max-width: 580px;
+      line-height: 1.85;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, var(--rose-seco), var(--nude-claro), transparent);
+      margin: var(--space-xl) auto;
+      max-width: 1400px;
+      opacity: 0.5;
+    }
+
+    /* ═══════════════════════════════════════════════
+       ESSENCE
+    ═══════════════════════════════════════════════ */
+    .essence-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .essence-card {
+      padding: 2rem;
+      background: white;
+      border: 1px solid rgba(61,54,49,0.05);
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .essence-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--grafite);
+      transition: width 0.4s ease;
+    }
+
+    .essence-card:hover::after { width: 100%; }
+    .essence-card:hover { box-shadow: 0 12px 48px rgba(61,54,49,0.06); }
+
+    .essence-number {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--nude-claro);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .essence-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--grafite);
+      margin-bottom: 0.75rem;
+    }
+
+    .essence-card p {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      line-height: 1.8;
+    }
+
+    /* ═══════════════════════════════════════════════
+       WORDMARK / LOGO
+    ═══════════════════════════════════════════════ */
+    .logo-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .logo-box {
+      padding: var(--space-lg) var(--space-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 340px;
+      position: relative;
+    }
+
+    .logo-box.bg-white {
+      background: white;
+      border: 1px solid rgba(61,54,49,0.06);
+    }
+    .logo-box.bg-petroleo { background: var(--petroleo); }
+    .logo-box.bg-nude { background: var(--nude-claro); }
+    .logo-box.bg-grafite { background: var(--grafite); }
+
+    .wordmark {
+      font-family: var(--font-display);
+      line-height: 1.05;
+      text-align: center;
+    }
+
+    .wordmark-main { font-size: clamp(2.5rem, 4vw, 3.5rem); }
+
+    .wordmark-sub {
+      font-family: var(--font-body);
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5em;
+      margin-top: 1rem;
+      display: block;
+    }
+
+    .wordmark-bar {
+      width: 32px;
+      height: 2px;
+      margin: 0.75rem auto;
+    }
+
+    /* Variações por fundo */
+    .logo-box.bg-white .wordmark { color: var(--grafite); }
+    .logo-box.bg-white .wordmark-sub { color: var(--rose-seco); }
+    .logo-box.bg-white .wordmark-bar { background: var(--grafite); }
+
+    .logo-box.bg-petroleo .wordmark { color: var(--nude-claro); }
+    .logo-box.bg-petroleo .wordmark-sub { color: var(--rose-seco); }
+    .logo-box.bg-petroleo .wordmark-bar { background: var(--rose-seco); }
+
+    .logo-box.bg-nude .wordmark { color: var(--grafite); }
+    .logo-box.bg-nude .wordmark-sub { color: var(--petroleo); }
+    .logo-box.bg-nude .wordmark-bar { background: var(--grafite); }
+
+    .logo-box.bg-grafite .wordmark { color: var(--nude-claro); }
+    .logo-box.bg-grafite .wordmark-sub { color: var(--rose-seco); }
+    .logo-box.bg-grafite .wordmark-bar { background: var(--rose-seco); }
+
+    .logo-label {
+      position: absolute;
+      bottom: 1rem;
+      font-size: 0.55rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0.4;
+    }
+
+    .logo-box.bg-white .logo-label { color: var(--grafite); }
+    .logo-box.bg-petroleo .logo-label { color: var(--nude-claro); }
+    .logo-box.bg-nude .logo-label { color: var(--grafite); }
+    .logo-box.bg-grafite .logo-label { color: var(--nude-claro); }
+
+    /* Monogram */
+    .monogram-row {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .mono-circle {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mono-circle.m-outline { border: 2px solid var(--grafite); }
+    .mono-circle.m-petroleo { background: var(--petroleo); }
+    .mono-circle.m-nude { background: var(--nude-claro); }
+    .mono-circle.m-rose { background: var(--rose-seco); }
+
+    .mono-letter {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-style: italic;
+    }
+
+    .mono-circle.m-outline .mono-letter { color: var(--grafite); }
+    .mono-circle.m-petroleo .mono-letter { color: var(--nude-claro); }
+    .mono-circle.m-nude .mono-letter { color: var(--grafite); }
+    .mono-circle.m-rose .mono-letter { color: white; }
+
+    /* ═══════════════════════════════════════════════
+       COLORS
+    ═══════════════════════════════════════════════ */
+    .palette-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .color-card {
+      overflow: hidden;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .color-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px rgba(0,0,0,0.07);
+    }
+
+    .color-swatch {
+      height: 160px;
+      display: flex;
+      align-items: flex-end;
+      padding: 0.75rem;
+    }
+
+    .swatch-label {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+    }
+
+    .color-info { padding: 1rem; }
+
+    .color-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--grafite);
+    }
+
+    .color-hex {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--rose-seco);
+      letter-spacing: 0.05em;
+      margin-top: 0.2rem;
+    }
+
+    .color-use {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+
+    /* Combinações */
+    .combos-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--grafite);
+      margin-top: var(--space-lg);
+      margin-bottom: var(--space-sm);
+    }
+
+    .combo-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .combo-box {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .combo-box .combo-text {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .combo-box .combo-label {
+      position: absolute;
+      bottom: 0.75rem;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0.5;
+    }
+
+    /* Gradientes */
+    .gradient-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: var(--space-md);
+    }
+
+    .gradient-box {
+      height: 160px;
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem;
+    }
+
+    .gradient-box span {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: white;
+      background: rgba(0,0,0,0.12);
+      padding: 0.3rem 0.75rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .grad-1 { background: linear-gradient(145deg, var(--rose-seco), var(--petroleo)); }
+    .grad-2 { background: linear-gradient(145deg, var(--nude-claro), var(--rose-seco)); }
+    .grad-3 { background: linear-gradient(145deg, var(--petroleo), var(--grafite)); }
+
+    /* ═══════════════════════════════════════════════
+       TYPOGRAPHY
+    ═══════════════════════════════════════════════ */
+    .type-showcase { margin-top: var(--space-lg); }
+
+    .type-specimen {
+      padding: 2rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .type-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: var(--rose-seco);
+      margin-bottom: 0.75rem;
+    }
+
+    .type-display {
+      font-family: var(--font-display);
+      color: var(--grafite);
+      line-height: 1.1;
+    }
+
+    .type-body {
+      font-family: var(--font-body);
+      color: var(--grafite);
+    }
+
+    .type-meta {
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: var(--rose-seco);
+      margin-top: 0.75rem;
+    }
+
+    .type-scale {
+      margin-top: var(--space-md);
+      background: white;
+      border: 1px solid rgba(61,54,49,0.05);
+      overflow: hidden;
+    }
+
+    .type-scale-item {
+      display: flex;
+      align-items: baseline;
+      padding: 1.4rem 2rem;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      gap: 2rem;
+    }
+
+    .type-scale-item:last-child { border-bottom: none; }
+
+    .type-scale-role {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--rose-seco);
+      min-width: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    /* ═══════════════════════════════════════════════
+       COMPONENTS
+    ═══════════════════════════════════════════════ */
+    .comp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .comp-card {
+      background: white;
+      padding: 2rem;
+      border: 1px solid rgba(61,54,49,0.05);
+    }
+
+    .comp-title {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--rose-seco);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 1rem 2.5rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.35s ease;
+    }
+
+    .btn-grafite {
+      background: var(--grafite);
+      color: var(--nude-claro);
+    }
+    .btn-grafite:hover {
+      background: var(--petroleo);
+      box-shadow: 0 8px 28px rgba(42,63,71,0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--grafite);
+      border: 2px solid var(--grafite);
+    }
+    .btn-outline:hover {
+      background: var(--grafite);
+      color: var(--nude-claro);
+    }
+
+    .btn-nude {
+      background: var(--nude-claro);
+      color: var(--grafite);
+    }
+    .btn-nude:hover {
+      background: var(--rose-seco);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--grafite);
+      padding: 1rem 0;
+      border-bottom: 2px solid var(--grafite);
+      letter-spacing: 0.15em;
+    }
+    .btn-ghost:hover {
+      border-color: var(--rose-seco);
+      color: var(--rose-seco);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    /* Card */
+    .demo-card {
+      background: white;
+      border: 1px solid rgba(61,54,49,0.06);
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .demo-card:hover {
+      box-shadow: 0 16px 48px rgba(42,63,71,0.08);
+      transform: translateY(-3px);
+    }
+
+    .demo-card-img {
+      height: 180px;
+      background: linear-gradient(135deg, var(--nude-claro) 0%, var(--rose-seco) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .demo-card-img .mono-mark {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-style: italic;
+      color: var(--petroleo);
+      opacity: 0.2;
+    }
+
+    .demo-card-body { padding: 1.5rem; }
+
+    .demo-card-tag {
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--rose-seco);
+    }
+
+    .demo-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--grafite);
+      margin: 0.5rem 0;
+    }
+
+    .demo-card-text {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      line-height: 1.7;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--petroleo);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--grafite);
+      background: var(--nude-palido);
+      border: 2px solid transparent;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--grafite);
+      background: white;
+    }
+
+    .form-input::placeholder { color: var(--rose-seco); }
+
+    /* Tags */
+    .tag {
+      display: inline-flex;
+      padding: 0.35rem 1rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0.25rem;
+    }
+
+    .tag-grafite { background: var(--grafite); color: var(--nude-claro); }
+    .tag-petroleo { background: var(--petroleo); color: var(--nude-claro); }
+    .tag-nude { background: var(--nude-claro); color: var(--grafite); }
+    .tag-rose { background: var(--rose-seco); color: white; }
+
+    /* ═══════════════════════════════════════════════
+       APPLICATIONS
+    ═══════════════════════════════════════════════ */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .app-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--rose-seco);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Business Card */
+    .biz-card {
+      width: 100%;
+      aspect-ratio: 1.75 / 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.07);
+    }
+
+    .biz-card.front {
+      background: var(--branco-quente);
+      border: 1px solid rgba(61,54,49,0.06);
+    }
+
+    .biz-card.front::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grafite);
+    }
+
+    .biz-card-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--grafite);
+    }
+
+    .biz-card-role {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--rose-seco);
+      margin-top: 0.3rem;
+    }
+
+    .biz-card-contact {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      line-height: 1.9;
+    }
+
+    .biz-card.back {
+      background: var(--petroleo);
+    }
+
+    .biz-card.back .back-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .biz-card.back .back-mono {
+      font-family: var(--font-display);
+      font-size: 3.8rem;
+      font-style: italic;
+      color: var(--rose-seco);
+    }
+
+    .biz-card.back .back-tagline {
+      font-size: 0.5rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5em;
+      color: rgba(230,216,204,0.35);
+      margin-top: 0.5rem;
+    }
+
+    .biz-card.back::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--rose-seco);
+    }
+
+    /* Social Posts */
+    .social-post {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.06);
+    }
+
+    .social-post.style-nude { background: var(--nude-claro); }
+    .social-post.style-dark { background: var(--petroleo); }
+    .social-post.style-light {
+      background: var(--branco-quente);
+      border: 1px solid rgba(61,54,49,0.06);
+    }
+
+    .social-post .post-content { position: relative; z-index: 2; }
+
+    .post-quote {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+    }
+
+    .post-author {
+      font-family: var(--font-body);
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+    }
+
+    .social-post.style-nude .post-quote { color: var(--grafite); }
+    .social-post.style-nude .post-author { color: var(--petroleo); }
+
+    .social-post.style-dark .post-quote { color: var(--nude-claro); }
+    .social-post.style-dark .post-author { color: var(--rose-seco); }
+
+    .social-post.style-dark::before {
+      content: '"';
+      position: absolute;
+      top: 0.5rem; right: 1.5rem;
+      font-family: var(--font-display);
+      font-size: 12rem;
+      color: rgba(184,155,148,0.08);
+      line-height: 1;
+    }
+
+    .social-post.style-light .post-center-content {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 80%;
+    }
+
+    .social-post.style-light .post-topic {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      color: var(--rose-seco);
+      margin-bottom: 1.25rem;
+    }
+
+    .social-post.style-light .post-headline {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--grafite);
+      line-height: 1.3;
+    }
+
+    .social-post.style-light .post-sub {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    .social-post.style-light::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grafite);
+    }
+
+    /* ═══════════════════════════════════════════════
+       VOICE
+    ═══════════════════════════════════════════════ */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: var(--space-lg);
+    }
+
+    .voice-card { padding: 2rem; }
+
+    .voice-card.do {
+      background: rgba(42,63,71,0.03);
+      border: 1px solid rgba(42,63,71,0.06);
+    }
+
+    .voice-card.dont {
+      background: rgba(184,155,148,0.08);
+      border: 1px solid rgba(184,155,148,0.12);
+    }
+
+    .voice-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--grafite);
+      margin-bottom: 1.25rem;
+    }
+
+    .voice-card ul { list-style: none; }
+
+    .voice-card ul li {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--petroleo);
+      padding: 0.55rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    .voice-card.do ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--petroleo);
+      font-weight: 800;
+    }
+
+    .voice-card.dont ul li::before {
+      content: '×';
+      position: absolute;
+      left: 0;
+      color: var(--rose-seco);
+      font-weight: 800;
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════ */
+    footer {
+      background: var(--grafite);
+      text-align: center;
+      padding: var(--space-lg) var(--space-md);
+      margin-top: var(--space-xl);
+    }
+
+    .footer-mark {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--nude-claro);
+      margin-bottom: 1rem;
+    }
+
+    footer p {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184,155,148,0.35);
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      section { padding: var(--space-lg) 1.5rem; }
+      .nav-inner { padding: 1rem 1.5rem; }
+      nav ul { display: none; }
+      .logo-showcase, .comp-grid, .voice-grid { grid-template-columns: 1fr; }
+      .palette-row { grid-template-columns: 1fr 1fr; }
+      .gradient-row, .combo-row { grid-template-columns: 1fr; }
+      .app-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">Rosely Vieira</div>
+      <ul>
+        <li><a href="#essence">Essência</a></li>
+        <li><a href="#logo">Wordmark</a></li>
+        <li><a href="#cores">Cores</a></li>
+        <li><a href="#tipografia">Tipografia</a></li>
+        <li><a href="#componentes">Componentes</a></li>
+        <li><a href="#aplicacoes">Aplicações</a></li>
+        <li><a href="#voz">Voz</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Design System &amp; Brand Guidelines</div>
+      <h1 class="hero-name">Rosely Vieira</h1>
+      <p class="hero-subtitle">Estrategista de Imagem</p>
+      <div class="hero-line"></div>
+      <p class="hero-desc">Sofisticação é contenção com presença. Quatro cores. Nenhuma a mais. Uma identidade que não grita — impõe.</p>
+    </div>
+  </section>
+
+  <!-- ESSENCE -->
+  <section id="essence">
+    <div class="section-label">01 — Essência da Marca</div>
+    <h2 class="section-title">Tudo que é excesso<br>é <em>fraqueza</em></h2>
+    <p class="section-desc">A força da marca está na contenção inteligente. Sofisticação não é enfeitar — é saber o que tirar. Quatro cores bastam quando cada uma tem propósito.</p>
+
+    <div class="essence-grid">
+      <div class="essence-card">
+        <div class="essence-number">01</div>
+        <h3>Sofisticação</h3>
+        <p>Elegância com impacto. Não precisa de excesso para ser notada. A presença se impõe pelo peso, pela consistência, pela escolha certeira.</p>
+      </div>
+      <div class="essence-card">
+        <div class="essence-number">02</div>
+        <h3>Autenticidade</h3>
+        <p>Clientes não são cópias. A marca celebra o singular — como o cupuaçu: exótico, brasileiro, impossível de confundir com outro.</p>
+      </div>
+      <div class="essence-card">
+        <div class="essence-number">03</div>
+        <h3>Equilíbrio</h3>
+        <p>Contrastes que se complementam. Harmonia sem monotonia. A consultoria de imagem trabalha com o que você já tem — e potencializa.</p>
+      </div>
+      <div class="essence-card">
+        <div class="essence-number">04</div>
+        <h3>Contemporaneidade</h3>
+        <p>Maturidade que vive o presente. Sexagenária e contemporânea não são opostos — são a prova de que autenticidade não envelhece.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WORDMARK -->
+  <section id="logo">
+    <div class="section-label">02 — Wordmark &amp; Identidade</div>
+    <h2 class="section-title">Uma assinatura que <em>pesa</em></h2>
+    <p class="section-desc">Uma cor. Uma fonte com corpo. O nome fala por si — com o peso que a sofisticação exige. Sem split, sem ruído, sem decoração.</p>
+
+    <div class="logo-showcase">
+      <div class="logo-box bg-white">
+        <div class="wordmark wordmark-main">Rosely Vieira</div>
+        <div class="wordmark-bar" style="background: var(--grafite);"></div>
+        <span class="wordmark-sub" style="color: var(--rose-seco);">Estrategista de Imagem</span>
+        <span class="logo-label">Fundo branco</span>
+      </div>
+      <div class="logo-box bg-petroleo">
+        <div class="wordmark wordmark-main">Rosely Vieira</div>
+        <div class="wordmark-bar" style="background: var(--rose-seco);"></div>
+        <span class="wordmark-sub" style="color: var(--rose-seco);">Estrategista de Imagem</span>
+        <span class="logo-label">Fundo petróleo</span>
+      </div>
+      <div class="logo-box bg-nude">
+        <div class="wordmark wordmark-main">Rosely Vieira</div>
+        <div class="wordmark-bar" style="background: var(--grafite);"></div>
+        <span class="wordmark-sub" style="color: var(--petroleo);">Estrategista de Imagem</span>
+        <span class="logo-label">Fundo nude</span>
+      </div>
+      <div class="logo-box bg-grafite">
+        <div class="wordmark wordmark-main">Rosely Vieira</div>
+        <div class="wordmark-bar" style="background: var(--rose-seco);"></div>
+        <span class="wordmark-sub" style="color: var(--rose-seco);">Estrategista de Imagem</span>
+        <span class="logo-label">Fundo grafite</span>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--space-lg);">
+      <div class="section-label" style="text-align: center;">Monograma</div>
+      <p style="font-size: 0.85rem; font-weight: 300; color: var(--petroleo); margin-top: 0.5rem;">Para favicon, selo, ícone de redes sociais.</p>
+    </div>
+    <div class="monogram-row">
+      <div class="mono-circle m-outline"><span class="mono-letter">Rv</span></div>
+      <div class="mono-circle m-petroleo"><span class="mono-letter">Rv</span></div>
+      <div class="mono-circle m-nude"><span class="mono-letter">Rv</span></div>
+      <div class="mono-circle m-rose"><span class="mono-letter">Rv</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- COLORS -->
+  <section id="cores">
+    <div class="section-label">03 — Paleta de Cores</div>
+    <h2 class="section-title">Quatro cores. <em>Nenhuma a mais.</em></h2>
+    <p class="section-desc">Rosé Seco, Nude Claro, Petróleo e Grafite. Contrastes complementares e harmoniosos. Sem cores gritantes, sem arrogância. Presença com contenção.</p>
+
+    <div class="palette-row">
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--rose-seco);"><span class="swatch-label" style="color: white;">01</span></div>
+        <div class="color-info">
+          <div class="color-name">Rosé Seco</div>
+          <div class="color-hex">#B89B94</div>
+          <div class="color-use">Feminilidade madura. Acentos, labels, subtítulos, detalhes que aquecem.</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--nude-claro);"><span class="swatch-label" style="color: var(--grafite);">02</span></div>
+        <div class="color-info">
+          <div class="color-name">Nude Claro</div>
+          <div class="color-hex">#E6D8CC</div>
+          <div class="color-use">Acolhimento. Fundos, cards, botões suaves, áreas de respiro.</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--petroleo);"><span class="swatch-label" style="color: rgba(255,255,255,0.7);">03</span></div>
+        <div class="color-info">
+          <div class="color-name">Petróleo</div>
+          <div class="color-hex">#2A3F47</div>
+          <div class="color-use">Profundidade. Fundos premium, blocos de destaque, textos secundários.</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background: var(--grafite);"><span class="swatch-label" style="color: rgba(255,255,255,0.7);">04</span></div>
+        <div class="color-info">
+          <div class="color-name">Grafite</div>
+          <div class="color-hex">#3D3631</div>
+          <div class="color-use">Presença. Wordmark, texto principal, CTAs, elementos de peso.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combinações -->
+    <div class="combos-title">Combinações permitidas</div>
+    <div class="combo-row">
+      <div class="combo-box" style="background: var(--petroleo);">
+        <div class="combo-text" style="color: var(--nude-claro);">Rosely Vieira</div>
+        <span class="combo-label" style="color: rgba(230,216,204,0.4);">Petróleo + Nude</span>
+      </div>
+      <div class="combo-box" style="background: var(--nude-claro);">
+        <div class="combo-text" style="color: var(--grafite);">Rosely Vieira</div>
+        <span class="combo-label" style="color: var(--rose-seco);">Nude + Grafite</span>
+      </div>
+      <div class="combo-box" style="background: var(--grafite);">
+        <div class="combo-text" style="color: var(--rose-seco);">Rosely Vieira</div>
+        <span class="combo-label" style="color: rgba(184,155,148,0.4);">Grafite + Rosé</span>
+      </div>
+    </div>
+
+    <!-- Gradientes -->
+    <div class="combos-title">Gradientes</div>
+    <div class="gradient-row">
+      <div class="gradient-box grad-1"><span>Presença</span></div>
+      <div class="gradient-box grad-2"><span>Suavidade</span></div>
+      <div class="gradient-box grad-3"><span>Profundidade</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TYPOGRAPHY -->
+  <section id="tipografia">
+    <div class="section-label">04 — Tipografia</div>
+    <h2 class="section-title">Peso é <em>presença</em></h2>
+    <p class="section-desc">DM Serif Display: grossa, com personalidade, serifada com caráter. Plus Jakarta Sans: geométrica, contemporânea, com corpo. Sofisticação com substância.</p>
+
+    <div class="type-showcase">
+      <div class="type-specimen">
+        <div class="type-label">Display — DM Serif Display</div>
+        <div class="type-display" style="font-size: 4.5rem;">Aa Bb Cc</div>
+        <div class="type-display" style="font-size: 2.5rem; font-style: italic; margin-top: 0.5rem;">Sofisticação é contenção</div>
+        <div class="type-meta">DM Serif Display · Regular 400, Italic · Serifada com peso e caráter</div>
+      </div>
+
+      <div class="type-specimen">
+        <div class="type-label">Body — Plus Jakarta Sans</div>
+        <div class="type-body" style="font-size: 1.5rem; font-weight: 600;">The quick brown fox jumps over the lazy dog</div>
+        <div class="type-body" style="font-size: 1rem; font-weight: 300; margin-top: 0.75rem; max-width: 600px; line-height: 1.9;">Numa sociedade de iguais, ser diferente é realmente importante. A consultoria de imagem trabalha com harmonia, equilíbrio e a ruptura que transforma.</div>
+        <div class="type-meta">Plus Jakarta Sans · 300 Light → 800 ExtraBold · Sans-serif geométrica com personalidade</div>
+      </div>
+    </div>
+
+    <div class="type-scale">
+      <div class="type-scale-item">
+        <span class="type-scale-role">H1 Display</span>
+        <span class="type-display" style="font-size: 3.2rem;">Rosely Vieira</span>
+      </div>
+      <div class="type-scale-item">
+        <span class="type-scale-role">H2 Título</span>
+        <span class="type-display" style="font-size: 2.2rem;">Estratégia de Imagem</span>
+      </div>
+      <div class="type-scale-item">
+        <span class="type-scale-role">H3 Subtítulo</span>
+        <span class="type-display" style="font-size: 1.5rem;">Sofisticação com impacto</span>
+      </div>
+      <div class="type-scale-item">
+        <span class="type-scale-role">Body</span>
+        <span class="type-body" style="font-size: 1rem; font-weight: 400;">A imagem pessoal é a comunicação mais poderosa que existe.</span>
+      </div>
+      <div class="type-scale-item">
+        <span class="type-scale-role">Caption</span>
+        <span class="type-body" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;">Consultoria de Imagem Pessoal</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- COMPONENTS -->
+  <section id="componentes">
+    <div class="section-label">05 — Componentes UI</div>
+    <h2 class="section-title">Elementos com <em>substância</em></h2>
+    <p class="section-desc">Cada componente usa apenas as quatro cores da marca. Premium é decisão, não decoração.</p>
+
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-title">Botões</div>
+        <div class="btn-group">
+          <button class="btn btn-grafite">Agende sua consultoria</button>
+          <button class="btn btn-outline">Saiba mais</button>
+          <button class="btn btn-nude">Baixar portfólio</button>
+          <button class="btn btn-ghost">Ver depoimentos</button>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-title">Card de Conteúdo</div>
+        <div class="demo-card">
+          <div class="demo-card-img"><span class="mono-mark">Rv</span></div>
+          <div class="demo-card-body">
+            <div class="demo-card-tag">Consultoria</div>
+            <div class="demo-card-title">A Imagem que Comunica</div>
+            <div class="demo-card-text">Descubra como alinhar sua imagem pessoal com a essência do seu negócio.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-title">Formulário</div>
+        <div class="form-group">
+          <label class="form-label">Nome completo</label>
+          <input class="form-input" type="text" placeholder="Seu nome aqui">
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-input" type="email" placeholder="seu@email.com">
+        </div>
+        <button class="btn btn-grafite" style="width: 100%; margin-top: 0.5rem;">Enviar</button>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-title">Tags</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+          <span class="tag tag-grafite">Consultoria</span>
+          <span class="tag tag-petroleo">Imagem Pessoal</span>
+          <span class="tag tag-nude">Coloração</span>
+          <span class="tag tag-rose">Estilo</span>
+        </div>
+        <div class="comp-title" style="margin-top: 1.5rem;">Divisores</div>
+        <div style="margin-top: 1rem;">
+          <div style="height: 2px; background: var(--grafite); width: 60px; margin-bottom: 1.25rem;"></div>
+          <div style="height: 1px; background: var(--nude-claro); margin-bottom: 1.25rem;"></div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="height: 1px; flex: 1; background: var(--rose-seco);"></div>
+            <span style="font-family: var(--font-display); font-style: italic; color: var(--grafite); font-size: 1rem;">Rv</span>
+            <div style="height: 1px; flex: 1; background: var(--rose-seco);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- APPLICATIONS -->
+  <section id="aplicacoes">
+    <div class="section-label">06 — Aplicações</div>
+    <h2 class="section-title">A marca <em>no mundo</em></h2>
+    <p class="section-desc">Cada ponto de contato usa apenas Rosé Seco, Nude Claro, Petróleo e Grafite. Mesma presença, mesmo peso, mesma contenção.</p>
+
+    <div class="app-grid">
+      <div>
+        <div class="app-label">Cartão de Visita — Frente</div>
+        <div class="biz-card front">
+          <div>
+            <div class="biz-card-name">Rosely Vieira</div>
+            <div class="biz-card-role">Estrategista de Imagem</div>
+          </div>
+          <div class="biz-card-contact">
+            +55 11 9xxxx-xxxx<br>
+            rosely@roselyvieira.com.br<br>
+            @roselyvieira
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="app-label">Cartão de Visita — Verso</div>
+        <div class="biz-card back">
+          <div class="back-center">
+            <div class="back-mono">Rv</div>
+            <div class="back-tagline">Sofisticação com Impacto</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="app-label">Instagram — Frase (Nude)</div>
+        <div class="social-post style-nude">
+          <div class="post-content">
+            <div class="post-quote">"Numa sociedade de iguais, ser diferente é realmente importante."</div>
+            <div class="post-author">— Rosely Vieira</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="app-label">Instagram — Frase (Dark)</div>
+        <div class="social-post style-dark">
+          <div class="post-content">
+            <div class="post-quote">"Sofisticação não é elegância. É elegância com impacto."</div>
+            <div class="post-author">— Rosely Vieira</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="app-label">Instagram — Conteúdo</div>
+        <div class="social-post style-light">
+          <div class="post-center-content">
+            <div class="post-topic">Dica de Imagem</div>
+            <div class="post-headline">O poder das cores complementares</div>
+            <div class="post-sub">Harmonia visual é a chave para uma imagem que comunica sem palavras.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- VOICE -->
+  <section id="voz">
+    <div class="section-label">07 — Tom de Voz</div>
+    <h2 class="section-title">Fale do <em>seu jeito</em></h2>
+    <p class="section-desc">A comunicação da Rosely tem peso. Não repete o que todos dizem. É sofisticada sem ser inacessível, é direta sem ser fria.</p>
+
+    <div class="voice-grid">
+      <div class="voice-card do">
+        <h3>A marca é</h3>
+        <ul>
+          <li>Sofisticada com impacto — presença que se impõe</li>
+          <li>Autêntica — fala verdades do seu jeito próprio</li>
+          <li>Contemporânea e conectada com o presente</li>
+          <li>Acolhedora para mulheres maduras e empreendedoras</li>
+          <li>Contida — tudo que é excesso é fraqueza</li>
+          <li>Singular como o cupuaçu — exótica e brasileira</li>
+        </ul>
+      </div>
+      <div class="voice-card dont">
+        <h3>A marca não é</h3>
+        <ul>
+          <li>Óbvia — nunca faz o que todos fazem</li>
+          <li>Arrogante — premium não é distância</li>
+          <li>Gritante — sem cores dominantes, sem exagero</li>
+          <li>Datada — matura mas vive o contemporâneo</li>
+          <li>Genérica — cada cliente é única, não cópia</li>
+          <li>Excessiva — menos é força, não é fraqueza</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-mark">Rosely Vieira</div>
+    <p>Design System v3.0 — Quatro cores. Nenhuma a mais.</p>
+  </footer>
+
+</body>
+</html>
